@@ -9,8 +9,8 @@ export const defaultCV = {
     email: "test@yopmail.com",
     phone: "+39 333 000 0000",
     location: "Milano, Italia",
-    website: "github.com/lorisparata",
-    linkedin: "linkedin.com/in/lorisparata",
+    website: "github.com/johndoe",
+    linkedin: "linkedin.com/in/johndoe",
     summary:
       "Frontend developer con oltre 5 anni di esperienza nella progettazione e sviluppo di applicazioni web scalabili. Specializzato in Angular, React e architetture component-based. Appassionato di performance, accessibilità e developer experience.",
     photo: null,
