@@ -1,0 +1,182 @@
+import { useState, useRef, useCallback } from "react";
+import { Sidebar } from "./components/ui/Sidebar";
+import { Toolbar } from "./components/ui/Toolbar";
+import { EditorPanel } from "./components/editor/EditorPanel";
+import { CVPreview } from "./components/preview/CVPreview";
+import { useCVStore } from "./store/useCVStore";
+import { exportPDF } from "./exporters/exportPDF";
+import { exportDOCX } from "./exporters/exportDOCX";
+
+// ─── Sidebar divider con bottone collapse ─────────────────────────────────────
+function SidebarDivider({ collapsed, onToggle }) {
+  return (
+    <div style={{
+      width: "20px", flexShrink: 0, display: "flex", flexDirection: "column",
+      alignItems: "center", backgroundColor: "#f1f5f9",
+      borderLeft: "1px solid #e2e8f0", borderRight: "1px solid #e2e8f0",
+    }}>
+      <button
+        onClick={onToggle}
+        title={collapsed ? "Espandi sidebar" : "Comprimi sidebar"}
+        style={{
+          marginTop: "12px", width: "20px", height: "36px",
+          borderRadius: "0 6px 6px 0", backgroundColor: "#1e293b",
+          border: "none", color: "#94a3b8", display: "flex",
+          alignItems: "center", justifyContent: "center",
+          cursor: "pointer", fontSize: "12px", fontWeight: "bold",
+          boxShadow: "2px 0 6px rgba(0,0,0,0.15)",
+          transition: "background-color 0.15s, color 0.15s",
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#3b82f6"; e.currentTarget.style.color = "#fff"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#1e293b"; e.currentTarget.style.color = "#94a3b8"; }}
+      >
+        {collapsed ? "›" : "‹"}
+      </button>
+      <div style={{ flex: 1, width: "1px", backgroundColor: "#e2e8f0", marginTop: "8px", marginBottom: "16px" }} />
+    </div>
+  );
+}
+
+// ─── Editor resize handle ─────────────────────────────────────────────────────
+function EditorResizeHandle({ onDrag }) {
+  const dragging = useRef(false);
+  const startX = useRef(0);
+  const [active, setActive] = useState(false);
+  const [hover, setHover] = useState(false);
+
+  const handleMouseDown = useCallback((e) => {
+    e.preventDefault();
+    dragging.current = true;
+    startX.current = e.clientX;
+    setActive(true);
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+    const onMove = (e) => { if (!dragging.current) return; const d = e.clientX - startX.current; startX.current = e.clientX; onDrag(d); };
+    const onUp = () => { dragging.current = false; setActive(false); document.body.style.cursor = ""; document.body.style.userSelect = ""; window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  }, [onDrag]);
+
+  const hi = active || hover;
+  return (
+    <div onMouseDown={handleMouseDown} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
+      title="Trascina per ridimensionare"
+      style={{ width: "10px", flexShrink: 0, cursor: "col-resize", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: hi ? "#dbeafe" : "#f8fafc", borderLeft: `1px solid ${hi ? "#93c5fd" : "#e2e8f0"}`, borderRight: `1px solid ${hi ? "#93c5fd" : "#e2e8f0"}`, transition: "background-color 0.15s, border-color 0.15s" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "3px", pointerEvents: "none" }}>
+        {[0,1,2,3,4].map(i => <div key={i} style={{ width: "3px", height: "3px", borderRadius: "50%", backgroundColor: hi ? "#3b82f6" : "#cbd5e1", transition: "background-color 0.15s" }} />)}
+      </div>
+    </div>
+  );
+}
+
+// ─── Export / Import ──────────────────────────────────────────────────────────
+function useExportHandlers(setExporting) {
+  const store = useCVStore();
+  const importInputRef = useRef(null);
+
+  const getStoreData = () => {
+    const { deepLApiKey, setTemplate, setDesignerPalette, setPersonal, setSkills,
+      addSkillCategory, removeSkillCategory, updateSkillCategory, addSkillTag,
+      removeSkillTag, updateSkillTag, setExperience, addExperience, removeExperience,
+      updateExperience, setEducation, addEducation, removeEducation, updateEducation,
+      setCertifications, addCertification, removeCertification, updateCertification,
+      setLanguages, addLanguage, removeLanguage, updateLanguage, setProjects,
+      addProject, removeProject, updateProject, setTargetLanguage, setDeepLApiKey,
+      resetCV, importCV, ...data } = store;
+    return data;
+  };
+
+  const handleExportPDF = async () => {
+    setExporting('pdf');
+    try { await exportPDF(getStoreData()); }
+    catch (e) { console.error(e); alert('Errore nella generazione del PDF.'); }
+    finally { setExporting(null); }
+  };
+
+  const handleExportDOCX = async () => {
+    setExporting('docx');
+    try { await exportDOCX(getStoreData()); }
+    catch (e) { console.error(e); alert('Errore nella generazione del DOCX.'); }
+    finally { setExporting(null); }
+  };
+
+  const handleExportJSON = () => {
+    const data = getStoreData();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `cv-${(store.personal.name || "export").replace(/\s+/g, "-").toLowerCase()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportJSON = () => importInputRef.current?.click();
+
+  const handleFileImport = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (!data.personal || !data.skills || !data.experience) throw new Error();
+        store.importCV(data);
+      } catch { alert("File JSON non valido o struttura non riconosciuta."); }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  };
+
+  return { importInputRef, handleExportPDF, handleExportDOCX, handleExportJSON, handleImportJSON, handleFileImport };
+}
+
+// ─── App ──────────────────────────────────────────────────────────────────────
+const SIDEBAR_WIDTH = 220;
+const EDITOR_MIN = 240;
+const EDITOR_MAX = 600;
+
+export default function App() {
+  const [activeSection, setActiveSection] = useState("personal");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [editorWidth, setEditorWidth] = useState(300);
+  const [exporting, setExporting] = useState(null); // 'pdf' | 'docx' | null
+
+  const { importInputRef, handleExportPDF, handleExportDOCX,
+    handleExportJSON, handleImportJSON, handleFileImport } = useExportHandlers(setExporting);
+
+  const handleEditorDrag = useCallback((delta) => {
+    setEditorWidth((w) => Math.min(EDITOR_MAX, Math.max(EDITOR_MIN, w + delta)));
+  }, []);
+
+  return (
+    <div style={{ display: "flex", height: "100vh", width: "100vw", overflow: "hidden" }}>
+      <div style={{ width: sidebarCollapsed ? 0 : SIDEBAR_WIDTH, flexShrink: 0, overflow: "hidden", transition: "width 0.2s ease" }}>
+        <div style={{ width: SIDEBAR_WIDTH, height: "100%" }}>
+          <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
+        </div>
+      </div>
+
+      <SidebarDivider collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(v => !v)} />
+
+      <div style={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
+        <Toolbar
+          onExportPDF={handleExportPDF}
+          onExportDOCX={handleExportDOCX}
+          onExportJSON={handleExportJSON}
+          onImportJSON={handleImportJSON}
+          exporting={exporting}
+        />
+        <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+          <div style={{ width: editorWidth, flexShrink: 0, overflow: "hidden" }}>
+            <EditorPanel activeSection={activeSection} />
+          </div>
+          <EditorResizeHandle onDrag={handleEditorDrag} />
+          <CVPreview />
+        </div>
+      </div>
+
+      <input ref={importInputRef} type="file" accept=".json" style={{ display: "none" }} onChange={handleFileImport} />
+    </div>
+  );
+}
