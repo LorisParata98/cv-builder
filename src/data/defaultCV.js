@@ -4,9 +4,9 @@ export const defaultCV = {
   designerPalette: "noir-gold",
 
   personal: {
-    name: "Loris Parata",
+    name: "John Doe",
     title: "Senior Frontend Developer",
-    email: "lorisparata@gmail.com",
+    email: "test@yopmail.com",
     phone: "+39 333 000 0000",
     location: "Milano, Italia",
     website: "github.com/lorisparata",
@@ -36,7 +36,13 @@ export const defaultCV = {
         {
           label: "React",
           versionsRange: "16–19",
-          atsKeywords: ["React", "React 16", "React 18", "React 19", "React.js"],
+          atsKeywords: [
+            "React",
+            "React 16",
+            "React 18",
+            "React 19",
+            "React.js",
+          ],
         },
         {
           label: "TypeScript",
@@ -142,7 +148,8 @@ export const defaultCV = {
       grade: "110/110",
       startDate: "2015-09",
       endDate: "2019-07",
-      thesis: "Sviluppo di un'applicazione web per la visualizzazione di dati IoT in tempo reale",
+      thesis:
+        "Sviluppo di un'applicazione web per la visualizzazione di dati IoT in tempo reale",
     },
   ],
 
