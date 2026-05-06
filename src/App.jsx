@@ -15,16 +15,27 @@ function Toast({ message, type, onDismiss }) {
     return () => clearTimeout(t);
   }, [message, onDismiss]);
 
-  const bg = type === "error" ? "#ef4444" : type === "success" ? "#22c55e" : "#3b82f6";
+  const bg =
+    type === "error" ? "#ef4444" : type === "success" ? "#22c55e" : "#3b82f6";
 
   return (
     <div
       onClick={onDismiss}
       style={{
-        position: "fixed", bottom: "24px", left: "50%", transform: "translateX(-50%)",
-        backgroundColor: bg, color: "#fff", padding: "10px 20px", borderRadius: "8px",
-        fontSize: "13px", fontWeight: 500, boxShadow: "0 4px 16px rgba(0,0,0,0.25)",
-        cursor: "pointer", zIndex: 9999, pointerEvents: "auto",
+        position: "fixed",
+        bottom: "24px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        backgroundColor: bg,
+        color: "#fff",
+        padding: "10px 20px",
+        borderRadius: "8px",
+        fontSize: "13px",
+        fontWeight: 500,
+        boxShadow: "0 4px 16px rgba(0,0,0,0.25)",
+        cursor: "pointer",
+        zIndex: 9999,
+        pointerEvents: "auto",
         animation: "fadeSlideUp 0.25s ease",
         whiteSpace: "nowrap",
       }}
@@ -37,29 +48,58 @@ function Toast({ message, type, onDismiss }) {
 // ─── Sidebar divider con bottone collapse ─────────────────────────────────────
 function SidebarDivider({ collapsed, onToggle }) {
   return (
-    <div style={{
-      width: "20px", flexShrink: 0, display: "flex", flexDirection: "column",
-      alignItems: "center", backgroundColor: "#f1f5f9",
-      borderLeft: "1px solid #e2e8f0", borderRight: "1px solid #e2e8f0",
-    }}>
+    <div
+      style={{
+        width: "20px",
+        flexShrink: 0,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        backgroundColor: "#f1f5f9",
+        borderLeft: "1px solid #e2e8f0",
+        borderRight: "1px solid #e2e8f0",
+      }}
+    >
       <button
         onClick={onToggle}
         title={collapsed ? "Espandi sidebar" : "Comprimi sidebar"}
         style={{
-          marginTop: "12px", width: "20px", height: "36px",
-          borderRadius: "0 6px 6px 0", backgroundColor: "#1e293b",
-          border: "none", color: "#94a3b8", display: "flex",
-          alignItems: "center", justifyContent: "center",
-          cursor: "pointer", fontSize: "12px", fontWeight: "bold",
+          marginTop: "12px",
+          width: "20px",
+          height: "36px",
+          borderRadius: "0 6px 6px 0",
+          backgroundColor: "#1e293b",
+          border: "none",
+          color: "#94a3b8",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer",
+          fontSize: "12px",
+          fontWeight: "bold",
           boxShadow: "2px 0 6px rgba(0,0,0,0.15)",
           transition: "background-color 0.15s, color 0.15s",
         }}
-        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#3b82f6"; e.currentTarget.style.color = "#fff"; }}
-        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#1e293b"; e.currentTarget.style.color = "#94a3b8"; }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = "#3b82f6";
+          e.currentTarget.style.color = "#fff";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = "#1e293b";
+          e.currentTarget.style.color = "#94a3b8";
+        }}
       >
         {collapsed ? "›" : "‹"}
       </button>
-      <div style={{ flex: 1, width: "1px", backgroundColor: "#e2e8f0", marginTop: "8px", marginBottom: "16px" }} />
+      <div
+        style={{
+          flex: 1,
+          width: "1px",
+          backgroundColor: "#e2e8f0",
+          marginTop: "8px",
+          marginBottom: "16px",
+        }}
+      />
     </div>
   );
 }
@@ -71,26 +111,74 @@ function EditorResizeHandle({ onDrag }) {
   const [active, setActive] = useState(false);
   const [hover, setHover] = useState(false);
 
-  const handleMouseDown = useCallback((e) => {
-    e.preventDefault();
-    dragging.current = true;
-    startX.current = e.clientX;
-    setActive(true);
-    document.body.style.cursor = "col-resize";
-    document.body.style.userSelect = "none";
-    const onMove = (e) => { if (!dragging.current) return; const d = e.clientX - startX.current; startX.current = e.clientX; onDrag(d); };
-    const onUp = () => { dragging.current = false; setActive(false); document.body.style.cursor = ""; document.body.style.userSelect = ""; window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseup", onUp);
-  }, [onDrag]);
+  const handleMouseDown = useCallback(
+    (e) => {
+      e.preventDefault();
+      dragging.current = true;
+      startX.current = e.clientX;
+      setActive(true);
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
+      const onMove = (e) => {
+        if (!dragging.current) return;
+        const d = e.clientX - startX.current;
+        startX.current = e.clientX;
+        onDrag(d);
+      };
+      const onUp = () => {
+        dragging.current = false;
+        setActive(false);
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+        window.removeEventListener("mousemove", onMove);
+        window.removeEventListener("mouseup", onUp);
+      };
+      window.addEventListener("mousemove", onMove);
+      window.addEventListener("mouseup", onUp);
+    },
+    [onDrag],
+  );
 
   const hi = active || hover;
   return (
-    <div onMouseDown={handleMouseDown} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
+    <div
+      onMouseDown={handleMouseDown}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
       title="Trascina per ridimensionare"
-      style={{ width: "10px", flexShrink: 0, cursor: "col-resize", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: hi ? "#dbeafe" : "#f8fafc", borderLeft: `1px solid ${hi ? "#93c5fd" : "#e2e8f0"}`, borderRight: `1px solid ${hi ? "#93c5fd" : "#e2e8f0"}`, transition: "background-color 0.15s, border-color 0.15s" }}>
-      <div style={{ display: "flex", flexDirection: "column", gap: "3px", pointerEvents: "none" }}>
-        {[0,1,2,3,4].map(i => <div key={i} style={{ width: "3px", height: "3px", borderRadius: "50%", backgroundColor: hi ? "#3b82f6" : "#cbd5e1", transition: "background-color 0.15s" }} />)}
+      style={{
+        width: "10px",
+        flexShrink: 0,
+        cursor: "col-resize",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: hi ? "#dbeafe" : "#f8fafc",
+        borderLeft: `1px solid ${hi ? "#93c5fd" : "#e2e8f0"}`,
+        borderRight: `1px solid ${hi ? "#93c5fd" : "#e2e8f0"}`,
+        transition: "background-color 0.15s, border-color 0.15s",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "3px",
+          pointerEvents: "none",
+        }}
+      >
+        {[0, 1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            style={{
+              width: "3px",
+              height: "3px",
+              borderRadius: "50%",
+              backgroundColor: hi ? "#3b82f6" : "#cbd5e1",
+              transition: "background-color 0.15s",
+            }}
+          />
+        ))}
       </div>
     </div>
   );
@@ -102,14 +190,44 @@ function useExportHandlers(setExporting, showToast) {
   const importInputRef = useRef(null);
 
   const getStoreData = () => {
-    const { deepLApiKey, setTemplate, setDesignerPalette, setPersonal, setSkills,
-      addSkillCategory, removeSkillCategory, updateSkillCategory, addSkillTag,
-      removeSkillTag, updateSkillTag, setExperience, addExperience, removeExperience,
-      updateExperience, setEducation, addEducation, removeEducation, updateEducation,
-      setCertifications, addCertification, removeCertification, updateCertification,
-      setLanguages, addLanguage, removeLanguage, updateLanguage, setProjects,
-      addProject, removeProject, updateProject, setTargetLanguage, setDeepLApiKey,
-      resetCV, importCV, ...data } = store;
+    const {
+      deepLApiKey,
+      setTemplate,
+      setDesignerPalette,
+      setPersonal,
+      setSkills,
+      addSkillCategory,
+      removeSkillCategory,
+      updateSkillCategory,
+      addSkillTag,
+      removeSkillTag,
+      updateSkillTag,
+      setExperience,
+      addExperience,
+      removeExperience,
+      updateExperience,
+      setEducation,
+      addEducation,
+      removeEducation,
+      updateEducation,
+      setCertifications,
+      addCertification,
+      removeCertification,
+      updateCertification,
+      setLanguages,
+      addLanguage,
+      removeLanguage,
+      updateLanguage,
+      setProjects,
+      addProject,
+      removeProject,
+      updateProject,
+      setTargetLanguage,
+      setDeepLApiKey,
+      resetCV,
+      importCV,
+      ...data
+    } = store;
     return data;
   };
 
@@ -121,7 +239,9 @@ function useExportHandlers(setExporting, showToast) {
     } catch (e) {
       console.error(e);
       showToast("❌ Errore generazione PDF", "error");
-    } finally { setExporting(null); }
+    } finally {
+      setExporting(null);
+    }
   };
 
   const handleExportDOCX = async () => {
@@ -132,12 +252,16 @@ function useExportHandlers(setExporting, showToast) {
     } catch (e) {
       console.error(e);
       showToast("❌ Errore generazione DOCX", "error");
-    } finally { setExporting(null); }
+    } finally {
+      setExporting(null);
+    }
   };
 
   const handleExportJSON = () => {
     const data = getStoreData();
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: "application/json",
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -156,16 +280,27 @@ function useExportHandlers(setExporting, showToast) {
     reader.onload = (ev) => {
       try {
         const data = JSON.parse(ev.target.result);
-        if (!data.personal || !data.skills || !data.experience) throw new Error();
+        if (!data.personal || !data.skills || !data.experience)
+          throw new Error();
         store.importCV(data);
         showToast("✅ CV importato!", "success");
-      } catch { showToast("❌ File JSON non valido", "error"); }
+      } catch {
+        showToast("❌ File JSON non valido", "error");
+      }
     };
     reader.readAsText(file);
     e.target.value = "";
   };
 
-  return { importInputRef, getStoreData, handleExportPDF, handleExportDOCX, handleExportJSON, handleImportJSON, handleFileImport };
+  return {
+    importInputRef,
+    getStoreData,
+    handleExportPDF,
+    handleExportDOCX,
+    handleExportJSON,
+    handleImportJSON,
+    handleFileImport,
+  };
 }
 
 // ─── App ──────────────────────────────────────────────────────────────────────
@@ -188,28 +323,54 @@ export default function App() {
 
   const store = useCVStore();
 
-  const { importInputRef, getStoreData, handleExportPDF, handleExportDOCX,
-    handleExportJSON, handleImportJSON, handleFileImport } = useExportHandlers(setExporting, showToast);
+  const {
+    importInputRef,
+    getStoreData,
+    handleExportPDF,
+    handleExportDOCX,
+    handleExportJSON,
+    handleImportJSON,
+    handleFileImport,
+  } = useExportHandlers(setExporting, showToast);
 
   const handleEditorDrag = useCallback((delta) => {
-    setEditorWidth((w) => Math.min(EDITOR_MAX, Math.max(EDITOR_MIN, w + delta)));
+    setEditorWidth((w) =>
+      Math.min(EDITOR_MAX, Math.max(EDITOR_MIN, w + delta)),
+    );
   }, []);
 
   // ─── DeepL translation ───────────────────────────────────────────────────────
-  const handleTranslate = useCallback(async (targetLang, apiKey) => {
-    const data = getStoreData();
-    const translated = await translateCV(data, targetLang, apiKey);
-    store.importCV(translated);
-    showToast("✅ CV tradotto!", "success");
-  }, [getStoreData, store, showToast]);
+  const handleTranslate = useCallback(
+    async (targetLang, apiKey) => {
+      const data = getStoreData();
+      const translated = await translateCV(data, targetLang, apiKey);
+      store.importCV(translated);
+      showToast("✅ CV tradotto!", "success");
+    },
+    [getStoreData, store, showToast],
+  );
 
   return (
     <>
       {/* Inline keyframes for toast animation */}
       <style>{`@keyframes fadeSlideUp { from { opacity:0; transform:translateX(-50%) translateY(10px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }`}</style>
 
-      <div style={{ display: "flex", height: "100vh", width: "100vw", overflow: "hidden" }}>
-        <div style={{ width: sidebarCollapsed ? 0 : SIDEBAR_WIDTH, flexShrink: 0, overflow: "hidden", transition: "width 0.2s ease" }}>
+      <div
+        style={{
+          display: "flex",
+          height: "100vh",
+          width: "100vw",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            width: sidebarCollapsed ? 0 : SIDEBAR_WIDTH,
+            flexShrink: 0,
+            overflow: "hidden",
+            transition: "width 0.2s ease",
+          }}
+        >
           <div style={{ width: SIDEBAR_WIDTH, height: "100%" }}>
             <Sidebar
               activeSection={activeSection}
@@ -219,9 +380,19 @@ export default function App() {
           </div>
         </div>
 
-        <SidebarDivider collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(v => !v)} />
+        <SidebarDivider
+          collapsed={sidebarCollapsed}
+          onToggle={() => setSidebarCollapsed((v) => !v)}
+        />
 
-        <div style={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            flex: 1,
+            overflow: "hidden",
+          }}
+        >
           <Toolbar
             onExportPDF={handleExportPDF}
             onExportDOCX={handleExportDOCX}
@@ -230,7 +401,9 @@ export default function App() {
             exporting={exporting}
           />
           <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
-            <div style={{ width: editorWidth, flexShrink: 0, overflow: "hidden" }}>
+            <div
+              style={{ width: editorWidth, flexShrink: 0, overflow: "hidden" }}
+            >
               <EditorPanel activeSection={activeSection} />
             </div>
             <EditorResizeHandle onDrag={handleEditorDrag} />
@@ -238,10 +411,22 @@ export default function App() {
           </div>
         </div>
 
-        <input ref={importInputRef} type="file" accept=".json" style={{ display: "none" }} onChange={handleFileImport} />
+        <input
+          ref={importInputRef}
+          type="file"
+          accept=".json"
+          style={{ display: "none" }}
+          onChange={handleFileImport}
+        />
       </div>
 
-      {toast && <Toast message={toast.message} type={toast.type} onDismiss={dismissToast} />}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onDismiss={dismissToast}
+        />
+      )}
     </>
   );
 }
