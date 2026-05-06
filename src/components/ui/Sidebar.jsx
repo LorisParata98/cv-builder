@@ -9,8 +9,9 @@ import {
   Rocket,
   Palette,
   Translate,
-  DotsSixVertical,
   Warning,
+  EyeIcon,
+  EyeSlashIcon,
 } from "@phosphor-icons/react";
 import { useCVStore } from "../../store/useCVStore";
 import { UI_LANGUAGES } from "../../locales/index.js";
@@ -43,7 +44,7 @@ const PALETTE_KEYS = {
 
 const HEX_VALID = /^#[0-9a-fA-F]{6}$/;
 
-// ─── PaletteCustomizerPanel ──────────────────────────────────────────────────
+// ─── PaletteCustomizerPanel ───────────────────────────────────────────────────
 function PaletteCustomizerPanel() {
   const template = useCVStore((s) => s.template);
   const customPalettes = useCVStore((s) => s.customPalettes);
@@ -130,7 +131,7 @@ function PaletteCustomizerPanel() {
                         return n;
                       })
                     }
-                    className=" w-24 bg-gray-800 border border-gray-600 rounded px-2 py-1 text-xs text-gray-100 font-mono placeholder-gray-600 focus:outline-none focus:border-purple-500"
+                    className="w-24 bg-gray-800 border border-gray-600 rounded px-2 py-1 text-xs text-gray-100 font-mono placeholder-gray-600 focus:outline-none focus:border-purple-500"
                   />
                   {isDirty && (
                     <button
@@ -167,7 +168,7 @@ function PaletteCustomizerPanel() {
   );
 }
 
-// ─── Modale di conferma traduzione ────────────────────────────────────────────
+// ─── Modale conferma traduzione ───────────────────────────────────────────────
 function TranslateConfirmModal({
   onDownloadAndProceed,
   onProceed,
@@ -246,7 +247,7 @@ function TranslateConfirmModal({
               textAlign: "left",
             }}
           >
-            ⬇ Scarica backup e procedi
+            Scarica backup e procedi
           </button>
           <button
             onClick={onProceed}
@@ -263,9 +264,7 @@ function TranslateConfirmModal({
               textAlign: "left",
             }}
           >
-            {translating
-              ? "⏳ Traduzione in corso…"
-              : "Procedi senza scaricare"}
+            {translating ? "Traduzione in corso..." : "Procedi senza scaricare"}
           </button>
           <button
             onClick={onCancel}
@@ -394,7 +393,7 @@ function DeepLPanel({ onTranslate }) {
                   type={showKey ? "text" : "password"}
                   value={deepLApiKey}
                   onChange={(e) => setDeepLApiKey(e.target.value)}
-                  placeholder="xxxxxxxx-xxxx-…:fx"
+                  placeholder="xxxxxxxx-xxxx-...:fx"
                   className="flex-1 min-w-0 bg-gray-800 border border-gray-600 rounded px-2 py-1 text-xs text-gray-100 placeholder-gray-600 focus:outline-none focus:border-blue-500"
                 />
                 <button
@@ -402,7 +401,11 @@ function DeepLPanel({ onTranslate }) {
                   title={showKey ? "Nascondi" : "Mostra"}
                   className="px-1.5 bg-gray-700 border border-gray-600 rounded text-gray-400 hover:text-white text-xs"
                 >
-                  {showKey ? "🙈" : "👁"}
+                  {showKey ? (
+                    <EyeSlashIcon></EyeSlashIcon>
+                  ) : (
+                    <EyeIcon></EyeIcon>
+                  )}
                 </button>
               </div>
             </div>
@@ -431,7 +434,7 @@ function DeepLPanel({ onTranslate }) {
               disabled={translating}
               className="w-full py-1.5 rounded text-xs font-semibold bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:text-gray-500 text-white transition-colors"
             >
-              {translating ? "⏳ Traduzione…" : "🌐 Traduci contenuto CV"}
+              {translating ? "Traduzione..." : "Traduci contenuto CV"}
             </button>
           </div>
         )}
@@ -457,40 +460,38 @@ function DeepLPanel({ onTranslate }) {
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
 export function Sidebar({ activeSection, onSectionChange, onTranslate }) {
   return (
-    <aside className="w-[220px] flex-shrink-0 bg-gray-900 text-white flex flex-col h-full">
-      <div className="px-5 py-4 border-b border-gray-700">
-        <h1 className="text-base font-semibold text-white tracking-tight">
+    <div className="flex flex-col h-full bg-gray-900 text-white overflow-y-auto">
+      {/* Logo / Brand */}
+      <div className="px-4 py-4 border-b border-gray-700 flex-shrink-0">
+        <h1 className="text-sm font-bold text-white tracking-wide">
           CV Builder
         </h1>
-        <p className="text-xs text-gray-400 mt-0.5">Editor professionale</p>
+        <p className="text-xs text-gray-500 mt-0.5">
+          Costruisci il tuo CV professionale
+        </p>
       </div>
 
-      <nav className="flex-1 py-3 overflow-y-auto">
-        <p className="px-5 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">
-          Sezioni
-        </p>
+      {/* Navigazione sezioni */}
+      <nav className="flex-1 py-2">
         {SECTIONS.map(({ id, label, Icon }) => (
           <button
             key={id}
             onClick={() => onSectionChange(id)}
-            className={`w-full flex items-center gap-3 px-5 py-2.5 text-sm transition-colors text-left ${
+            className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors text-left ${
               activeSection === id
                 ? "bg-blue-600 text-white"
-                : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                : "text-gray-400 hover:text-white hover:bg-gray-800"
             }`}
           >
             <Icon size={16} weight="duotone" />
-            <span>{label}</span>
+            <span className="truncate">{label}</span>
           </button>
         ))}
       </nav>
 
+      {/* Pannelli bottom */}
       <PaletteCustomizerPanel />
       <DeepLPanel onTranslate={onTranslate} />
-
-      <div className="px-5 py-3 border-t border-gray-700 text-xs text-gray-500">
-        v1.0.0 · Client-side
-      </div>
-    </aside>
+    </div>
   );
 }

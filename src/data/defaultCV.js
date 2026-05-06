@@ -1,4 +1,3 @@
-// Dati di esempio precompilati con i dati di Loris Parata
 export const defaultCV = {
   template: "tech",
   designerPalette: "noir-gold",
@@ -14,96 +13,35 @@ export const defaultCV = {
     summary:
       "Frontend developer con oltre 5 anni di esperienza nella progettazione e sviluppo di applicazioni web scalabili. Specializzato in Angular, React e architetture component-based. Appassionato di performance, accessibilità e developer experience.",
     photo: null,
+    photoPosition: { x: 50, y: 50 },
   },
 
   skills: [
     {
       category: "Frontend",
       tags: [
-        {
-          label: "Angular",
-          versionsRange: "v8–v20",
-          atsKeywords: [
-            "Angular",
-            "Angular 8",
-            "Angular 11",
-            "Angular 14",
-            "Angular 17",
-            "Angular 18",
-            "Angular 20",
-          ],
-        },
-        {
-          label: "React",
-          versionsRange: "16–19",
-          atsKeywords: [
-            "React",
-            "React 16",
-            "React 18",
-            "React 19",
-            "React.js",
-          ],
-        },
-        {
-          label: "TypeScript",
-          versionsRange: null,
-          atsKeywords: ["TypeScript", "TypeScript 5"],
-        },
-        {
-          label: "Vue.js",
-          versionsRange: "2 & 3",
-          atsKeywords: ["Vue.js", "Vue 2", "Vue 3", "Vue.js 2", "Vue.js 3"],
-        },
-        {
-          label: "HTML5 / CSS3",
-          versionsRange: null,
-          atsKeywords: ["HTML5", "CSS3", "HTML", "CSS"],
-        },
-        {
-          label: "Tailwind CSS",
-          versionsRange: null,
-          atsKeywords: ["Tailwind CSS", "Tailwind"],
-        },
+        { label: "Angular",     versionsRange: "v8–v20", atsKeywords: ["Angular","Angular 8","Angular 11","Angular 14","Angular 17","Angular 18","Angular 20"] },
+        { label: "React",       versionsRange: "16–19",  atsKeywords: ["React","React 16","React 18","React 19","React.js"] },
+        { label: "TypeScript",  versionsRange: null,     atsKeywords: ["TypeScript","TypeScript 5"] },
+        { label: "Vue.js",      versionsRange: "2 & 3",  atsKeywords: ["Vue.js","Vue 2","Vue 3","Vue.js 2","Vue.js 3"] },
+        { label: "HTML5 / CSS3",versionsRange: null,     atsKeywords: ["HTML5","CSS3","HTML","CSS"] },
+        { label: "Tailwind CSS",versionsRange: null,     atsKeywords: ["Tailwind CSS","Tailwind"] },
       ],
     },
     {
       category: "Backend & Tools",
       tags: [
-        {
-          label: "Node.js",
-          versionsRange: null,
-          atsKeywords: ["Node.js", "Node", "NodeJS"],
-        },
-        {
-          label: "REST API",
-          versionsRange: null,
-          atsKeywords: ["REST API", "RESTful API", "REST"],
-        },
-        {
-          label: "Git",
-          versionsRange: null,
-          atsKeywords: ["Git", "GitHub", "GitLab"],
-        },
-        {
-          label: "Docker",
-          versionsRange: null,
-          atsKeywords: ["Docker", "Docker Compose"],
-        },
+        { label: "Node.js",  versionsRange: null, atsKeywords: ["Node.js","Node","NodeJS"] },
+        { label: "REST API", versionsRange: null, atsKeywords: ["REST API","RESTful API","REST"] },
+        { label: "Git",      versionsRange: null, atsKeywords: ["Git","GitHub","GitLab"] },
+        { label: "Docker",   versionsRange: null, atsKeywords: ["Docker","Docker Compose"] },
       ],
     },
     {
       category: "Testing",
       tags: [
-        {
-          label: "Jest",
-          versionsRange: null,
-          atsKeywords: ["Jest", "unit testing"],
-        },
-        {
-          label: "Cypress",
-          versionsRange: null,
-          atsKeywords: ["Cypress", "E2E testing", "end-to-end testing"],
-        },
+        { label: "Jest",    versionsRange: null, atsKeywords: ["Jest","unit testing"] },
+        { label: "Cypress", versionsRange: null, atsKeywords: ["Cypress","E2E testing","end-to-end testing"] },
       ],
     },
   ],
@@ -148,8 +86,7 @@ export const defaultCV = {
       grade: "110/110",
       startDate: "2015-09",
       endDate: "2019-07",
-      thesis:
-        "Sviluppo di un'applicazione web per la visualizzazione di dati IoT in tempo reale",
+      thesis: "Sviluppo di un'applicazione web per la visualizzazione di dati IoT in tempo reale",
     },
   ],
 
@@ -160,7 +97,7 @@ export const defaultCV = {
 
   languages: [
     { language: "Italiano", level: "Madrelingua" },
-    { language: "Inglese", level: "C1 – Avanzato" },
+    { language: "Inglese",  level: "C1 – Avanzato" },
   ],
 
   projects: [

@@ -9,7 +9,6 @@ import { exportPDF } from "./exporters/exportPDF";
 import { exportDOCX } from "./exporters/exportDOCX";
 import { translateCV } from "./services/translateCV";
 
-// ─── Toast notification ───────────────────────────────────────────────────────
 function Toast({ message, type, onDismiss }) {
   useEffect(() => {
     const t = setTimeout(onDismiss, 3500);
@@ -46,11 +45,10 @@ function Toast({ message, type, onDismiss }) {
   );
 }
 
-// ─── Mobile Warning ───────────────────────────────────────────────────────────
 function MobileWarning() {
   const [dismissed, setDismissed] = useState(false);
   const [narrow, setNarrow] = useState(
-    typeof window !== "undefined" && window.innerWidth < 1024,
+    typeof window !== "undefined" && window.innerWidth < 1024
   );
 
   useEffect(() => {
@@ -86,13 +84,7 @@ function MobileWarning() {
           boxShadow: "0 24px 64px rgba(0,0,0,0.6)",
         }}
       >
-        <div
-          style={{
-            marginBottom: "16px",
-            display: "flex",
-            justifyContent: "center",
-          }}
-        >
+        <div style={{ marginBottom: "16px", display: "flex", justifyContent: "center" }}>
           <Desktop size={52} weight="duotone" color="#94a3b8" />
         </div>
         <h2
@@ -138,7 +130,6 @@ function MobileWarning() {
   );
 }
 
-// ─── Sidebar divider con bottone collapse ─────────────────────────────────────
 function SidebarDivider({ collapsed, onToggle }) {
   return (
     <div
@@ -182,7 +173,7 @@ function SidebarDivider({ collapsed, onToggle }) {
           e.currentTarget.style.color = "#94a3b8";
         }}
       >
-        {collapsed ? "›" : "‹"}
+        {collapsed ? ">" : "<"}
       </button>
       <div
         style={{
@@ -197,7 +188,6 @@ function SidebarDivider({ collapsed, onToggle }) {
   );
 }
 
-// ─── Editor resize handle ─────────────────────────────────────────────────────
 function EditorResizeHandle({ onDrag }) {
   const dragging = useRef(false);
   const startX = useRef(0);
@@ -277,7 +267,6 @@ function EditorResizeHandle({ onDrag }) {
   );
 }
 
-// ─── Export / Import ──────────────────────────────────────────────────────────
 function useExportHandlers(setExporting, showToast) {
   const store = useCVStore();
   const importInputRef = useRef(null);
@@ -328,10 +317,10 @@ function useExportHandlers(setExporting, showToast) {
     setExporting("pdf");
     try {
       await exportPDF(getStoreData());
-      showToast("✅ PDF esportato!", "success");
+      showToast("PDF esportato!", "success");
     } catch (e) {
       console.error(e);
-      showToast("❌ Errore generazione PDF", "error");
+      showToast("Errore generazione PDF", "error");
     } finally {
       setExporting(null);
     }
@@ -341,10 +330,10 @@ function useExportHandlers(setExporting, showToast) {
     setExporting("docx");
     try {
       await exportDOCX(getStoreData());
-      showToast("✅ DOCX esportato!", "success");
+      showToast("DOCX esportato!", "success");
     } catch (e) {
       console.error(e);
-      showToast("❌ Errore generazione DOCX", "error");
+      showToast("Errore generazione DOCX", "error");
     } finally {
       setExporting(null);
     }
@@ -361,7 +350,7 @@ function useExportHandlers(setExporting, showToast) {
     a.download = `cv-${(store.personal.name || "export").replace(/\s+/g, "-").toLowerCase()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    showToast("✅ JSON esportato!", "success");
+    showToast("JSON esportato!", "success");
   };
 
   const handleImportJSON = () => importInputRef.current?.click();
@@ -376,9 +365,9 @@ function useExportHandlers(setExporting, showToast) {
         if (!data.personal || !data.skills || !data.experience)
           throw new Error();
         store.importCV(data);
-        showToast("✅ CV importato!", "success");
+        showToast("CV importato!", "success");
       } catch {
-        showToast("❌ File JSON non valido", "error");
+        showToast("File JSON non valido", "error");
       }
     };
     reader.readAsText(file);
@@ -396,7 +385,6 @@ function useExportHandlers(setExporting, showToast) {
   };
 }
 
-// ─── App ──────────────────────────────────────────────────────────────────────
 const SIDEBAR_WIDTH = 220;
 const EDITOR_MIN = 240;
 const EDITOR_MAX = 600;
@@ -404,9 +392,9 @@ const EDITOR_MAX = 600;
 export default function App() {
   const [activeSection, setActiveSection] = useState("personal");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [editorWidth, setEditorWidth] = useState(400);
-  const [exporting, setExporting] = useState(null); // 'pdf' | 'docx' | null
-  const [toast, setToast] = useState(null); // { message, type }
+  const [editorWidth, setEditorWidth] = useState(300);
+  const [exporting, setExporting] = useState(null);
+  const [toast, setToast] = useState(null);
 
   const showToast = useCallback((message, type = "info") => {
     setToast({ message, type });
@@ -432,13 +420,12 @@ export default function App() {
     );
   }, []);
 
-  // ─── DeepL translation ───────────────────────────────────────────────────────
   const handleTranslate = useCallback(
     async (targetLang, apiKey) => {
       const data = getStoreData();
       const translated = await translateCV(data, targetLang, apiKey);
       store.importCV(translated);
-      showToast("✅ CV tradotto!", "success");
+      showToast("CV tradotto!", "success");
     },
     [getStoreData, store, showToast],
   );
@@ -446,7 +433,6 @@ export default function App() {
   return (
     <>
       <MobileWarning />
-      {/* Inline keyframes for toast animation */}
       <style>{`@keyframes fadeSlideUp { from { opacity:0; transform:translateX(-50%) translateY(10px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }`}</style>
 
       <div
