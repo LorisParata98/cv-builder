@@ -3,29 +3,29 @@ import { useCVStore } from "../../store/useCVStore";
 import { DEEPL_LANGUAGES } from "../../services/translateCV";
 
 const SECTIONS = [
-  { id: "personal",       label: "Dati Personali",  icon: "👤" },
-  { id: "skills",         label: "Competenze",       icon: "⚡" },
-  { id: "experience",     label: "Esperienza",       icon: "💼" },
-  { id: "education",      label: "Formazione",       icon: "🎓" },
-  { id: "certifications", label: "Certificazioni",   icon: "🏆" },
-  { id: "languages",      label: "Lingue",           icon: "🌍" },
-  { id: "projects",       label: "Progetti",         icon: "🚀" },
+  { id: "personal", label: "Dati Personali", icon: "👤" },
+  { id: "skills", label: "Competenze", icon: "⚡" },
+  { id: "experience", label: "Esperienza", icon: "💼" },
+  { id: "education", label: "Formazione", icon: "🎓" },
+  { id: "certifications", label: "Certificazioni", icon: "🏆" },
+  { id: "languages", label: "Lingue", icon: "🌍" },
+  { id: "projects", label: "Progetti", icon: "🚀" },
 ];
 
 // Colori chiave editabili per ogni template
 const PALETTE_KEYS = {
   tech: [
-    { key: "bg",     label: "Header",  def: "#0f2644" },
+    { key: "bg", label: "Header", def: "#0f2644" },
     { key: "accent", label: "Accento", def: "#4ec9b0" },
   ],
   manager: [
-    { key: "bg",     label: "Header",  def: "#1e3a5f" },
+    { key: "bg", label: "Header", def: "#1e3a5f" },
     { key: "accent", label: "Accento", def: "#c8a951" },
   ],
   designer: [
-    { key: "accent",    label: "Accento", def: "#C8B89A" },
+    { key: "accent", label: "Accento", def: "#C8B89A" },
     { key: "sidebarBg", label: "Sidebar", def: "#1A1A1A" },
-    { key: "bg",        label: "Sfondo",  def: "#0D0D0D" },
+    { key: "bg", label: "Sfondo", def: "#0D0D0D" },
   ],
 };
 
@@ -34,21 +34,23 @@ const HEX_VALID = /^#[0-9a-fA-F]{6}$/;
 
 // ─── PaletteCustomizerPanel ──────────────────────────────────────────────────
 function PaletteCustomizerPanel() {
-  const template              = useCVStore((s) => s.template);
-  const customPalettes        = useCVStore((s) => s.customPalettes);
+  const template = useCVStore((s) => s.template);
+  const customPalettes = useCVStore((s) => s.customPalettes);
   const setCustomPaletteColor = useCVStore((s) => s.setCustomPaletteColor);
-  const resetCustomPalette    = useCVStore((s) => s.resetCustomPalette);
+  const resetCustomPalette = useCVStore((s) => s.resetCustomPalette);
 
-  const [open, setOpen]       = useState(false);
+  const [open, setOpen] = useState(false);
   // Stato locale per i text input: permette di digitare liberamente
   // senza applicare valori parziali/invalidi al template
   const [textInputs, setTextInputs] = useState({});
 
-  const keys    = PALETTE_KEYS[template] || [];
+  const keys = PALETTE_KEYS[template] || [];
   const current = customPalettes[template] || {};
 
   // Reset text inputs locali quando si cambia template
-  useEffect(() => { setTextInputs({}); }, [template]);
+  useEffect(() => {
+    setTextInputs({});
+  }, [template]);
 
   // Colore valido salvato nello store (o default di palette se assente/invalido)
   const getStoreValue = (key, def) => {
@@ -62,12 +64,12 @@ function PaletteCustomizerPanel() {
     textInputs[key] !== undefined ? textInputs[key] : getStoreValue(key, def);
 
   // Il pallino viola appare solo se c'è almeno un colore valido salvato
-  const hasCustom = Object.values(current).some(v => HEX_VALID.test(v));
+  const hasCustom = Object.values(current).some((v) => HEX_VALID.test(v));
 
   return (
     <div className="border-t border-gray-700">
       <button
-        onClick={() => setOpen(v => !v)}
+        onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center justify-between px-4 py-2.5 text-xs font-medium text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
       >
         <span className="flex items-center gap-2">
@@ -87,14 +89,16 @@ function PaletteCustomizerPanel() {
         <div className="px-4 pb-4 space-y-3">
           {keys.map(({ key, label, def }) => {
             const storeValue = getStoreValue(key, def);
-            const textValue  = getTextValue(key, def);
-            const isDirty    = HEX_VALID.test(current[key]) && current[key] !== def;
+            const textValue = getTextValue(key, def);
+            const isDirty =
+              HEX_VALID.test(current[key]) && current[key] !== def;
 
             return (
               <div key={key}>
-                <label className="block text-xs text-gray-500 mb-1">{label}</label>
+                <label className="block text-xs text-gray-500 mb-1">
+                  {label}
+                </label>
                 <div className="flex gap-2 items-center">
-
                   {/* Color picker nativo — riceve sempre un colore #RRGGBB valido */}
                   <input
                     type="color"
@@ -103,7 +107,7 @@ function PaletteCustomizerPanel() {
                       const v = e.target.value; // sempre #RRGGBB
                       setCustomPaletteColor(template, key, v);
                       // Sincronizza anche il text input locale
-                      setTextInputs(prev => ({ ...prev, [key]: v }));
+                      setTextInputs((prev) => ({ ...prev, [key]: v }));
                     }}
                     className="w-8 h-8 rounded cursor-pointer border-0 p-0 bg-transparent flex-shrink-0"
                     style={{ appearance: "none", WebkitAppearance: "none" }}
@@ -119,7 +123,7 @@ function PaletteCustomizerPanel() {
                     onChange={(e) => {
                       const v = e.target.value;
                       // Aggiorna solo la visualizzazione locale
-                      setTextInputs(prev => ({ ...prev, [key]: v }));
+                      setTextInputs((prev) => ({ ...prev, [key]: v }));
                       // Salva nello store (e aggiorna il template) solo se completo
                       if (HEX_VALID.test(v)) {
                         setCustomPaletteColor(template, key, v);
@@ -127,7 +131,7 @@ function PaletteCustomizerPanel() {
                     }}
                     onBlur={() => {
                       // Al blur scarta i valori parziali: reverte al valore store/default
-                      setTextInputs(prev => {
+                      setTextInputs((prev) => {
                         const next = { ...prev };
                         delete next[key];
                         return next;
@@ -141,7 +145,7 @@ function PaletteCustomizerPanel() {
                     <button
                       onClick={() => {
                         setCustomPaletteColor(template, key, def);
-                        setTextInputs(prev => ({ ...prev, [key]: def }));
+                        setTextInputs((prev) => ({ ...prev, [key]: def }));
                       }}
                       title="Ripristina default"
                       className="text-gray-600 hover:text-gray-300 text-xs px-1 flex-shrink-0"
@@ -167,7 +171,8 @@ function PaletteCustomizerPanel() {
           </button>
 
           <p className="text-xs text-gray-600 leading-tight">
-            Modifica i colori del template attivo. Il cambio e immediato nella preview.
+            Modifica i colori del template attivo. Il cambio e immediato nella
+            preview.
           </p>
         </div>
       )}
@@ -177,16 +182,19 @@ function PaletteCustomizerPanel() {
 
 // ─── DeepL panel ──────────────────────────────────────────────────────────────
 function DeepLPanel({ onTranslate }) {
-  const deepLApiKey    = useCVStore((s) => s.deepLApiKey);
+  const deepLApiKey = useCVStore((s) => s.deepLApiKey);
   const setDeepLApiKey = useCVStore((s) => s.setDeepLApiKey);
-  const [open,        setOpen]        = useState(false);
-  const [targetLang,  setTargetLang]  = useState("EN-US");
-  const [showKey,     setShowKey]     = useState(false);
+  const [open, setOpen] = useState(false);
+  const [targetLang, setTargetLang] = useState("EN-US");
+  const [showKey, setShowKey] = useState(false);
   const [translating, setTranslating] = useState(false);
-  const [error,       setError]       = useState("");
+  const [error, setError] = useState("");
 
   const handleTranslate = async () => {
-    if (!deepLApiKey.trim()) { setError("Inserisci la tua API key DeepL."); return; }
+    if (!deepLApiKey.trim()) {
+      setError("Inserisci la tua API key DeepL.");
+      return;
+    }
     setError("");
     setTranslating(true);
     try {
@@ -201,7 +209,7 @@ function DeepLPanel({ onTranslate }) {
   return (
     <div className="border-t border-gray-700">
       <button
-        onClick={() => setOpen(v => !v)}
+        onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center justify-between px-4 py-2.5 text-xs font-medium text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
       >
         <span className="flex items-center gap-2">
@@ -223,7 +231,7 @@ function DeepLPanel({ onTranslate }) {
                 className="flex-1 min-w-0 bg-gray-800 border border-gray-600 rounded px-2 py-1 text-xs text-gray-100 placeholder-gray-600 focus:outline-none focus:border-blue-500"
               />
               <button
-                onClick={() => setShowKey(v => !v)}
+                onClick={() => setShowKey((v) => !v)}
                 title={showKey ? "Nascondi" : "Mostra"}
                 className="px-1.5 bg-gray-700 border border-gray-600 rounded text-gray-400 hover:text-white text-xs"
               >
@@ -233,14 +241,18 @@ function DeepLPanel({ onTranslate }) {
           </div>
 
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Lingua di destinazione</label>
+            <label className="block text-xs text-gray-500 mb-1">
+              Lingua di destinazione
+            </label>
             <select
               value={targetLang}
               onChange={(e) => setTargetLang(e.target.value)}
               className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1 text-xs text-gray-100 focus:outline-none focus:border-blue-500"
             >
               {DEEPL_LANGUAGES.map((l) => (
-                <option key={l.code} value={l.code}>{l.label}</option>
+                <option key={l.code} value={l.code}>
+                  {l.label}
+                </option>
               ))}
             </select>
           </div>
@@ -248,7 +260,8 @@ function DeepLPanel({ onTranslate }) {
           {error && <p className="text-xs text-red-400">{error}</p>}
 
           <p className="text-xs text-gray-600 leading-tight">
-            Sovrascrive il testo del CV. Esporta il JSON prima per fare un backup.
+            Sovrascrive il testo del CV. Esporta il JSON prima per fare un
+            backup.
           </p>
 
           <button
@@ -269,7 +282,9 @@ export function Sidebar({ activeSection, onSectionChange, onTranslate }) {
   return (
     <aside className="w-[220px] flex-shrink-0 bg-gray-900 text-white flex flex-col h-full">
       <div className="px-5 py-4 border-b border-gray-700">
-        <h1 className="text-base font-semibold text-white tracking-tight">CV Builder</h1>
+        <h1 className="text-base font-semibold text-white tracking-tight">
+          CV Builder
+        </h1>
         <p className="text-xs text-gray-400 mt-0.5">Editor professionale</p>
       </div>
 

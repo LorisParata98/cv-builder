@@ -5,7 +5,9 @@ import { SectionCard } from "../ui/SectionCard";
 function Field({ label, value, onChange, placeholder = "", type = "text" }) {
   return (
     <div className="mb-2">
-      <label className="block text-xs font-medium text-gray-500 mb-0.5">{label}</label>
+      <label className="block text-xs font-medium text-gray-500 mb-0.5">
+        {label}
+      </label>
       <input
         type={type}
         value={value}
@@ -50,12 +52,17 @@ function BulletList({ bullets, onUpdate }) {
   return (
     <div className="mt-2">
       <label className="block text-xs font-medium text-gray-500 mb-1">
-        Bullet point <span className="text-gray-400 font-normal">(Invio = nuovo, Backspace su riga vuota = rimuovi)</span>
+        Bullet point{" "}
+        <span className="text-gray-400 font-normal">
+          (Invio = nuovo, Backspace su riga vuota = rimuovi)
+        </span>
       </label>
       <ul className="space-y-1">
         {bullets.map((bullet, i) => (
           <li key={i} className="flex gap-1 items-start">
-            <span className="text-blue-400 mt-1.5 flex-shrink-0 text-xs">•</span>
+            <span className="text-blue-400 mt-1.5 flex-shrink-0 text-xs">
+              •
+            </span>
             <textarea
               value={bullet}
               onChange={(e) => handleChange(i, e.target.value)}
@@ -85,7 +92,13 @@ function BulletList({ bullets, onUpdate }) {
   );
 }
 
-function ExperienceCard({ exp, onUpdate, onRemove, dragHandleProps, isDragOver }) {
+function ExperienceCard({
+  exp,
+  onUpdate,
+  onRemove,
+  dragHandleProps,
+  isDragOver,
+}) {
   return (
     <div
       className={`border rounded-lg p-3 mb-2 bg-white transition-colors ${
@@ -102,7 +115,8 @@ function ExperienceCard({ exp, onUpdate, onRemove, dragHandleProps, isDragOver }
           ⠿
         </span>
         <span className="text-xs font-semibold text-gray-600 truncate flex-1">
-          {exp.role || "Nuova esperienza"}{exp.company ? ` @ ${exp.company}` : ""}
+          {exp.role || "Nuova esperienza"}
+          {exp.company ? ` @ ${exp.company}` : ""}
         </span>
         <button
           onClick={onRemove}
@@ -112,17 +126,39 @@ function ExperienceCard({ exp, onUpdate, onRemove, dragHandleProps, isDragOver }
         </button>
       </div>
 
-      <Field label="Ruolo" value={exp.role} onChange={(v) => onUpdate({ role: v })} placeholder="Es. Senior Frontend Developer" />
-      <Field label="Azienda" value={exp.company} onChange={(v) => onUpdate({ company: v })} placeholder="Es. Acme Corp" />
-      <Field label="Città / Nazione" value={exp.location} onChange={(v) => onUpdate({ location: v })} placeholder="Es. Milano, Italia" />
+      <Field
+        label="Ruolo"
+        value={exp.role}
+        onChange={(v) => onUpdate({ role: v })}
+        placeholder="Es. Senior Frontend Developer"
+      />
+      <Field
+        label="Azienda"
+        value={exp.company}
+        onChange={(v) => onUpdate({ company: v })}
+        placeholder="Es. Acme Corp"
+      />
+      <Field
+        label="Città / Nazione"
+        value={exp.location}
+        onChange={(v) => onUpdate({ location: v })}
+        placeholder="Es. Milano, Italia"
+      />
 
       <div className="flex gap-2">
         <div className="flex-1">
-          <Field label="Data inizio" value={exp.startDate} onChange={(v) => onUpdate({ startDate: v })} placeholder="YYYY-MM" />
+          <Field
+            label="Data inizio"
+            value={exp.startDate}
+            onChange={(v) => onUpdate({ startDate: v })}
+            placeholder="YYYY-MM"
+          />
         </div>
         <div className="flex-1">
           <div className="mb-2">
-            <label className="block text-xs font-medium text-gray-500 mb-0.5">Data fine</label>
+            <label className="block text-xs font-medium text-gray-500 mb-0.5">
+              Data fine
+            </label>
             <div className="flex gap-1">
               <input
                 type="text"
@@ -133,7 +169,11 @@ function ExperienceCard({ exp, onUpdate, onRemove, dragHandleProps, isDragOver }
                 className="flex-1 border border-gray-300 rounded px-2.5 py-1.5 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-400"
               />
               <button
-                onClick={() => onUpdate({ endDate: exp.endDate === "present" ? "" : "present" })}
+                onClick={() =>
+                  onUpdate({
+                    endDate: exp.endDate === "present" ? "" : "present",
+                  })
+                }
                 className={`px-2 py-1 text-xs rounded border transition-colors flex-shrink-0 ${
                   exp.endDate === "present"
                     ? "bg-green-100 text-green-700 border-green-300"
@@ -156,13 +196,13 @@ function ExperienceCard({ exp, onUpdate, onRemove, dragHandleProps, isDragOver }
 }
 
 export function ExperienceForm() {
-  const experience      = useCVStore((s) => s.experience);
-  const setExperience   = useCVStore((s) => s.setExperience);
-  const addExperience   = useCVStore((s) => s.addExperience);
+  const experience = useCVStore((s) => s.experience);
+  const setExperience = useCVStore((s) => s.setExperience);
+  const addExperience = useCVStore((s) => s.addExperience);
   const removeExperience = useCVStore((s) => s.removeExperience);
   const updateExperience = useCVStore((s) => s.updateExperience);
 
-  const dragIndex   = useRef(null);
+  const dragIndex = useRef(null);
   const [dragOver, setDragOver] = useState(null);
 
   const reorder = (from, to) => {
@@ -179,10 +219,22 @@ export function ExperienceForm() {
         <div
           key={exp.id}
           draggable
-          onDragStart={() => { dragIndex.current = index; }}
-          onDragOver={(e) => { e.preventDefault(); setDragOver(index); }}
-          onDrop={() => { reorder(dragIndex.current, index); setDragOver(null); dragIndex.current = null; }}
-          onDragEnd={() => { setDragOver(null); dragIndex.current = null; }}
+          onDragStart={() => {
+            dragIndex.current = index;
+          }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragOver(index);
+          }}
+          onDrop={() => {
+            reorder(dragIndex.current, index);
+            setDragOver(null);
+            dragIndex.current = null;
+          }}
+          onDragEnd={() => {
+            setDragOver(null);
+            dragIndex.current = null;
+          }}
           style={{ opacity: dragIndex.current === index ? 0.5 : 1 }}
         >
           <ExperienceCard

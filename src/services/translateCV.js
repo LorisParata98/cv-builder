@@ -107,7 +107,9 @@ export async function translateCV(cvData, targetLang, apiKey) {
 
   const translated = await deeplBatch(strings, targetLang, apiKey);
 
-  translated.forEach((text, i) => setters[i](result, text));
+  translated.forEach((text, i) => {
+    setters[i](text); // Passa solo la stringa tradotta
+  });
 
   return result;
 }

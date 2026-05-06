@@ -44,7 +44,6 @@ export function PersonalInfoForm() {
     reader.onload = (ev) => setPersonal({ photo: ev.target.result });
     reader.readAsDataURL(file);
   };
-
   return (
     <SectionCard title="Dati Personali" icon="👤">
       {/* Foto */}
