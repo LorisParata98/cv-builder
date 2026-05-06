@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import { Desktop } from "@phosphor-icons/react";
 import { Sidebar } from "./components/ui/Sidebar";
 import { Toolbar } from "./components/ui/Toolbar";
 import { EditorPanel } from "./components/editor/EditorPanel";
@@ -41,6 +42,98 @@ function Toast({ message, type, onDismiss }) {
       }}
     >
       {message}
+    </div>
+  );
+}
+
+// ─── Mobile Warning ───────────────────────────────────────────────────────────
+function MobileWarning() {
+  const [dismissed, setDismissed] = useState(false);
+  const [narrow, setNarrow] = useState(
+    typeof window !== "undefined" && window.innerWidth < 1024,
+  );
+
+  useEffect(() => {
+    const check = () => setNarrow(window.innerWidth < 1024);
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  if (!narrow || dismissed) return null;
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        backgroundColor: "rgba(10,15,28,0.96)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 99999,
+        padding: "24px",
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: "#1e293b",
+          borderRadius: "18px",
+          padding: "36px 28px",
+          maxWidth: "340px",
+          width: "100%",
+          textAlign: "center",
+          border: "1px solid #334155",
+          boxShadow: "0 24px 64px rgba(0,0,0,0.6)",
+        }}
+      >
+        <div
+          style={{
+            marginBottom: "16px",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <Desktop size={52} weight="duotone" color="#94a3b8" />
+        </div>
+        <h2
+          style={{
+            color: "#f1f5f9",
+            fontSize: "17px",
+            fontWeight: 700,
+            marginBottom: "12px",
+            lineHeight: 1.3,
+          }}
+        >
+          Schermo troppo piccolo
+        </h2>
+        <p
+          style={{
+            color: "#94a3b8",
+            fontSize: "13px",
+            lineHeight: 1.65,
+            marginBottom: "28px",
+          }}
+        >
+          Per un layout accurato e una generazione PDF ottimale, si raccomanda
+          l'uso da Desktop.
+        </p>
+        <button
+          onClick={() => setDismissed(true)}
+          style={{
+            padding: "11px 28px",
+            borderRadius: "8px",
+            backgroundColor: "#3b82f6",
+            color: "#fff",
+            border: "none",
+            cursor: "pointer",
+            fontSize: "13px",
+            fontWeight: 600,
+            width: "100%",
+          }}
+        >
+          Continua comunque
+        </button>
+      </div>
     </div>
   );
 }
@@ -311,7 +404,7 @@ const EDITOR_MAX = 600;
 export default function App() {
   const [activeSection, setActiveSection] = useState("personal");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [editorWidth, setEditorWidth] = useState(300);
+  const [editorWidth, setEditorWidth] = useState(400);
   const [exporting, setExporting] = useState(null); // 'pdf' | 'docx' | null
   const [toast, setToast] = useState(null); // { message, type }
 
@@ -352,6 +445,7 @@ export default function App() {
 
   return (
     <>
+      <MobileWarning />
       {/* Inline keyframes for toast animation */}
       <style>{`@keyframes fadeSlideUp { from { opacity:0; transform:translateX(-50%) translateY(10px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }`}</style>
 

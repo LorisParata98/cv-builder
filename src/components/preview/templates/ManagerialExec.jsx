@@ -1,27 +1,28 @@
 // ManagerialExec.jsx — Profilo manager / executive
 // Layout due colonne, Playfair Display, palette navy + bianco
 
+import { getLocale } from "../../../locales/index.js";
+
 const COLORS_DEFAULT = {
-  bg: '#1e3a5f',        // header background
-  bgDark: '#152c4a',    // variante scura header
-  accent: '#1e3a5f',    // colore accento (sezioni, bullet, bordi tag)
+  bg:          '#1e3a5f',
+  bgDark:      '#152c4a',
+  accent:      '#1e3a5f',
   accentLight: '#e8eef5',
-  white: '#ffffff',
-  body: '#2d2d2d',
-  muted: '#6b7280',
-  border: '#e5e7eb',
-  leftBg: '#f7f6f4',
-  tagBg: '#e8eef5',
-  tagText: '#1e3a5f',
+  white:       '#ffffff',
+  body:        '#2d2d2d',
+  muted:       '#6b7280',
+  border:      '#e5e7eb',
+  leftBg:      '#f7f6f4',
+  tagBg:       '#e8eef5',
+  tagText:     '#1e3a5f',
 };
 
-function formatDate(d) {
+function formatDate(d, L) {
   if (!d) return '';
-  if (d === 'present') return 'Presente';
+  if (d === 'present') return L.present;
   const [y, m] = d.split('-');
   if (!m) return y;
-  const months = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
-  return `${months[parseInt(m,10)-1]} ${y}`;
+  return `${L.months[parseInt(m, 10) - 1]} ${y}`;
 }
 
 function SectionTitle({ children, C }) {
@@ -65,7 +66,7 @@ function SectionTitleLight({ children, C }) {
 }
 
 // ─── Colonna sinistra ─────────────────────────────────────────────────────────
-function LeftColumn({ data, C }) {
+function LeftColumn({ data, C, L }) {
   const { personal, skills, languages, certifications } = data;
 
   return (
@@ -97,7 +98,7 @@ function LeftColumn({ data, C }) {
 
       {/* Contatti */}
       <div>
-        <SectionTitleLight C={C}>Contatti</SectionTitleLight>
+        <SectionTitleLight C={C}>{L.contacts}</SectionTitleLight>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           {[
             { icon: '✉', val: personal.email },
@@ -117,7 +118,7 @@ function LeftColumn({ data, C }) {
       {/* Competenze */}
       {skills.length > 0 && (
         <div>
-          <SectionTitleLight C={C}>Competenze</SectionTitleLight>
+          <SectionTitleLight C={C}>{L.skillsShort}</SectionTitleLight>
           {skills.map((cat, i) => (
             <div key={i} style={{ marginBottom: '8px' }}>
               <p style={{ fontSize: '8px', fontWeight: 700, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>
@@ -145,7 +146,7 @@ function LeftColumn({ data, C }) {
       {/* Lingue */}
       {languages.length > 0 && (
         <div>
-          <SectionTitleLight C={C}>Lingue</SectionTitleLight>
+          <SectionTitleLight C={C}>{L.languages}</SectionTitleLight>
           {languages.map((l, i) => (
             <div key={i} style={{ marginBottom: '5px' }}>
               <p style={{ fontSize: '9px', fontWeight: 700, color: C.body, marginBottom: '1px' }}>{l.language}</p>
@@ -158,7 +159,7 @@ function LeftColumn({ data, C }) {
       {/* Certificazioni */}
       {certifications.filter(Boolean).length > 0 && (
         <div>
-          <SectionTitleLight C={C}>Certificazioni</SectionTitleLight>
+          <SectionTitleLight C={C}>{L.certifications}</SectionTitleLight>
           {certifications.filter(Boolean).map((cert, i) => (
             <div key={i} style={{ display: 'flex', gap: '5px', marginBottom: '4px', alignItems: 'flex-start' }}>
               <span style={{ color: C.accent, fontSize: '8px', flexShrink: 0 }}>★</span>
@@ -172,7 +173,7 @@ function LeftColumn({ data, C }) {
 }
 
 // ─── Colonna destra ───────────────────────────────────────────────────────────
-function RightColumn({ data, C }) {
+function RightColumn({ data, C, L }) {
   const { personal, experience, education, projects } = data;
 
   return (
@@ -181,7 +182,7 @@ function RightColumn({ data, C }) {
       {/* Sommario */}
       {personal.summary && (
         <div style={{ marginBottom: '20px' }}>
-          <SectionTitle C={C}>Profilo</SectionTitle>
+          <SectionTitle C={C}>{L.profile}</SectionTitle>
           <p style={{ fontSize: '10px', lineHeight: 1.7, color: C.body, fontFamily: 'system-ui, sans-serif' }}>
             {personal.summary}
           </p>
@@ -191,7 +192,7 @@ function RightColumn({ data, C }) {
       {/* Esperienza */}
       {experience.length > 0 && (
         <div style={{ marginBottom: '20px' }}>
-          <SectionTitle C={C}>Esperienza</SectionTitle>
+          <SectionTitle C={C}>{L.experienceShort}</SectionTitle>
           {experience.map((exp) => (
             <div key={exp.id} style={{ marginBottom: '14px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2px' }}>
@@ -204,7 +205,7 @@ function RightColumn({ data, C }) {
                   </p>
                 </div>
                 <span style={{ fontSize: '9px', color: C.muted, whiteSpace: 'nowrap', marginLeft: '10px', marginTop: '1px' }}>
-                  {formatDate(exp.startDate)} – {formatDate(exp.endDate)}
+                  {formatDate(exp.startDate, L)} – {formatDate(exp.endDate, L)}
                 </span>
               </div>
               <ul style={{ margin: '5px 0 0', padding: 0, listStyle: 'none' }}>
@@ -223,7 +224,7 @@ function RightColumn({ data, C }) {
       {/* Formazione */}
       {education.length > 0 && (
         <div style={{ marginBottom: '20px' }}>
-          <SectionTitle C={C}>Formazione</SectionTitle>
+          <SectionTitle C={C}>{L.education}</SectionTitle>
           {education.map((edu) => (
             <div key={edu.id} style={{ marginBottom: '10px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -236,12 +237,12 @@ function RightColumn({ data, C }) {
                   </p>
                 </div>
                 <span style={{ fontSize: '9px', color: C.muted, whiteSpace: 'nowrap', marginLeft: '10px' }}>
-                  {formatDate(edu.startDate)} – {formatDate(edu.endDate)}
+                  {formatDate(edu.startDate, L)} – {formatDate(edu.endDate, L)}
                 </span>
               </div>
               {edu.thesis && (
                 <p style={{ fontSize: '9px', color: C.muted, fontStyle: 'italic', marginTop: '3px' }}>
-                  Tesi: {edu.thesis}
+                  {L.thesis}: {edu.thesis}
                 </p>
               )}
             </div>
@@ -252,7 +253,7 @@ function RightColumn({ data, C }) {
       {/* Progetti */}
       {projects.filter(Boolean).length > 0 && (
         <div>
-          <SectionTitle C={C}>Progetti</SectionTitle>
+          <SectionTitle C={C}>{L.projects}</SectionTitle>
           {projects.filter(Boolean).map((p, i) => (
             <div key={i} style={{ display: 'flex', gap: '6px', marginBottom: '4px', alignItems: 'flex-start' }}>
               <span style={{ color: C.accent, flexShrink: 0, fontWeight: 700 }}>—</span>
@@ -266,9 +267,9 @@ function RightColumn({ data, C }) {
 }
 
 // ─── Componente principale ────────────────────────────────────────────────────
-export function ManagerialExec({ data, customColors = {} }) {
-  // Merge: i colori custom sovrascrivono solo le chiavi fornite
+export function ManagerialExec({ data, customColors = {}, locale }) {
   const C = { ...COLORS_DEFAULT, ...customColors };
+  const L = locale || getLocale('IT');
 
   return (
     <div style={{ width: '100%', backgroundColor: C.white, fontFamily: 'system-ui, sans-serif' }}>
@@ -308,8 +309,8 @@ export function ManagerialExec({ data, customColors = {} }) {
 
       {/* Corpo a due colonne */}
       <div style={{ display: 'flex', minHeight: '900px' }}>
-        <LeftColumn data={data} C={C} />
-        <RightColumn data={data} C={C} />
+        <LeftColumn data={data} C={C} L={L} />
+        <RightColumn data={data} C={C} L={L} />
       </div>
     </div>
   );

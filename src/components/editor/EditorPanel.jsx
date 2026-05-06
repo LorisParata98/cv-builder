@@ -20,7 +20,7 @@ export function EditorPanel({ activeSection }) {
   const FormComponent = FORMS[activeSection];
 
   return (
-    <div className="w-full h-full bg-gray-50 overflow-y-auto p-4">
+    <div className="w-full h-full bg-gray-50 overflow-y-auto p-5">
       {FormComponent ? (
         <FormComponent />
       ) : (

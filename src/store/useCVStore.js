@@ -44,6 +44,8 @@ const initialState = {
     ...DEFAULT_CUSTOM_PALETTES,
     ...((savedState || {}).customPalettes || {}),
   },
+  // Lingua attiva per i titoli sezione (i18n locale) e per DeepL
+  targetLanguage: (savedState || {}).targetLanguage || 'IT',
 };
 
 export const useCVStore = create((set, get) => ({

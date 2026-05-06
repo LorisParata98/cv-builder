@@ -1,3 +1,4 @@
+import { ArrowCounterClockwise, UploadSimple, DownloadSimple, FilePdf, FileDoc, CircleNotch } from "@phosphor-icons/react";
 import { useCVStore } from "../../store/useCVStore";
 
 const TEMPLATES = [
@@ -73,9 +74,10 @@ export function Toolbar({ onExportPDF, onExportDOCX, onExportJSON, onImportJSON,
           onClick={handleReset}
           disabled={!!exporting}
           title="Ripristina i dati di default"
-          className="px-2.5 py-1.5 rounded text-xs font-medium text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-30"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded text-xs font-medium text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-30"
         >
-          ↺ Reset
+          <ArrowCounterClockwise size={14} />
+          Reset
         </button>
 
         <div className="w-px h-5 bg-gray-200" />
@@ -83,38 +85,46 @@ export function Toolbar({ onExportPDF, onExportDOCX, onExportJSON, onImportJSON,
         <button
           onClick={onImportJSON}
           disabled={!!exporting}
-          className="px-3 py-1.5 rounded text-xs font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors border border-gray-300 disabled:opacity-50"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors border border-gray-300 disabled:opacity-50"
         >
-          ↑ Carica CV
+          <UploadSimple size={14} />
+          Carica CV
         </button>
         <button
           onClick={onExportJSON}
           disabled={!!exporting}
-          className="px-3 py-1.5 rounded text-xs font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors border border-gray-300 disabled:opacity-50"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors border border-gray-300 disabled:opacity-50"
         >
-          ↓ JSON
+          <DownloadSimple size={14} />
+          JSON
         </button>
         <button
           onClick={onExportDOCX}
           disabled={!!exporting}
-          className={`px-3 py-1.5 rounded text-xs font-medium transition-colors border disabled:opacity-50 ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors border disabled:opacity-50 ${
             exporting === "docx"
               ? "bg-blue-200 text-blue-700 border-blue-300 cursor-wait"
               : "bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200"
           }`}
         >
-          {exporting === "docx" ? "⏳ DOCX…" : "↓ DOCX"}
+          {exporting === "docx"
+            ? <><CircleNotch size={14} className="animate-spin" /> DOCX…</>
+            : <><FileDoc size={14} /> DOCX</>
+          }
         </button>
         <button
           onClick={onExportPDF}
           disabled={!!exporting}
-          className={`px-3 py-1.5 rounded text-xs font-medium transition-colors disabled:opacity-50 ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors disabled:opacity-50 ${
             exporting === "pdf"
               ? "bg-red-400 text-white cursor-wait"
               : "bg-red-600 text-white hover:bg-red-700"
           }`}
         >
-          {exporting === "pdf" ? "⏳ PDF…" : "↓ PDF"}
+          {exporting === "pdf"
+            ? <><CircleNotch size={14} className="animate-spin" /> PDF…</>
+            : <><FilePdf size={14} /> PDF</>
+          }
         </button>
       </div>
     </header>

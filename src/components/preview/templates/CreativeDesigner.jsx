@@ -1,67 +1,68 @@
 // CreativeDesigner.jsx — Profilo designer / UX-UI / creativo
 // Layout asimmetrico con sidebar colorata, 3 sub-palette, font Fraunces
 
+import { getLocale } from "../../../locales/index.js";
+
 const PALETTES = {
   'noir-gold': {
-    bg: '#0D0D0D',
-    bgSecondary: '#2A2A2A',
-    accent: '#C8B89A',
-    textPrimary: '#F5F0E8',
-    textMuted: '#888888',
-    tagBg: '#2A2A2A',
-    tagBorder: '#C8B89A',
-    tagText: '#C8B89A',
-    sidebarBg: '#1A1A1A',
-    contentBg: '#ffffff',
-    contentText: '#1a1a1a',
+    bg:           '#0D0D0D',
+    bgSecondary:  '#2A2A2A',
+    accent:       '#C8B89A',
+    textPrimary:  '#F5F0E8',
+    textMuted:    '#888888',
+    tagBg:        '#2A2A2A',
+    tagBorder:    '#C8B89A',
+    tagText:      '#C8B89A',
+    sidebarBg:    '#1A1A1A',
+    contentBg:    '#ffffff',
+    contentText:  '#1a1a1a',
     contentMuted: '#555555',
-    sectionLine: '#C8B89A',
-    bulletChar: '—',
-    headerFont: "'Fraunces', Georgia, serif",
+    sectionLine:  '#C8B89A',
+    bulletChar:   '—',
+    headerFont:   "'Fraunces', Georgia, serif",
   },
   'indigo-electric': {
-    bg: '#F7F6FF',
-    bgSecondary: '#EEEDFE',
-    accent: '#5B4FE8',
-    textPrimary: '#1A1060',
-    textMuted: '#555555',
-    tagBg: '#EEEDFE',
-    tagBorder: '#5B4FE8',
-    tagText: '#3D35B0',
-    sidebarBg: '#EEEDFE',
-    contentBg: '#ffffff',
-    contentText: '#1A1060',
+    bg:           '#F7F6FF',
+    bgSecondary:  '#EEEDFE',
+    accent:       '#5B4FE8',
+    textPrimary:  '#1A1060',
+    textMuted:    '#555555',
+    tagBg:        '#EEEDFE',
+    tagBorder:    '#5B4FE8',
+    tagText:      '#3D35B0',
+    sidebarBg:    '#EEEDFE',
+    contentBg:    '#ffffff',
+    contentText:  '#1A1060',
     contentMuted: '#555555',
-    sectionLine: '#5B4FE8',
-    bulletChar: '▸',
-    headerFont: "'Fraunces', Georgia, serif",
+    sectionLine:  '#5B4FE8',
+    bulletChar:   '▸',
+    headerFont:   "'Fraunces', Georgia, serif",
   },
   'forest-stone': {
-    bg: '#F0EDE8',
-    bgSecondary: '#D8F3DC',
-    accent: '#2D6A4F',
-    textPrimary: '#1B4332',
-    textMuted: '#4A4A4A',
-    tagBg: '#D8F3DC',
-    tagBorder: '#2D6A4F',
-    tagText: '#1B4332',
-    sidebarBg: '#E8F5E9',
-    contentBg: '#FAFAF8',
-    contentText: '#1B4332',
+    bg:           '#F0EDE8',
+    bgSecondary:  '#D8F3DC',
+    accent:       '#2D6A4F',
+    textPrimary:  '#1B4332',
+    textMuted:    '#4A4A4A',
+    tagBg:        '#D8F3DC',
+    tagBorder:    '#2D6A4F',
+    tagText:      '#1B4332',
+    sidebarBg:    '#E8F5E9',
+    contentBg:    '#FAFAF8',
+    contentText:  '#1B4332',
     contentMuted: '#4A4A4A',
-    sectionLine: '#2D6A4F',
-    bulletChar: '◆',
-    headerFont: "'Fraunces', Georgia, serif",
+    sectionLine:  '#2D6A4F',
+    bulletChar:   '◆',
+    headerFont:   "'Fraunces', Georgia, serif",
   },
 };
 
-function formatDate(d) {
+function formatDate(d, L) {
   if (!d) return '';
-  if (d === 'present') return 'Presente';
+  if (d === 'present') return L.present;
   const [y, m] = d.split('-');
   if (!m) return y;
-  const months = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
-  return `${months[parseInt(m,10)-1]} ${y}`;
+  return `${L.months[parseInt(m, 10) - 1]} ${y}`;
 }
 
 function SectionTitle({ children, p }) {
@@ -84,7 +85,7 @@ function SectionTitle({ children, p }) {
 }
 
 // ─── Sidebar sinistra colorata ────────────────────────────────────────────────
-function DesignerSidebar({ data, p }) {
+function DesignerSidebar({ data, p, L }) {
   const { personal, skills, languages, certifications } = data;
 
   return (
@@ -126,7 +127,7 @@ function DesignerSidebar({ data, p }) {
       {/* Contatti */}
       <div>
         <p style={{ fontSize: '8px', fontWeight: 700, color: p.accent, textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '8px' }}>
-          Contatti
+          {L.contacts}
         </p>
         {[
           { icon: '✉', val: personal.email },
@@ -134,10 +135,10 @@ function DesignerSidebar({ data, p }) {
           { icon: '📍', val: personal.location },
           { icon: '🔗', val: personal.website },
           { icon: 'in', val: personal.linkedin },
-        ].filter(x => x.val).map((c, i) => (
+        ].filter(x => x.val).map((item, i) => (
           <div key={i} style={{ display: 'flex', gap: '6px', alignItems: 'flex-start', marginBottom: '5px' }}>
-            <span style={{ fontSize: '9px', color: p.accent, flexShrink: 0, minWidth: '14px' }}>{c.icon}</span>
-            <span style={{ fontSize: '8.5px', color: p.textMuted, wordBreak: 'break-all', lineHeight: 1.4 }}>{c.val}</span>
+            <span style={{ fontSize: '9px', color: p.accent, flexShrink: 0, minWidth: '14px' }}>{item.icon}</span>
+            <span style={{ fontSize: '8.5px', color: p.textMuted, wordBreak: 'break-all', lineHeight: 1.4 }}>{item.val}</span>
           </div>
         ))}
       </div>
@@ -146,7 +147,7 @@ function DesignerSidebar({ data, p }) {
       {skills.length > 0 && (
         <div>
           <p style={{ fontSize: '8px', fontWeight: 700, color: p.accent, textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '8px' }}>
-            Skills
+            {L.skillsShort}
           </p>
           {skills.map((cat, i) => (
             <div key={i} style={{ marginBottom: '10px' }}>
@@ -178,7 +179,7 @@ function DesignerSidebar({ data, p }) {
       {languages.length > 0 && (
         <div>
           <p style={{ fontSize: '8px', fontWeight: 700, color: p.accent, textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '8px' }}>
-            Lingue
+            {L.languages}
           </p>
           {languages.map((l, i) => (
             <div key={i} style={{ marginBottom: '5px' }}>
@@ -193,12 +194,12 @@ function DesignerSidebar({ data, p }) {
       {certifications.filter(Boolean).length > 0 && (
         <div>
           <p style={{ fontSize: '8px', fontWeight: 700, color: p.accent, textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '8px' }}>
-            Certificazioni
+            {L.certifications}
           </p>
-          {certifications.filter(Boolean).map((c, i) => (
+          {certifications.filter(Boolean).map((cert, i) => (
             <div key={i} style={{ display: 'flex', gap: '5px', marginBottom: '4px', alignItems: 'flex-start' }}>
               <span style={{ color: p.accent, fontSize: '8px', flexShrink: 0 }}>✦</span>
-              <span style={{ fontSize: '8.5px', color: p.textMuted, lineHeight: 1.4 }}>{c}</span>
+              <span style={{ fontSize: '8.5px', color: p.textMuted, lineHeight: 1.4 }}>{cert}</span>
             </div>
           ))}
         </div>
@@ -208,7 +209,7 @@ function DesignerSidebar({ data, p }) {
 }
 
 // ─── Contenuto principale ─────────────────────────────────────────────────────
-function DesignerContent({ data, p }) {
+function DesignerContent({ data, p, L }) {
   const { personal, experience, education, projects } = data;
 
   return (
@@ -220,7 +221,7 @@ function DesignerContent({ data, p }) {
       {/* Sommario */}
       {personal.summary && (
         <div style={{ marginBottom: '20px' }}>
-          <SectionTitle p={p}>Profilo</SectionTitle>
+          <SectionTitle p={p}>{L.profile}</SectionTitle>
           <p style={{ fontSize: '10px', lineHeight: 1.7, color: p.contentText, fontFamily: 'system-ui, sans-serif' }}>
             {personal.summary}
           </p>
@@ -230,7 +231,7 @@ function DesignerContent({ data, p }) {
       {/* Esperienza */}
       {experience.length > 0 && (
         <div style={{ marginBottom: '20px' }}>
-          <SectionTitle p={p}>Esperienza</SectionTitle>
+          <SectionTitle p={p}>{L.experienceShort}</SectionTitle>
           {experience.map((exp) => (
             <div key={exp.id} style={{ marginBottom: '14px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2px' }}>
@@ -243,7 +244,7 @@ function DesignerContent({ data, p }) {
                   </p>
                 </div>
                 <span style={{ fontSize: '8.5px', color: p.contentMuted, whiteSpace: 'nowrap', marginLeft: '10px', marginTop: '2px' }}>
-                  {formatDate(exp.startDate)} – {formatDate(exp.endDate)}
+                  {formatDate(exp.startDate, L)} – {formatDate(exp.endDate, L)}
                 </span>
               </div>
               <ul style={{ margin: '5px 0 0', padding: 0, listStyle: 'none' }}>
@@ -262,7 +263,7 @@ function DesignerContent({ data, p }) {
       {/* Formazione */}
       {education.length > 0 && (
         <div style={{ marginBottom: '20px' }}>
-          <SectionTitle p={p}>Formazione</SectionTitle>
+          <SectionTitle p={p}>{L.education}</SectionTitle>
           {education.map((edu) => (
             <div key={edu.id} style={{ marginBottom: '10px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -275,12 +276,12 @@ function DesignerContent({ data, p }) {
                   </p>
                 </div>
                 <span style={{ fontSize: '8.5px', color: p.contentMuted, whiteSpace: 'nowrap', marginLeft: '10px' }}>
-                  {formatDate(edu.startDate)} – {formatDate(edu.endDate)}
+                  {formatDate(edu.startDate, L)} – {formatDate(edu.endDate, L)}
                 </span>
               </div>
               {edu.thesis && (
                 <p style={{ fontSize: '9px', color: p.contentMuted, fontStyle: 'italic', marginTop: '3px' }}>
-                  Tesi: {edu.thesis}
+                  {L.thesis}: {edu.thesis}
                 </p>
               )}
             </div>
@@ -291,7 +292,7 @@ function DesignerContent({ data, p }) {
       {/* Progetti */}
       {projects.filter(Boolean).length > 0 && (
         <div>
-          <SectionTitle p={p}>Progetti</SectionTitle>
+          <SectionTitle p={p}>{L.projects}</SectionTitle>
           {projects.filter(Boolean).map((proj, i) => (
             <div key={i} style={{ display: 'flex', gap: '7px', marginBottom: '5px', alignItems: 'flex-start' }}>
               <span style={{ color: p.accent, flexShrink: 0, fontWeight: 700 }}>{p.bulletChar}</span>
@@ -305,10 +306,10 @@ function DesignerContent({ data, p }) {
 }
 
 // ─── Componente principale ────────────────────────────────────────────────────
-export function CreativeDesigner({ data, palette = 'noir-gold', customColors = {} }) {
-  // Prima seleziona la palette base, poi applica gli override custom
+export function CreativeDesigner({ data, palette = 'noir-gold', customColors = {}, locale }) {
   const baseP = PALETTES[palette] || PALETTES['noir-gold'];
   const p = { ...baseP, ...customColors };
+  const L = locale || getLocale('IT');
 
   return (
     <div style={{ width: '100%', backgroundColor: p.bg, fontFamily: 'system-ui, sans-serif' }}>
@@ -347,8 +348,8 @@ export function CreativeDesigner({ data, palette = 'noir-gold', customColors = {
 
       {/* Corpo: sidebar + contenuto */}
       <div style={{ display: 'flex', minHeight: '860px' }}>
-        <DesignerSidebar data={data} p={p} />
-        <DesignerContent data={data} p={p} />
+        <DesignerSidebar data={data} p={p} L={L} />
+        <DesignerContent data={data} p={p} L={L} />
       </div>
     </div>
   );

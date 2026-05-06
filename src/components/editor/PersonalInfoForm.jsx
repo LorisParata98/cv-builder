@@ -1,29 +1,21 @@
+import { User } from "@phosphor-icons/react";
 import { useCVStore } from "../../store/useCVStore";
 import { SectionCard } from "../ui/SectionCard";
+import { AutoTextarea } from "../ui/AutoTextarea";
 
 function Field({ label, value, onChange, type = "text", placeholder = "" }) {
   return (
-    <div className="mb-3">
-      <label className="block text-xs font-medium text-gray-600 mb-1">
+    <div className="mb-4">
+      <label className="block text-xs font-medium text-gray-600 mb-1.5">
         {label}
       </label>
-      {type === "textarea" ? (
-        <textarea
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          rows={6}
-          className="w-full border border-gray-300 rounded px-2.5 py-1.5 text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 resize-vertical"
-        />
-      ) : (
-        <input
-          type={type}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          className="w-full border border-gray-300 rounded px-2.5 py-1.5 text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-        />
-      )}
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full border border-gray-300 rounded px-2.5 py-2 text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+      />
     </div>
   );
 }
@@ -44,10 +36,11 @@ export function PersonalInfoForm() {
     reader.onload = (ev) => setPersonal({ photo: ev.target.result });
     reader.readAsDataURL(file);
   };
+
   return (
-    <SectionCard title="Dati Personali" icon="👤">
+    <SectionCard title="Dati Personali" icon={<User size={15} weight="duotone" />}>
       {/* Foto */}
-      <div className="flex items-center gap-4 mb-4">
+      <div className="flex items-center gap-4 mb-6">
         <div className="w-16 h-16 rounded-full bg-gray-200 overflow-hidden flex-shrink-0 border-2 border-gray-300">
           {personal.photo ? (
             <img
@@ -56,8 +49,8 @@ export function PersonalInfoForm() {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-400 text-2xl">
-              👤
+            <div className="w-full h-full flex items-center justify-center text-gray-400">
+              <User size={28} weight="light" />
             </div>
           )}
         </div>
@@ -125,13 +118,19 @@ export function PersonalInfoForm() {
         onChange={(v) => setPersonal({ linkedin: v })}
         placeholder="linkedin.com/in/tuoprofilo"
       />
-      <Field
-        label="Sommario professionale"
-        value={personal.summary}
-        onChange={(v) => setPersonal({ summary: v })}
-        type="textarea"
-        placeholder="Breve descrizione del tuo profilo..."
-      />
+
+      <div className="mb-4">
+        <label className="block text-xs font-medium text-gray-600 mb-1.5">
+          Sommario professionale
+        </label>
+        <AutoTextarea
+          value={personal.summary}
+          onChange={(e) => setPersonal({ summary: e.target.value })}
+          placeholder="Breve descrizione del tuo profilo..."
+          rows={4}
+          className="w-full border border-gray-300 rounded px-2.5 py-2 text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
     </SectionCard>
   );
 }

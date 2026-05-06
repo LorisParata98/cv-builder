@@ -1,11 +1,13 @@
 import { useRef, useState } from "react";
+import { DotsSixVertical, Briefcase } from "@phosphor-icons/react";
 import { useCVStore } from "../../store/useCVStore";
 import { SectionCard } from "../ui/SectionCard";
+import { AutoTextarea } from "../ui/AutoTextarea";
 
 function Field({ label, value, onChange, placeholder = "", type = "text" }) {
   return (
-    <div className="mb-2">
-      <label className="block text-xs font-medium text-gray-500 mb-0.5">
+    <div className="mb-3.5">
+      <label className="block text-xs font-medium text-gray-500 mb-1.5">
         {label}
       </label>
       <input
@@ -13,7 +15,7 @@ function Field({ label, value, onChange, placeholder = "", type = "text" }) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full border border-gray-300 rounded px-2.5 py-1.5 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        className="w-full border border-gray-300 rounded px-2.5 py-2 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
       />
     </div>
   );
@@ -50,31 +52,29 @@ function BulletList({ bullets, onUpdate }) {
   };
 
   return (
-    <div className="mt-2">
-      <label className="block text-xs font-medium text-gray-500 mb-1">
+    <div className="mt-3">
+      <label className="block text-xs font-medium text-gray-500 mb-1.5">
         Bullet point{" "}
         <span className="text-gray-400 font-normal">
           (Invio = nuovo, Backspace su riga vuota = rimuovi)
         </span>
       </label>
-      <ul className="space-y-1">
+      <ul className="space-y-2.5">
         {bullets.map((bullet, i) => (
-          <li key={i} className="flex gap-1 items-start">
-            <span className="text-blue-400 mt-1.5 flex-shrink-0 text-xs">
-              •
-            </span>
-            <textarea
+          <li key={i} className="flex gap-1.5 items-start">
+            <span className="text-blue-400 mt-2 flex-shrink-0 text-xs">•</span>
+            <AutoTextarea
               value={bullet}
               onChange={(e) => handleChange(i, e.target.value)}
               onKeyDown={(e) => handleKeyDown(e, i)}
               placeholder="Descrivi il tuo contributo con numeri di impatto..."
               rows={2}
-              className="flex-1 border border-gray-300 rounded px-2 py-1 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+              className="flex-1 border border-gray-300 rounded px-2.5 py-2 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
             {bullets.length > 1 && (
               <button
                 onClick={() => handleRemove(i)}
-                className="text-gray-300 hover:text-red-400 mt-1 flex-shrink-0 text-sm leading-none"
+                className="text-gray-300 hover:text-red-400 mt-1.5 flex-shrink-0 text-sm leading-none"
               >
                 ✕
               </button>
@@ -84,7 +84,7 @@ function BulletList({ bullets, onUpdate }) {
       </ul>
       <button
         onClick={handleAdd}
-        className="mt-1 text-xs text-blue-500 hover:text-blue-700"
+        className="mt-2 text-xs text-blue-500 hover:text-blue-700"
       >
         + Aggiungi bullet
       </button>
@@ -92,27 +92,20 @@ function BulletList({ bullets, onUpdate }) {
   );
 }
 
-function ExperienceCard({
-  exp,
-  onUpdate,
-  onRemove,
-  dragHandleProps,
-  isDragOver,
-}) {
+function ExperienceCard({ exp, onUpdate, onRemove, dragHandleProps, isDragOver }) {
   return (
     <div
-      className={`border rounded-lg p-3 mb-2 bg-white transition-colors ${
+      className={`border rounded-lg p-4 mb-3.5 bg-white transition-colors ${
         isDragOver ? "border-blue-400 bg-blue-50" : "border-gray-200"
       }`}
     >
-      <div className="flex justify-between items-start mb-2">
-        {/* Drag handle */}
+      <div className="flex justify-between items-start mb-3">
         <span
           {...dragHandleProps}
           title="Trascina per riordinare"
-          className="text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing mr-2 mt-0.5 flex-shrink-0 select-none text-base leading-none"
+          className="text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing mr-2 mt-0.5 flex-shrink-0 select-none flex items-center"
         >
-          ⠿
+          <DotsSixVertical size={18} weight="bold" />
         </span>
         <span className="text-xs font-semibold text-gray-600 truncate flex-1">
           {exp.role || "Nuova esperienza"}
@@ -126,55 +119,33 @@ function ExperienceCard({
         </button>
       </div>
 
-      <Field
-        label="Ruolo"
-        value={exp.role}
-        onChange={(v) => onUpdate({ role: v })}
-        placeholder="Es. Senior Frontend Developer"
-      />
-      <Field
-        label="Azienda"
-        value={exp.company}
-        onChange={(v) => onUpdate({ company: v })}
-        placeholder="Es. Acme Corp"
-      />
-      <Field
-        label="Città / Nazione"
-        value={exp.location}
-        onChange={(v) => onUpdate({ location: v })}
-        placeholder="Es. Milano, Italia"
-      />
+      <Field label="Ruolo"         value={exp.role}     onChange={(v) => onUpdate({ role: v })}     placeholder="Es. Senior Frontend Developer" />
+      <Field label="Azienda"       value={exp.company}  onChange={(v) => onUpdate({ company: v })}  placeholder="Es. Acme Corp" />
+      <Field label="Città / Nazione" value={exp.location} onChange={(v) => onUpdate({ location: v })} placeholder="Es. Milano, Italia" />
 
-      <div className="flex gap-2">
+      <div className="flex gap-3">
         <div className="flex-1">
-          <Field
-            label="Data inizio"
-            value={exp.startDate}
-            onChange={(v) => onUpdate({ startDate: v })}
-            placeholder="YYYY-MM"
-          />
+          <Field label="Data inizio" value={exp.startDate} onChange={(v) => onUpdate({ startDate: v })} placeholder="YYYY-MM" />
         </div>
         <div className="flex-1">
-          <div className="mb-2">
-            <label className="block text-xs font-medium text-gray-500 mb-0.5">
+          <div className="mb-3.5">
+            <label className="block text-xs font-medium text-gray-500 mb-1.5">
               Data fine
             </label>
-            <div className="flex gap-1">
+            <div className="flex gap-1.5">
               <input
                 type="text"
                 value={exp.endDate === "present" ? "" : exp.endDate}
                 onChange={(e) => onUpdate({ endDate: e.target.value })}
                 placeholder="YYYY-MM"
                 disabled={exp.endDate === "present"}
-                className="flex-1 border border-gray-300 rounded px-2.5 py-1.5 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-400"
+                className="flex-1 border border-gray-300 rounded px-2.5 py-2 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-400"
               />
               <button
                 onClick={() =>
-                  onUpdate({
-                    endDate: exp.endDate === "present" ? "" : "present",
-                  })
+                  onUpdate({ endDate: exp.endDate === "present" ? "" : "present" })
                 }
-                className={`px-2 py-1 text-xs rounded border transition-colors flex-shrink-0 ${
+                className={`px-2 py-1.5 text-xs rounded border transition-colors flex-shrink-0 ${
                   exp.endDate === "present"
                     ? "bg-green-100 text-green-700 border-green-300"
                     : "bg-gray-100 text-gray-500 border-gray-300 hover:bg-gray-200"
@@ -196,9 +167,9 @@ function ExperienceCard({
 }
 
 export function ExperienceForm() {
-  const experience = useCVStore((s) => s.experience);
-  const setExperience = useCVStore((s) => s.setExperience);
-  const addExperience = useCVStore((s) => s.addExperience);
+  const experience      = useCVStore((s) => s.experience);
+  const setExperience   = useCVStore((s) => s.setExperience);
+  const addExperience   = useCVStore((s) => s.addExperience);
   const removeExperience = useCVStore((s) => s.removeExperience);
   const updateExperience = useCVStore((s) => s.updateExperience);
 
@@ -214,27 +185,15 @@ export function ExperienceForm() {
   };
 
   return (
-    <SectionCard title="Esperienza" icon="💼">
+    <SectionCard title="Esperienza" icon={<Briefcase size={15} weight="duotone" />}>
       {experience.map((exp, index) => (
         <div
           key={exp.id}
           draggable
-          onDragStart={() => {
-            dragIndex.current = index;
-          }}
-          onDragOver={(e) => {
-            e.preventDefault();
-            setDragOver(index);
-          }}
-          onDrop={() => {
-            reorder(dragIndex.current, index);
-            setDragOver(null);
-            dragIndex.current = null;
-          }}
-          onDragEnd={() => {
-            setDragOver(null);
-            dragIndex.current = null;
-          }}
+          onDragStart={() => { dragIndex.current = index; }}
+          onDragOver={(e) => { e.preventDefault(); setDragOver(index); }}
+          onDrop={() => { reorder(dragIndex.current, index); setDragOver(null); dragIndex.current = null; }}
+          onDragEnd={() => { setDragOver(null); dragIndex.current = null; }}
           style={{ opacity: dragIndex.current === index ? 0.5 : 1 }}
         >
           <ExperienceCard
@@ -248,7 +207,7 @@ export function ExperienceForm() {
       ))}
       <button
         onClick={addExperience}
-        className="w-full text-sm py-2 border-2 border-dashed border-gray-300 text-gray-500 rounded-lg hover:border-blue-400 hover:text-blue-500 transition-colors"
+        className="w-full text-sm py-2.5 border-2 border-dashed border-gray-300 text-gray-500 rounded-lg hover:border-blue-400 hover:text-blue-500 transition-colors"
       >
         + Aggiungi esperienza
       </button>

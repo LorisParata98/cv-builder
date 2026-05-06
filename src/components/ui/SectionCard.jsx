@@ -19,7 +19,7 @@ export function SectionCard({ title, icon, children, defaultOpen = true }) {
 
       {/* Contenuto */}
       {open && (
-        <div className="px-4 py-4 bg-white">
+        <div className="px-4 py-5 bg-white">
           {children}
         </div>
       )}

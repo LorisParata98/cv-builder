@@ -1,17 +1,19 @@
 import { useRef, useState } from "react";
+import { DotsSixVertical, GraduationCap } from "@phosphor-icons/react";
 import { useCVStore } from "../../store/useCVStore";
 import { SectionCard } from "../ui/SectionCard";
+import { AutoTextarea } from "../ui/AutoTextarea";
 
 function Field({ label, value, onChange, placeholder = "" }) {
   return (
-    <div className="mb-2">
-      <label className="block text-xs font-medium text-gray-500 mb-0.5">{label}</label>
+    <div className="mb-3.5">
+      <label className="block text-xs font-medium text-gray-500 mb-1.5">{label}</label>
       <input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full border border-gray-300 rounded px-2.5 py-1.5 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        className="w-full border border-gray-300 rounded px-2.5 py-2 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
       />
     </div>
   );
@@ -19,16 +21,16 @@ function Field({ label, value, onChange, placeholder = "" }) {
 
 function EducationCard({ edu, onUpdate, onRemove, isDragOver, dragHandleProps }) {
   return (
-    <div className={`border rounded-lg p-3 mb-2 bg-white transition-colors ${
+    <div className={`border rounded-lg p-4 mb-3.5 bg-white transition-colors ${
       isDragOver ? "border-blue-400 bg-blue-50" : "border-gray-200"
     }`}>
-      <div className="flex justify-between items-start mb-2">
+      <div className="flex justify-between items-start mb-3">
         <span
           {...dragHandleProps}
           title="Trascina per riordinare"
-          className="text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing mr-2 mt-0.5 flex-shrink-0 select-none text-base leading-none"
+          className="text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing mr-2 mt-0.5 flex-shrink-0 select-none flex items-center"
         >
-          ⠿
+          <DotsSixVertical size={18} weight="bold" />
         </span>
         <span className="text-xs font-semibold text-gray-600 truncate flex-1">
           {edu.institution || "Nuovo titolo di studio"}
@@ -38,28 +40,28 @@ function EducationCard({ edu, onUpdate, onRemove, isDragOver, dragHandleProps })
         </button>
       </div>
 
-      <Field label="Istituto" value={edu.institution} onChange={(v) => onUpdate({ institution: v })} placeholder="Es. Politecnico di Milano" />
-      <Field label="Titolo" value={edu.degree} onChange={(v) => onUpdate({ degree: v })} placeholder="Es. Laurea Magistrale" />
-      <Field label="Indirizzo / Materia" value={edu.field} onChange={(v) => onUpdate({ field: v })} placeholder="Es. Ingegneria Informatica" />
-      <Field label="Voto" value={edu.grade} onChange={(v) => onUpdate({ grade: v })} placeholder="Es. 110/110" />
+      <Field label="Istituto"          value={edu.institution} onChange={(v) => onUpdate({ institution: v })} placeholder="Es. Politecnico di Milano" />
+      <Field label="Titolo"            value={edu.degree}      onChange={(v) => onUpdate({ degree: v })}      placeholder="Es. Laurea Magistrale" />
+      <Field label="Indirizzo / Materia" value={edu.field}     onChange={(v) => onUpdate({ field: v })}       placeholder="Es. Ingegneria Informatica" />
+      <Field label="Voto"              value={edu.grade}       onChange={(v) => onUpdate({ grade: v })}       placeholder="Es. 110/110" />
 
-      <div className="flex gap-2">
+      <div className="flex gap-3">
         <div className="flex-1">
           <Field label="Inizio" value={edu.startDate} onChange={(v) => onUpdate({ startDate: v })} placeholder="YYYY-MM" />
         </div>
         <div className="flex-1">
-          <Field label="Fine" value={edu.endDate} onChange={(v) => onUpdate({ endDate: v })} placeholder="YYYY-MM" />
+          <Field label="Fine"   value={edu.endDate}   onChange={(v) => onUpdate({ endDate: v })}   placeholder="YYYY-MM" />
         </div>
       </div>
 
-      <div className="mb-2">
-        <label className="block text-xs font-medium text-gray-500 mb-0.5">Tesi (opzionale)</label>
-        <textarea
+      <div className="mb-3.5">
+        <label className="block text-xs font-medium text-gray-500 mb-1.5">Tesi (opzionale)</label>
+        <AutoTextarea
           value={edu.thesis}
           onChange={(e) => onUpdate({ thesis: e.target.value })}
           placeholder="Titolo o argomento della tesi..."
           rows={2}
-          className="w-full border border-gray-300 rounded px-2.5 py-1.5 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+          className="w-full border border-gray-300 rounded px-2.5 py-2 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
       </div>
     </div>
@@ -85,7 +87,7 @@ export function EducationForm() {
   };
 
   return (
-    <SectionCard title="Formazione" icon="🎓">
+    <SectionCard title="Formazione" icon={<GraduationCap size={15} weight="duotone" />}>
       {education.map((edu, index) => (
         <div
           key={edu.id}
@@ -107,7 +109,7 @@ export function EducationForm() {
       ))}
       <button
         onClick={addEducation}
-        className="w-full text-sm py-2 border-2 border-dashed border-gray-300 text-gray-500 rounded-lg hover:border-blue-400 hover:text-blue-500 transition-colors"
+        className="w-full text-sm py-2.5 border-2 border-dashed border-gray-300 text-gray-500 rounded-lg hover:border-blue-400 hover:text-blue-500 transition-colors"
       >
         + Aggiungi titolo di studio
       </button>

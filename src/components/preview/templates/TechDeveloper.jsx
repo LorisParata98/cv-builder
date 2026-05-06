@@ -3,31 +3,32 @@
 // Font: JetBrains Mono (titoli), system-ui (corpo)
 // Layout: colonna singola, ATS-safe
 
+import { getLocale } from "../../../locales/index.js";
+
 const COLORS_DEFAULT = {
-  bg: "#0f2644",
-  bgLight: "#162f52",
-  accent: "#4ec9b0",
-  accentOrange: "#e07b3e",
-  text: "#e8eaf0",
-  textMuted: "#8fa8c8",
-  tagBg: "#1a3a60",
-  tagBorder: "#4ec9b0",
-  white: "#ffffff",
-  bodyBg: "#f8f9fa",
-  bodyText: "#1a1a2e",
-  bodyMuted: "#4a5568",
-  border: "#dde3ed",
+  bg:          "#0f2644",
+  bgLight:     "#162f52",
+  accent:      "#4ec9b0",
+  accentOrange:"#e07b3e",
+  text:        "#e8eaf0",
+  textMuted:   "#8fa8c8",
+  tagBg:       "#1a3a60",
+  tagBorder:   "#4ec9b0",
+  white:       "#ffffff",
+  bodyBg:      "#f8f9fa",
+  bodyText:    "#1a1a2e",
+  bodyMuted:   "#4a5568",
+  border:      "#dde3ed",
 };
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-function formatDate(dateStr) {
+function formatDate(dateStr, L) {
   if (!dateStr) return "";
-  if (dateStr === "present") return "Presente";
+  if (dateStr === "present") return L.present;
   const [year, month] = dateStr.split("-");
   if (!month) return year;
-  const months = ["Gen","Feb","Mar","Apr","Mag","Giu","Lug","Ago","Set","Ott","Nov","Dic"];
-  return `${months[parseInt(month, 10) - 1]} ${year}`;
+  return `${L.months[parseInt(month, 10) - 1]} ${year}`;
 }
 
 function SectionHeader({ icon, title, C }) {
@@ -81,8 +82,7 @@ function HeaderSection({ personal, C }) {
         </div>
       )}
 
-      {/* Info principale */}
-      <div style={{ flex: 1 }}>
+      <div>
         <h1 style={{
           fontFamily: "'JetBrains Mono', monospace",
           fontSize: "26px",
@@ -96,39 +96,43 @@ function HeaderSection({ personal, C }) {
         </h1>
         <p style={{
           fontFamily: "'JetBrains Mono', monospace",
-          fontSize: "13px",
+          fontSize: "12px",
           color: C.accent,
-          margin: "6px 0 14px",
+          margin: "6px 0 12px",
           fontWeight: 500,
         }}>
           {personal.title || "Il tuo ruolo"}
         </p>
 
-        {/* Contatti in riga */}
-        <div style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "6px 20px",
-          fontSize: "11px",
-          color: C.textMuted,
-          fontFamily: "system-ui, sans-serif",
-        }}>
-          {personal.email    && <span>✉ {personal.email}</span>}
-          {personal.phone    && <span>☎ {personal.phone}</span>}
-          {personal.location && <span>📍 {personal.location}</span>}
-          {personal.website  && <span style={{ color: C.accent }}>⬡ {personal.website}</span>}
-          {personal.linkedin && <span style={{ color: C.accent }}>in {personal.linkedin}</span>}
+        {/* Contatti inline */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 18px" }}>
+          {[
+            personal.email    && { val: personal.email,    prefix: "✉" },
+            personal.phone    && { val: personal.phone,    prefix: "☎" },
+            personal.location && { val: personal.location, prefix: "📍" },
+            personal.website  && { val: personal.website,  prefix: "gh" },
+            personal.linkedin && { val: personal.linkedin, prefix: "in" },
+          ].filter(Boolean).map((item, i) => (
+            <span key={i} style={{
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: "9px",
+              color: C.textMuted,
+            }}>
+              <span style={{ color: C.accent }}>{item.prefix} </span>
+              {item.val}
+            </span>
+          ))}
         </div>
       </div>
     </div>
   );
 }
 
-function SummarySection({ summary, C }) {
+function SummarySection({ summary, C, L }) {
   if (!summary) return null;
   return (
     <div style={{ marginBottom: "22px" }}>
-      <SectionHeader icon="</>" title="Profilo" C={C} />
+      <SectionHeader icon="</>" title={L.profile} C={C} />
       <p style={{
         fontSize: "12px",
         lineHeight: "1.7",
@@ -142,11 +146,11 @@ function SummarySection({ summary, C }) {
   );
 }
 
-function SkillsSection({ skills, C }) {
+function SkillsSection({ skills, C, L }) {
   if (!skills || skills.length === 0) return null;
   return (
     <div style={{ marginBottom: "22px" }}>
-      <SectionHeader icon="$" title="Competenze tecniche" C={C} />
+      <SectionHeader icon="$" title={L.skills} C={C} />
       <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         {skills.map((cat, i) => (
           <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
@@ -192,168 +196,160 @@ function SkillsSection({ skills, C }) {
   );
 }
 
-function ExperienceSection({ experience, C }) {
+function ExperienceSection({ experience, C, L }) {
   if (!experience || experience.length === 0) return null;
   return (
     <div style={{ marginBottom: "22px" }}>
-      <SectionHeader icon="⚙" title="Esperienza professionale" C={C} />
-      <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-        {experience.map((exp) => (
-          <div key={exp.id}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "4px" }}>
-              <div>
-                <span style={{
-                  fontSize: "13px",
-                  fontWeight: 700,
-                  color: C.bodyText,
-                  fontFamily: "system-ui, sans-serif",
-                }}>
-                  {exp.role}
-                </span>
-                <span style={{
-                  fontSize: "12px",
-                  color: C.bodyMuted,
-                  fontFamily: "system-ui, sans-serif",
-                  marginLeft: "8px",
-                }}>
-                  @ {exp.company}
-                  {exp.location && ` · ${exp.location}`}
-                </span>
-              </div>
-              <span style={{
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: "10px",
-                color: C.accent,
-                whiteSpace: "nowrap",
-                flexShrink: 0,
-                marginLeft: "12px",
+      <SectionHeader icon=">>" title={L.experience} C={C} />
+      {experience.map((exp) => (
+        <div key={exp.id} style={{ marginBottom: "16px" }}>
+          <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            marginBottom: "6px",
+          }}>
+            <div>
+              <p style={{
+                fontFamily: "system-ui, sans-serif",
+                fontSize: "13px",
+                fontWeight: 700,
+                color: C.bodyText,
+                margin: 0,
               }}>
-                {formatDate(exp.startDate)} – {formatDate(exp.endDate)}
-              </span>
-            </div>
-            <ul style={{ margin: "6px 0 0", padding: 0, listStyle: "none" }}>
-              {exp.bullets.filter(Boolean).map((bullet, bi) => (
-                <li key={bi} style={{
-                  display: "flex",
-                  gap: "8px",
-                  fontSize: "11.5px",
-                  lineHeight: "1.6",
-                  color: C.bodyText,
-                  fontFamily: "system-ui, sans-serif",
-                  marginBottom: "2px",
-                }}>
-                  <span style={{ color: C.accent, flexShrink: 0, fontWeight: 700 }}>•</span>
-                  {bullet}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function EducationSection({ education, C }) {
-  if (!education || education.length === 0) return null;
-  return (
-    <div style={{ marginBottom: "22px" }}>
-      <SectionHeader icon="⬡" title="Formazione" C={C} />
-      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-        {education.map((edu) => (
-          <div key={edu.id}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-              <div>
-                <span style={{
-                  fontSize: "13px",
-                  fontWeight: 700,
-                  color: C.bodyText,
-                  fontFamily: "system-ui, sans-serif",
-                }}>
-                  {edu.degree}{edu.field ? ` in ${edu.field}` : ""}
-                </span>
-                <div style={{
-                  fontSize: "11.5px",
-                  color: C.bodyMuted,
-                  fontFamily: "system-ui, sans-serif",
-                  marginTop: "2px",
-                }}>
-                  {edu.institution}{edu.grade ? ` · ${edu.grade}` : ""}
-                </div>
-              </div>
-              <span style={{
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: "10px",
-                color: C.accent,
-                whiteSpace: "nowrap",
-                flexShrink: 0,
-                marginLeft: "12px",
-              }}>
-                {formatDate(edu.startDate)} – {formatDate(edu.endDate)}
-              </span>
-            </div>
-            {edu.thesis && (
+                {exp.role}
+              </p>
               <p style={{
                 fontSize: "11px",
                 color: C.bodyMuted,
+                margin: "2px 0 0",
                 fontFamily: "system-ui, sans-serif",
-                margin: "4px 0 0",
-                fontStyle: "italic",
               }}>
-                Tesi: {edu.thesis}
+                {exp.company}{exp.location ? ` · ${exp.location}` : ""}
               </p>
-            )}
+            </div>
+            <span style={{
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: "9px",
+              color: C.accent,
+              whiteSpace: "nowrap",
+              marginLeft: "12px",
+            }}>
+              {formatDate(exp.startDate, L)} – {formatDate(exp.endDate, L)}
+            </span>
           </div>
-        ))}
-      </div>
+          <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
+            {exp.bullets.filter(Boolean).map((b, bi) => (
+              <li key={bi} style={{
+                display: "flex",
+                gap: "8px",
+                fontSize: "11px",
+                lineHeight: "1.65",
+                color: C.bodyText,
+                marginBottom: "3px",
+                fontFamily: "system-ui, sans-serif",
+              }}>
+                <span style={{ color: C.accent, flexShrink: 0, fontWeight: 700 }}>–</span>
+                {b}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </div>
   );
 }
 
-function CertificationsSection({ certifications, C }) {
-  const items = certifications?.filter(Boolean) || [];
+function EducationSection({ education, C, L }) {
+  if (!education || education.length === 0) return null;
+  return (
+    <div style={{ marginBottom: "22px" }}>
+      <SectionHeader icon="[]" title={L.education} C={C} />
+      {education.map((edu) => (
+        <div key={edu.id} style={{ marginBottom: "12px" }}>
+          <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+          }}>
+            <div>
+              <p style={{
+                fontFamily: "system-ui, sans-serif",
+                fontSize: "13px",
+                fontWeight: 700,
+                color: C.bodyText,
+                margin: 0,
+              }}>
+                {edu.degree}{edu.field ? ` in ${edu.field}` : ""}
+              </p>
+              <p style={{
+                fontSize: "11px",
+                color: C.bodyMuted,
+                margin: "2px 0 0",
+                fontFamily: "system-ui, sans-serif",
+              }}>
+                {edu.institution}{edu.grade ? ` · ${edu.grade}` : ""}
+              </p>
+            </div>
+            <span style={{
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: "9px",
+              color: C.accent,
+              whiteSpace: "nowrap",
+              marginLeft: "12px",
+            }}>
+              {formatDate(edu.startDate, L)} – {formatDate(edu.endDate, L)}
+            </span>
+          </div>
+          {edu.thesis && (
+            <p style={{
+              fontSize: "10px",
+              color: C.bodyMuted,
+              fontStyle: "italic",
+              marginTop: "4px",
+              fontFamily: "system-ui, sans-serif",
+            }}>
+              {L.thesis}: {edu.thesis}
+            </p>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CertificationsSection({ certifications, C, L }) {
+  const items = (certifications || []).filter(Boolean);
   if (items.length === 0) return null;
   return (
     <div style={{ marginBottom: "22px" }}>
-      <SectionHeader icon="★" title="Certificazioni" C={C} />
-      <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
-        {items.map((cert, i) => (
-          <li key={i} style={{
-            display: "flex",
-            gap: "8px",
-            fontSize: "11.5px",
-            lineHeight: "1.6",
-            color: C.bodyText,
-            fontFamily: "system-ui, sans-serif",
-          }}>
-            <span style={{ color: C.accent, flexShrink: 0, fontWeight: 700 }}>•</span>
+      <SectionHeader icon="[*]" title={L.certifications} C={C} />
+      {items.map((cert, i) => (
+        <div key={i} style={{ display: "flex", gap: "8px", marginBottom: "4px" }}>
+          <span style={{ color: C.accent, flexShrink: 0, fontWeight: 700, fontSize: "11px" }}>★</span>
+          <span style={{ fontSize: "11px", color: C.bodyText, lineHeight: 1.6, fontFamily: "system-ui, sans-serif" }}>
             {cert}
-          </li>
-        ))}
-      </ul>
+          </span>
+        </div>
+      ))}
     </div>
   );
 }
 
-function LanguagesSection({ languages, C }) {
+function LanguagesSection({ languages, C, L }) {
   if (!languages || languages.length === 0) return null;
   return (
     <div style={{ marginBottom: "22px" }}>
-      <SectionHeader icon="◎" title="Lingue" C={C} />
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+      <SectionHeader icon="Aa" title={L.languages} C={C} />
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
         {languages.map((lang, i) => (
           <span key={i} style={{
-            fontSize: "11.5px",
-            fontFamily: "system-ui, sans-serif",
+            fontSize: "11px",
             color: C.bodyText,
+            fontFamily: "system-ui, sans-serif",
           }}>
             <strong>{lang.language}</strong>
-            {lang.level && (
-              <span style={{ color: C.bodyMuted }}> — {lang.level}</span>
-            )}
-            {i < languages.length - 1 && (
-              <span style={{ color: C.border, marginLeft: "8px" }}>|</span>
-            )}
+            {lang.level && <span style={{ color: C.bodyMuted }}> – {lang.level}</span>}
           </span>
         ))}
       </div>
@@ -361,58 +357,41 @@ function LanguagesSection({ languages, C }) {
   );
 }
 
-function ProjectsSection({ projects, C }) {
-  const items = projects?.filter(Boolean) || [];
+function ProjectsSection({ projects, C, L }) {
+  const items = (projects || []).filter(Boolean);
   if (items.length === 0) return null;
   return (
     <div style={{ marginBottom: "22px" }}>
-      <SectionHeader icon="▶" title="Progetti" C={C} />
-      <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
-        {items.map((proj, i) => (
-          <li key={i} style={{
-            display: "flex",
-            gap: "8px",
-            fontSize: "11.5px",
-            lineHeight: "1.6",
-            color: C.bodyText,
-            fontFamily: "system-ui, sans-serif",
-            marginBottom: "2px",
-          }}>
-            <span style={{ color: C.accent, flexShrink: 0, fontWeight: 700 }}>•</span>
+      <SectionHeader icon=">" title={L.projects} C={C} />
+      {items.map((proj, i) => (
+        <div key={i} style={{ display: "flex", gap: "8px", marginBottom: "5px" }}>
+          <span style={{ color: C.accent, flexShrink: 0, fontWeight: 700, fontSize: "11px" }}>▶</span>
+          <span style={{ fontSize: "11px", color: C.bodyText, lineHeight: 1.6, fontFamily: "system-ui, sans-serif" }}>
             {proj}
-          </li>
-        ))}
-      </ul>
+          </span>
+        </div>
+      ))}
     </div>
   );
 }
 
-// ─── Componente principale ───────────────────────────────────────────────────
-
-export function TechDeveloper({ data, customColors = {} }) {
-  // Merge: i colori custom sovrascrivono solo le chiavi fornite
+// ─── Componente principale ────────────────────────────────────────────────────
+export function TechDeveloper({ data, customColors = {}, locale }) {
   const C = { ...COLORS_DEFAULT, ...customColors };
+  const L = locale || getLocale("IT");
+  const { personal, skills, experience, education, certifications, languages, projects } = data;
 
   return (
-    <div style={{
-      width: "100%",
-      backgroundColor: C.white,
-      fontFamily: "system-ui, sans-serif",
-      fontSize: "12px",
-      color: C.bodyText,
-    }}>
-      {/* Header navy */}
-      <HeaderSection personal={data.personal} C={C} />
-
-      {/* Body */}
-      <div style={{ padding: "28px 40px 32px", backgroundColor: C.white }}>
-        <SummarySection    summary={data.personal.summary}   C={C} />
-        <SkillsSection     skills={data.skills}              C={C} />
-        <ExperienceSection experience={data.experience}      C={C} />
-        <EducationSection  education={data.education}        C={C} />
-        <CertificationsSection certifications={data.certifications} C={C} />
-        <LanguagesSection  languages={data.languages}        C={C} />
-        <ProjectsSection   projects={data.projects}          C={C} />
+    <div style={{ width: "100%", backgroundColor: C.bodyBg, fontFamily: "system-ui, sans-serif" }}>
+      <HeaderSection personal={personal} C={C} />
+      <div style={{ padding: "28px 40px 32px" }}>
+        <SummarySection       summary={personal.summary}  C={C} L={L} />
+        <SkillsSection        skills={skills}              C={C} L={L} />
+        <ExperienceSection    experience={experience}      C={C} L={L} />
+        <EducationSection     education={education}        C={C} L={L} />
+        <CertificationsSection certifications={certifications} C={C} L={L} />
+        <LanguagesSection     languages={languages}        C={C} L={L} />
+        <ProjectsSection      projects={projects}          C={C} L={L} />
       </div>
     </div>
   );

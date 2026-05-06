@@ -114,19 +114,11 @@ export async function translateCV(cvData, targetLang, apiKey) {
   return result;
 }
 
-// ─── Supported target languages ───────────────────────────────────────────────
+// ─── Supported target languages (ristrette a 4 con file locale i18n) ────────────
+// Per aggiungere lingue creare il locale in src/locales/index.js e aggiungere qui.
 export const DEEPL_LANGUAGES = [
-  { code: "EN-US", label: "Inglese (US)" },
-  { code: "EN-GB", label: "Inglese (UK)" },
-  { code: "IT", label: "Italiano" },
-  { code: "FR", label: "Francese" },
-  { code: "DE", label: "Tedesco" },
-  { code: "ES", label: "Spagnolo" },
-  { code: "PT-BR", label: "Portoghese (BR)" },
-  { code: "PT-PT", label: "Portoghese (PT)" },
-  { code: "NL", label: "Olandese" },
-  { code: "PL", label: "Polacco" },
-  { code: "RU", label: "Russo" },
-  { code: "JA", label: "Giapponese" },
-  { code: "ZH", label: "Cinese" },
+  { code: 'IT',    label: 'Italiano' },
+  { code: 'EN-GB', label: 'Inglese (UK)' },
+  { code: 'DE',    label: 'Tedesco' },
+  { code: 'ES',    label: 'Spagnolo' },
 ];
