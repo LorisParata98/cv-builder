@@ -1,20 +1,51 @@
+import { useRef, useState } from "react";
 import { useCVStore } from "../../store/useCVStore";
 import { SectionCard } from "../ui/SectionCard";
 
 export function ProjectsForm() {
-  const projects = useCVStore((s) => s.projects);
-  const addProject = useCVStore((s) => s.addProject);
+  const projects      = useCVStore((s) => s.projects);
+  const setProjects   = useCVStore((s) => s.setProjects);
+  const addProject    = useCVStore((s) => s.addProject);
   const removeProject = useCVStore((s) => s.removeProject);
   const updateProject = useCVStore((s) => s.updateProject);
+
+  const dragIndex = useRef(null);
+  const [dragOver, setDragOver] = useState(null);
+
+  const reorder = (from, to) => {
+    if (from === to || from === null) return;
+    const arr = [...projects];
+    const [moved] = arr.splice(from, 1);
+    arr.splice(to, 0, moved);
+    setProjects(arr);
+  };
 
   return (
     <SectionCard title="Progetti" icon="🚀">
       <p className="text-xs text-gray-400 mb-3">
         Includi nome, breve descrizione e link se disponibile
       </p>
-      <div className="space-y-2">
+      <div className="space-y-1">
         {projects.map((proj, i) => (
-          <div key={i} className="flex gap-2 items-start">
+          <div
+            key={i}
+            draggable
+            onDragStart={() => { dragIndex.current = i; }}
+            onDragOver={(e) => { e.preventDefault(); setDragOver(i); }}
+            onDrop={() => { reorder(dragIndex.current, i); setDragOver(null); dragIndex.current = null; }}
+            onDragEnd={() => { setDragOver(null); dragIndex.current = null; }}
+            style={{ opacity: dragIndex.current === i ? 0.4 : 1 }}
+            className={`flex gap-2 items-start rounded px-1 py-0.5 transition-colors ${
+              dragOver === i && dragIndex.current !== i ? "bg-blue-50 ring-1 ring-blue-300" : ""
+            }`}
+          >
+            {/* Drag handle */}
+            <span
+              title="Trascina per riordinare"
+              className="text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing flex-shrink-0 select-none mt-2 text-base leading-none"
+            >
+              ⠿
+            </span>
             <span className="text-blue-400 mt-2 text-xs flex-shrink-0">▶</span>
             <textarea
               value={proj}

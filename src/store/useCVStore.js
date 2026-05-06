@@ -32,10 +32,18 @@ const saveToStorage = (state) => {
 const savedState = loadFromStorage();
 const savedDeepLKey = localStorage.getItem(DEEPL_KEY) || "";
 
+// Palette custom di default (vuote = usa i colori predefiniti del template)
+const DEFAULT_CUSTOM_PALETTES = { tech: {}, manager: {}, designer: {} };
+
 const initialState = {
   ...defaultCV,
   ...(savedState || {}),
   deepLApiKey: savedDeepLKey,
+  // Assicura che customPalettes sia sempre presente anche su stato salvato vecchio
+  customPalettes: {
+    ...DEFAULT_CUSTOM_PALETTES,
+    ...((savedState || {}).customPalettes || {}),
+  },
 };
 
 export const useCVStore = create((set, get) => ({
@@ -50,6 +58,30 @@ export const useCVStore = create((set, get) => ({
   setDesignerPalette: (designerPalette) => {
     set({ designerPalette });
     saveToStorage({ ...get(), designerPalette });
+  },
+
+  // ─── Palette personalizzate ─────────────────────────────────────────────────
+  // Imposta un singolo colore custom per un template
+  // template: "tech" | "manager" | "designer"
+  // key: chiave colore (es. "bg", "accent")
+  // value: stringa hex (es. "#ff0000")
+  setCustomPaletteColor: (template, key, value) => {
+    const customPalettes = {
+      ...get().customPalettes,
+      [template]: { ...get().customPalettes[template], [key]: value },
+    };
+    set({ customPalettes });
+    saveToStorage({ ...get(), customPalettes });
+  },
+
+  // Resetta tutti i colori custom di un template ai default
+  resetCustomPalette: (template) => {
+    const customPalettes = {
+      ...get().customPalettes,
+      [template]: {},
+    };
+    set({ customPalettes });
+    saveToStorage({ ...get(), customPalettes });
   },
 
   // ─── Dati personali ─────────────────────────────────────────────────────────
@@ -280,14 +312,16 @@ export const useCVStore = create((set, get) => ({
   // ─── Reset / Import ──────────────────────────────────────────────────────────
   resetCV: () => {
     const deepLApiKey = get().deepLApiKey;
-    const newState = { ...defaultCV, deepLApiKey };
+    const customPalettes = get().customPalettes; // preserva customizzazioni palette
+    const newState = { ...defaultCV, deepLApiKey, customPalettes };
     set(newState);
     saveToStorage(newState);
   },
 
   importCV: (data) => {
     const deepLApiKey = get().deepLApiKey;
-    const newState = { ...data, deepLApiKey };
+    const customPalettes = get().customPalettes; // preserva customizzazioni palette
+    const newState = { ...data, deepLApiKey, customPalettes };
     set(newState);
     saveToStorage(newState);
   },

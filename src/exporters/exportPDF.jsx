@@ -4,6 +4,8 @@ import { saveAs } from 'file-saver';
 // ─── Font registration ────────────────────────────────────────────────────────
 // Usiamo font system-safe: Helvetica (sans) già built-in in react-pdf
 // Per monospace usiamo Courier (built-in)
+// NOTA: Helvetica usa WinAnsiEncoding → supporta solo Latin-1 (U+0000-U+00FF)
+//       Tutti i simboli/emoji Unicode vanno sostituiti con ASCII puro
 
 // ─── Colori (stessa palette TechDeveloper HTML) ───────────────────────────────
 const C = {
@@ -25,10 +27,19 @@ const s = StyleSheet.create({
     fontSize: 10,
     color: C.body,
     backgroundColor: C.white,
+    // paddingTop: margine superiore sulle pagine di continuazione (pag. 2+)
+    // Sulla pag. 1 crea uno spazio bianco minimo sopra l'header — accettabile
+    paddingTop: 20,
+    // paddingBottom: impedisce che il contenuto tocchi il bordo inferiore
+    // su ogni pagina, incluse quelle di overflow
+    paddingBottom: 40,
   },
   // Header
   header: {
     backgroundColor: C.navy,
+    // Compensiamo il paddingTop della Page con un margine negativo
+    // così l'header rimane a filo del bordo superiore su pag. 1
+    marginTop: -20,
     padding: '24 32 20 32',
     flexDirection: 'row',
     gap: 16,
@@ -66,8 +77,9 @@ const s = StyleSheet.create({
     color: C.teal,
     marginRight: 12,
   },
-  // Body
-  body: { padding: '20 32 28 32' },
+  // Body — paddingTop ridotto: lo spazio superiore su pag. 1 viene dal padding
+  // dell'header; su pag. 2+ la Page.paddingTop da già 20pt
+  body: { paddingHorizontal: 32, paddingTop: 20, paddingBottom: 8 },
   // Section header
   sectionRow: {
     flexDirection: 'row',
@@ -94,9 +106,9 @@ const s = StyleSheet.create({
     height: 1,
     backgroundColor: C.border,
   },
-  section: { marginBottom: 14 },
+  section: { marginBottom: 16 },
   // Summary
-  summary: { fontSize: 9.5, lineHeight: 1.6, color: C.body },
+  summary: { fontSize: 9.5, lineHeight: 1.65, color: C.body },
   // Skills
   skillRow: {
     flexDirection: 'row',
@@ -139,7 +151,8 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 3,
+    // Più spazio sotto l'intestazione role/azienda prima dei bullet
+    marginBottom: 6,
   },
   expRole: { fontFamily: 'Helvetica-Bold', fontSize: 10, color: C.body },
   expCompany: { fontSize: 9, color: C.bodyMuted, marginTop: 1 },
@@ -148,34 +161,64 @@ const s = StyleSheet.create({
     fontSize: 8,
     color: C.teal,
   },
+  // Contenitore della lista bullet — stacca visivamente dall'intestazione
+  bulletList: {
+    marginTop: 0,
+    marginLeft: 2,
+  },
   bullet: {
     flexDirection: 'row',
-    marginBottom: 2,
-    paddingLeft: 4,
+    // Spaziatura verticale tra bullet aumentata
+    marginBottom: 4,
+    alignItems: 'flex-start',
   },
-  bulletDot: { color: C.teal, fontSize: 9, marginRight: 5, fontFamily: 'Helvetica-Bold' },
-  bulletText: { flex: 1, fontSize: 9, lineHeight: 1.5, color: C.body },
-  expBlock: { marginBottom: 12 },
+  bulletDot: {
+    color: C.teal,
+    // Dimensione dot allineata alla text size del bullet
+    fontSize: 9,
+    marginRight: 6,
+    marginTop: 1,
+    fontFamily: 'Helvetica-Bold',
+    flexShrink: 0,
+  },
+  bulletText: {
+    flex: 1,
+    fontSize: 9,
+    // Line-height aumentato per leggibilità e respiro tra le righe
+    lineHeight: 1.65,
+    color: C.body,
+  },
+  // expBlock: wrap=false è messo come prop JSX per impedire split a cavallo di pagina
+  expBlock: { marginBottom: 14 },
   // Education
   eduHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 2,
+    marginBottom: 3,
   },
   eduDegree: { fontFamily: 'Helvetica-Bold', fontSize: 10, color: C.body },
   eduInstitution: { fontSize: 9, color: C.bodyMuted, marginTop: 1 },
   eduDate: { fontFamily: 'Courier', fontSize: 8, color: C.teal },
-  eduThesis: { fontSize: 8, color: C.bodyMuted, fontStyle: 'italic', marginTop: 3 },
-  eduBlock: { marginBottom: 10 },
+  eduThesis: { fontSize: 8, color: C.bodyMuted, fontStyle: 'italic', marginTop: 4 },
+  // eduBlock: wrap=false come prop JSX
+  eduBlock: { marginBottom: 11 },
   // Certs / Lang / Projects
   listItem: {
     flexDirection: 'row',
-    marginBottom: 3,
+    marginBottom: 4,
+    alignItems: 'flex-start',
   },
-  listDot: { color: C.teal, fontSize: 9, marginRight: 5, fontFamily: 'Helvetica-Bold' },
-  listText: { flex: 1, fontSize: 9, lineHeight: 1.5, color: C.body },
-  langRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  listDot: {
+    color: C.teal,
+    fontSize: 9,
+    marginRight: 6,
+    marginTop: 1,
+    fontFamily: 'Helvetica-Bold',
+    flexShrink: 0,
+  },
+  listText: { flex: 1, fontSize: 9, lineHeight: 1.6, color: C.body },
+  langRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   langItem: { fontSize: 9, color: C.body },
   langLevel: { fontSize: 9, color: C.bodyMuted },
   // ATS keywords invisibili (testo bianco su bianco)
@@ -198,6 +241,19 @@ function formatDate(d) {
   return `${months[parseInt(m,10)-1]} ${y}`;
 }
 
+// Icone ASCII-safe per Helvetica/Courier (WinAnsiEncoding, max U+00FF)
+const ICONS = {
+  profile:  '</>',
+  skills:   '$_',
+  exp:      '>>',
+  edu:      '[]',
+  certs:    '[*]',
+  langs:    'Aa',
+  projects: '>',
+  bullet:   '-',
+  email:    '@',
+};
+
 function SectionHeader({ icon, label }) {
   return (
     <View style={s.sectionRow}>
@@ -212,7 +268,6 @@ function SectionHeader({ icon, label }) {
 function CVDocument({ data }) {
   const { personal, skills, experience, education, certifications, languages, projects } = data;
 
-  // Raccoglie tutte le atsKeywords per embedding invisibile
   const allAtsKeywords = skills
     .flatMap(cat => cat.tags.flatMap(tag => tag.atsKeywords || []))
     .filter(Boolean)
@@ -221,7 +276,8 @@ function CVDocument({ data }) {
   return (
     <Document title={personal.name || 'CV'} author={personal.name} subject="Curriculum Vitae">
       <Page size="A4" style={s.page}>
-        {/* Header navy */}
+
+        {/* ── Header navy — marginTop:-20 annulla il paddingTop della Page ── */}
         <View style={s.header}>
           {personal.photo && (
             <Image src={personal.photo} style={s.photo} />
@@ -230,21 +286,22 @@ function CVDocument({ data }) {
             <Text style={s.name}>{personal.name}</Text>
             <Text style={s.title}>{personal.title}</Text>
             <View style={s.contactRow}>
-              {personal.email && <Text style={s.contact}>✉ {personal.email}</Text>}
-              {personal.phone && <Text style={s.contact}>☎ {personal.phone}</Text>}
-              {personal.location && <Text style={s.contact}>📍 {personal.location}</Text>}
-              {personal.website && <Text style={s.contactAccent}>{personal.website}</Text>}
+              {personal.email    && <Text style={s.contact}>Email: {personal.email}</Text>}
+              {personal.phone    && <Text style={s.contact}>Recapito telefonico: {personal.phone}</Text>}
+              {personal.location && <Text style={s.contact}>Localita: {personal.location}</Text>}
+              {personal.website  && <Text style={s.contactAccent}>Github: {personal.website}</Text>}
               {personal.linkedin && <Text style={s.contactAccent}>{personal.linkedin}</Text>}
             </View>
           </View>
         </View>
 
-        {/* Body */}
+        {/* ── Body ── */}
         <View style={s.body}>
+
           {/* Profilo */}
           {personal.summary ? (
-            <View style={s.section}>
-              <SectionHeader icon="</>" label="Profilo" />
+            <View style={s.section} wrap={false}>
+              <SectionHeader icon={ICONS.profile} label="Profilo" />
               <Text style={s.summary}>{personal.summary}</Text>
             </View>
           ) : null}
@@ -252,9 +309,9 @@ function CVDocument({ data }) {
           {/* Competenze */}
           {skills.length > 0 && (
             <View style={s.section}>
-              <SectionHeader icon="$" label="Competenze tecniche" />
+              <SectionHeader icon={ICONS.skills} label="Competenze tecniche" />
               {skills.map((cat, i) => (
-                <View key={i} style={s.skillRow}>
+                <View key={i} style={s.skillRow} wrap={false}>
                   <Text style={s.skillCategory}>{cat.category}</Text>
                   <View style={s.skillTags}>
                     {cat.tags.map((tag, ti) => (
@@ -274,9 +331,11 @@ function CVDocument({ data }) {
           {/* Esperienza */}
           {experience.length > 0 && (
             <View style={s.section}>
-              <SectionHeader icon="⚙" label="Esperienza professionale" />
+              <SectionHeader icon={ICONS.exp} label="Esperienza professionale" />
               {experience.map((exp) => (
-                <View key={exp.id} style={s.expBlock}>
+                // wrap={false}: impedisce che un singolo blocco esperienza
+                // venga spezzato a cavallo di due pagine
+                <View key={exp.id} style={s.expBlock} wrap={false}>
                   <View style={s.expHeader}>
                     <View>
                       <Text style={s.expRole}>{exp.role}</Text>
@@ -285,15 +344,18 @@ function CVDocument({ data }) {
                       </Text>
                     </View>
                     <Text style={s.expDate}>
-                      {formatDate(exp.startDate)} – {formatDate(exp.endDate)}
+                      {formatDate(exp.startDate)} - {formatDate(exp.endDate)}
                     </Text>
                   </View>
-                  {exp.bullets.filter(Boolean).map((b, bi) => (
-                    <View key={bi} style={s.bullet}>
-                      <Text style={s.bulletDot}>•</Text>
-                      <Text style={s.bulletText}>{b}</Text>
-                    </View>
-                  ))}
+                  {/* Contenitore bullet con spaziatura superiore */}
+                  <View style={s.bulletList}>
+                    {exp.bullets.filter(Boolean).map((b, bi) => (
+                      <View key={bi} style={s.bullet}>
+                        <Text style={s.bulletDot}>{ICONS.bullet}</Text>
+                        <Text style={s.bulletText}>{b}</Text>
+                      </View>
+                    ))}
+                  </View>
                 </View>
               ))}
             </View>
@@ -302,9 +364,9 @@ function CVDocument({ data }) {
           {/* Formazione */}
           {education.length > 0 && (
             <View style={s.section}>
-              <SectionHeader icon="⬡" label="Formazione" />
+              <SectionHeader icon={ICONS.edu} label="Formazione" />
               {education.map((edu) => (
-                <View key={edu.id} style={s.eduBlock}>
+                <View key={edu.id} style={s.eduBlock} wrap={false}>
                   <View style={s.eduHeader}>
                     <View>
                       <Text style={s.eduDegree}>
@@ -315,7 +377,7 @@ function CVDocument({ data }) {
                       </Text>
                     </View>
                     <Text style={s.eduDate}>
-                      {formatDate(edu.startDate)} – {formatDate(edu.endDate)}
+                      {formatDate(edu.startDate)} - {formatDate(edu.endDate)}
                     </Text>
                   </View>
                   {edu.thesis ? <Text style={s.eduThesis}>Tesi: {edu.thesis}</Text> : null}
@@ -326,11 +388,11 @@ function CVDocument({ data }) {
 
           {/* Certificazioni */}
           {certifications.filter(Boolean).length > 0 && (
-            <View style={s.section}>
-              <SectionHeader icon="★" label="Certificazioni" />
+            <View style={s.section} wrap={false}>
+              <SectionHeader icon={ICONS.certs} label="Certificazioni" />
               {certifications.filter(Boolean).map((c, i) => (
                 <View key={i} style={s.listItem}>
-                  <Text style={s.listDot}>•</Text>
+                  <Text style={s.listDot}>{ICONS.bullet}</Text>
                   <Text style={s.listText}>{c}</Text>
                 </View>
               ))}
@@ -339,13 +401,13 @@ function CVDocument({ data }) {
 
           {/* Lingue */}
           {languages.length > 0 && (
-            <View style={s.section}>
-              <SectionHeader icon="◎" label="Lingue" />
+            <View style={s.section} wrap={false}>
+              <SectionHeader icon={ICONS.langs} label="Lingue" />
               <View style={s.langRow}>
                 {languages.map((l, i) => (
                   <Text key={i} style={s.langItem}>
                     <Text style={{ fontFamily: 'Helvetica-Bold' }}>{l.language}</Text>
-                    {l.level ? <Text style={s.langLevel}> — {l.level}</Text> : null}
+                    {l.level ? <Text style={s.langLevel}> - {l.level}</Text> : null}
                   </Text>
                 ))}
               </View>
@@ -355,21 +417,23 @@ function CVDocument({ data }) {
           {/* Progetti */}
           {projects.filter(Boolean).length > 0 && (
             <View style={s.section}>
-              <SectionHeader icon="▶" label="Progetti" />
+              <SectionHeader icon={ICONS.projects} label="Progetti" />
               {projects.filter(Boolean).map((p, i) => (
-                <View key={i} style={s.listItem}>
-                  <Text style={s.listDot}>•</Text>
+                <View key={i} style={s.listItem} wrap={false}>
+                  <Text style={s.listDot}>{ICONS.bullet}</Text>
                   <Text style={s.listText}>{p}</Text>
                 </View>
               ))}
             </View>
           )}
+
         </View>
 
-        {/* ATS keywords invisibili — testo bianco su bianco, non visibile all'occhio */}
+        {/* ATS keywords invisibili — testo bianco su bianco */}
         {allAtsKeywords && (
           <Text style={s.atsHidden}>{allAtsKeywords}</Text>
         )}
+
       </Page>
     </Document>
   );

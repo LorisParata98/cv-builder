@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import { useCVStore } from "../../store/useCVStore";
 import { SectionCard } from "../ui/SectionCard";
 
@@ -16,10 +17,19 @@ function Field({ label, value, onChange, placeholder = "" }) {
   );
 }
 
-function EducationCard({ edu, onUpdate, onRemove }) {
+function EducationCard({ edu, onUpdate, onRemove, isDragOver, dragHandleProps }) {
   return (
-    <div className="border border-gray-200 rounded-lg p-3 mb-3 bg-white">
+    <div className={`border rounded-lg p-3 mb-2 bg-white transition-colors ${
+      isDragOver ? "border-blue-400 bg-blue-50" : "border-gray-200"
+    }`}>
       <div className="flex justify-between items-start mb-2">
+        <span
+          {...dragHandleProps}
+          title="Trascina per riordinare"
+          className="text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing mr-2 mt-0.5 flex-shrink-0 select-none text-base leading-none"
+        >
+          ⠿
+        </span>
         <span className="text-xs font-semibold text-gray-600 truncate flex-1">
           {edu.institution || "Nuovo titolo di studio"}
         </span>
@@ -57,20 +67,43 @@ function EducationCard({ edu, onUpdate, onRemove }) {
 }
 
 export function EducationForm() {
-  const education = useCVStore((s) => s.education);
-  const addEducation = useCVStore((s) => s.addEducation);
+  const education       = useCVStore((s) => s.education);
+  const setEducation    = useCVStore((s) => s.setEducation);
+  const addEducation    = useCVStore((s) => s.addEducation);
   const removeEducation = useCVStore((s) => s.removeEducation);
   const updateEducation = useCVStore((s) => s.updateEducation);
 
+  const dragIndex = useRef(null);
+  const [dragOver, setDragOver] = useState(null);
+
+  const reorder = (from, to) => {
+    if (from === to || from === null) return;
+    const arr = [...education];
+    const [moved] = arr.splice(from, 1);
+    arr.splice(to, 0, moved);
+    setEducation(arr);
+  };
+
   return (
     <SectionCard title="Formazione" icon="🎓">
-      {education.map((edu) => (
-        <EducationCard
+      {education.map((edu, index) => (
+        <div
           key={edu.id}
-          edu={edu}
-          onUpdate={(updates) => updateEducation(edu.id, updates)}
-          onRemove={() => removeEducation(edu.id)}
-        />
+          draggable
+          onDragStart={() => { dragIndex.current = index; }}
+          onDragOver={(e) => { e.preventDefault(); setDragOver(index); }}
+          onDrop={() => { reorder(dragIndex.current, index); setDragOver(null); dragIndex.current = null; }}
+          onDragEnd={() => { setDragOver(null); dragIndex.current = null; }}
+          style={{ opacity: dragIndex.current === index ? 0.5 : 1 }}
+        >
+          <EducationCard
+            edu={edu}
+            onUpdate={(updates) => updateEducation(edu.id, updates)}
+            onRemove={() => removeEducation(edu.id)}
+            isDragOver={dragOver === index && dragIndex.current !== index}
+            dragHandleProps={{}}
+          />
+        </div>
       ))}
       <button
         onClick={addEducation}

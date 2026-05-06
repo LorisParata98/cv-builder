@@ -305,8 +305,10 @@ function DesignerContent({ data, p }) {
 }
 
 // ─── Componente principale ────────────────────────────────────────────────────
-export function CreativeDesigner({ data, palette = 'noir-gold' }) {
-  const p = PALETTES[palette] || PALETTES['noir-gold'];
+export function CreativeDesigner({ data, palette = 'noir-gold', customColors = {} }) {
+  // Prima seleziona la palette base, poi applica gli override custom
+  const baseP = PALETTES[palette] || PALETTES['noir-gold'];
+  const p = { ...baseP, ...customColors };
 
   return (
     <div style={{ width: '100%', backgroundColor: p.bg, fontFamily: 'system-ui, sans-serif' }}>

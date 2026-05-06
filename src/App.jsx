@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Sidebar } from "./components/ui/Sidebar";
 import { Toolbar } from "./components/ui/Toolbar";
 import { EditorPanel } from "./components/editor/EditorPanel";
@@ -6,6 +6,33 @@ import { CVPreview } from "./components/preview/CVPreview";
 import { useCVStore } from "./store/useCVStore";
 import { exportPDF } from "./exporters/exportPDF";
 import { exportDOCX } from "./exporters/exportDOCX";
+import { translateCV } from "./services/translateCV";
+
+// ─── Toast notification ───────────────────────────────────────────────────────
+function Toast({ message, type, onDismiss }) {
+  useEffect(() => {
+    const t = setTimeout(onDismiss, 3500);
+    return () => clearTimeout(t);
+  }, [message, onDismiss]);
+
+  const bg = type === "error" ? "#ef4444" : type === "success" ? "#22c55e" : "#3b82f6";
+
+  return (
+    <div
+      onClick={onDismiss}
+      style={{
+        position: "fixed", bottom: "24px", left: "50%", transform: "translateX(-50%)",
+        backgroundColor: bg, color: "#fff", padding: "10px 20px", borderRadius: "8px",
+        fontSize: "13px", fontWeight: 500, boxShadow: "0 4px 16px rgba(0,0,0,0.25)",
+        cursor: "pointer", zIndex: 9999, pointerEvents: "auto",
+        animation: "fadeSlideUp 0.25s ease",
+        whiteSpace: "nowrap",
+      }}
+    >
+      {message}
+    </div>
+  );
+}
 
 // ─── Sidebar divider con bottone collapse ─────────────────────────────────────
 function SidebarDivider({ collapsed, onToggle }) {
@@ -70,7 +97,7 @@ function EditorResizeHandle({ onDrag }) {
 }
 
 // ─── Export / Import ──────────────────────────────────────────────────────────
-function useExportHandlers(setExporting) {
+function useExportHandlers(setExporting, showToast) {
   const store = useCVStore();
   const importInputRef = useRef(null);
 
@@ -87,17 +114,25 @@ function useExportHandlers(setExporting) {
   };
 
   const handleExportPDF = async () => {
-    setExporting('pdf');
-    try { await exportPDF(getStoreData()); }
-    catch (e) { console.error(e); alert('Errore nella generazione del PDF.'); }
-    finally { setExporting(null); }
+    setExporting("pdf");
+    try {
+      await exportPDF(getStoreData());
+      showToast("✅ PDF esportato!", "success");
+    } catch (e) {
+      console.error(e);
+      showToast("❌ Errore generazione PDF", "error");
+    } finally { setExporting(null); }
   };
 
   const handleExportDOCX = async () => {
-    setExporting('docx');
-    try { await exportDOCX(getStoreData()); }
-    catch (e) { console.error(e); alert('Errore nella generazione del DOCX.'); }
-    finally { setExporting(null); }
+    setExporting("docx");
+    try {
+      await exportDOCX(getStoreData());
+      showToast("✅ DOCX esportato!", "success");
+    } catch (e) {
+      console.error(e);
+      showToast("❌ Errore generazione DOCX", "error");
+    } finally { setExporting(null); }
   };
 
   const handleExportJSON = () => {
@@ -109,6 +144,7 @@ function useExportHandlers(setExporting) {
     a.download = `cv-${(store.personal.name || "export").replace(/\s+/g, "-").toLowerCase()}.json`;
     a.click();
     URL.revokeObjectURL(url);
+    showToast("✅ JSON esportato!", "success");
   };
 
   const handleImportJSON = () => importInputRef.current?.click();
@@ -122,13 +158,14 @@ function useExportHandlers(setExporting) {
         const data = JSON.parse(ev.target.result);
         if (!data.personal || !data.skills || !data.experience) throw new Error();
         store.importCV(data);
-      } catch { alert("File JSON non valido o struttura non riconosciuta."); }
+        showToast("✅ CV importato!", "success");
+      } catch { showToast("❌ File JSON non valido", "error"); }
     };
     reader.readAsText(file);
     e.target.value = "";
   };
 
-  return { importInputRef, handleExportPDF, handleExportDOCX, handleExportJSON, handleImportJSON, handleFileImport };
+  return { importInputRef, getStoreData, handleExportPDF, handleExportDOCX, handleExportJSON, handleImportJSON, handleFileImport };
 }
 
 // ─── App ──────────────────────────────────────────────────────────────────────
@@ -141,42 +178,70 @@ export default function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [editorWidth, setEditorWidth] = useState(300);
   const [exporting, setExporting] = useState(null); // 'pdf' | 'docx' | null
+  const [toast, setToast] = useState(null); // { message, type }
 
-  const { importInputRef, handleExportPDF, handleExportDOCX,
-    handleExportJSON, handleImportJSON, handleFileImport } = useExportHandlers(setExporting);
+  const showToast = useCallback((message, type = "info") => {
+    setToast({ message, type });
+  }, []);
+
+  const dismissToast = useCallback(() => setToast(null), []);
+
+  const store = useCVStore();
+
+  const { importInputRef, getStoreData, handleExportPDF, handleExportDOCX,
+    handleExportJSON, handleImportJSON, handleFileImport } = useExportHandlers(setExporting, showToast);
 
   const handleEditorDrag = useCallback((delta) => {
     setEditorWidth((w) => Math.min(EDITOR_MAX, Math.max(EDITOR_MIN, w + delta)));
   }, []);
 
+  // ─── DeepL translation ───────────────────────────────────────────────────────
+  const handleTranslate = useCallback(async (targetLang, apiKey) => {
+    const data = getStoreData();
+    const translated = await translateCV(data, targetLang, apiKey);
+    store.importCV(translated);
+    showToast("✅ CV tradotto!", "success");
+  }, [getStoreData, store, showToast]);
+
   return (
-    <div style={{ display: "flex", height: "100vh", width: "100vw", overflow: "hidden" }}>
-      <div style={{ width: sidebarCollapsed ? 0 : SIDEBAR_WIDTH, flexShrink: 0, overflow: "hidden", transition: "width 0.2s ease" }}>
-        <div style={{ width: SIDEBAR_WIDTH, height: "100%" }}>
-          <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
-        </div>
-      </div>
+    <>
+      {/* Inline keyframes for toast animation */}
+      <style>{`@keyframes fadeSlideUp { from { opacity:0; transform:translateX(-50%) translateY(10px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }`}</style>
 
-      <SidebarDivider collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(v => !v)} />
-
-      <div style={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
-        <Toolbar
-          onExportPDF={handleExportPDF}
-          onExportDOCX={handleExportDOCX}
-          onExportJSON={handleExportJSON}
-          onImportJSON={handleImportJSON}
-          exporting={exporting}
-        />
-        <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
-          <div style={{ width: editorWidth, flexShrink: 0, overflow: "hidden" }}>
-            <EditorPanel activeSection={activeSection} />
+      <div style={{ display: "flex", height: "100vh", width: "100vw", overflow: "hidden" }}>
+        <div style={{ width: sidebarCollapsed ? 0 : SIDEBAR_WIDTH, flexShrink: 0, overflow: "hidden", transition: "width 0.2s ease" }}>
+          <div style={{ width: SIDEBAR_WIDTH, height: "100%" }}>
+            <Sidebar
+              activeSection={activeSection}
+              onSectionChange={setActiveSection}
+              onTranslate={handleTranslate}
+            />
           </div>
-          <EditorResizeHandle onDrag={handleEditorDrag} />
-          <CVPreview />
         </div>
+
+        <SidebarDivider collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(v => !v)} />
+
+        <div style={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
+          <Toolbar
+            onExportPDF={handleExportPDF}
+            onExportDOCX={handleExportDOCX}
+            onExportJSON={handleExportJSON}
+            onImportJSON={handleImportJSON}
+            exporting={exporting}
+          />
+          <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+            <div style={{ width: editorWidth, flexShrink: 0, overflow: "hidden" }}>
+              <EditorPanel activeSection={activeSection} />
+            </div>
+            <EditorResizeHandle onDrag={handleEditorDrag} />
+            <CVPreview />
+          </div>
+        </div>
+
+        <input ref={importInputRef} type="file" accept=".json" style={{ display: "none" }} onChange={handleFileImport} />
       </div>
 
-      <input ref={importInputRef} type="file" accept=".json" style={{ display: "none" }} onChange={handleFileImport} />
-    </div>
+      {toast && <Toast message={toast.message} type={toast.type} onDismiss={dismissToast} />}
+    </>
   );
 }

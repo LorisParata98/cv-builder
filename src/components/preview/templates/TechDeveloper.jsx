@@ -3,7 +3,7 @@
 // Font: JetBrains Mono (titoli), system-ui (corpo)
 // Layout: colonna singola, ATS-safe
 
-const COLORS = {
+const COLORS_DEFAULT = {
   bg: "#0f2644",
   bgLight: "#162f52",
   accent: "#4ec9b0",
@@ -30,34 +30,34 @@ function formatDate(dateStr) {
   return `${months[parseInt(month, 10) - 1]} ${year}`;
 }
 
-function SectionHeader({ icon, title }) {
+function SectionHeader({ icon, title, C }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
       <span style={{
         fontFamily: "'JetBrains Mono', monospace",
         fontSize: "11px",
-        color: COLORS.accent,
+        color: C.accent,
         fontWeight: 600,
       }}>{icon}</span>
       <span style={{
         fontFamily: "'JetBrains Mono', monospace",
         fontSize: "10px",
         fontWeight: 700,
-        color: COLORS.bodyMuted,
+        color: C.bodyMuted,
         textTransform: "uppercase",
         letterSpacing: "1.5px",
       }}>{title}</span>
-      <div style={{ flex: 1, height: "1px", backgroundColor: COLORS.border }} />
+      <div style={{ flex: 1, height: "1px", backgroundColor: C.border }} />
     </div>
   );
 }
 
 // ─── Sezioni ────────────────────────────────────────────────────────────────
 
-function HeaderSection({ personal }) {
+function HeaderSection({ personal, C }) {
   return (
     <div style={{
-      backgroundColor: COLORS.bg,
+      backgroundColor: C.bg,
       padding: "32px 40px 28px",
       display: "flex",
       gap: "24px",
@@ -69,7 +69,7 @@ function HeaderSection({ personal }) {
           width: "80px",
           height: "80px",
           flexShrink: 0,
-          border: `2px solid ${COLORS.accent}`,
+          border: `2px solid ${C.accent}`,
           overflow: "hidden",
           borderRadius: "4px",
         }}>
@@ -87,7 +87,7 @@ function HeaderSection({ personal }) {
           fontFamily: "'JetBrains Mono', monospace",
           fontSize: "26px",
           fontWeight: 700,
-          color: COLORS.white,
+          color: C.white,
           margin: 0,
           letterSpacing: "-0.5px",
           lineHeight: 1.2,
@@ -97,7 +97,7 @@ function HeaderSection({ personal }) {
         <p style={{
           fontFamily: "'JetBrains Mono', monospace",
           fontSize: "13px",
-          color: COLORS.accent,
+          color: C.accent,
           margin: "6px 0 14px",
           fontWeight: 500,
         }}>
@@ -110,39 +110,29 @@ function HeaderSection({ personal }) {
           flexWrap: "wrap",
           gap: "6px 20px",
           fontSize: "11px",
-          color: COLORS.textMuted,
+          color: C.textMuted,
           fontFamily: "system-ui, sans-serif",
         }}>
-          {personal.email && (
-            <span>✉ {personal.email}</span>
-          )}
-          {personal.phone && (
-            <span>☎ {personal.phone}</span>
-          )}
-          {personal.location && (
-            <span>📍 {personal.location}</span>
-          )}
-          {personal.website && (
-            <span style={{ color: COLORS.accent }}>⬡ {personal.website}</span>
-          )}
-          {personal.linkedin && (
-            <span style={{ color: COLORS.accent }}>in {personal.linkedin}</span>
-          )}
+          {personal.email    && <span>✉ {personal.email}</span>}
+          {personal.phone    && <span>☎ {personal.phone}</span>}
+          {personal.location && <span>📍 {personal.location}</span>}
+          {personal.website  && <span style={{ color: C.accent }}>⬡ {personal.website}</span>}
+          {personal.linkedin && <span style={{ color: C.accent }}>in {personal.linkedin}</span>}
         </div>
       </div>
     </div>
   );
 }
 
-function SummarySection({ summary }) {
+function SummarySection({ summary, C }) {
   if (!summary) return null;
   return (
     <div style={{ marginBottom: "22px" }}>
-      <SectionHeader icon="</>" title="Profilo" />
+      <SectionHeader icon="</>" title="Profilo" C={C} />
       <p style={{
         fontSize: "12px",
         lineHeight: "1.7",
-        color: COLORS.bodyText,
+        color: C.bodyText,
         margin: 0,
         fontFamily: "system-ui, sans-serif",
       }}>
@@ -152,11 +142,11 @@ function SummarySection({ summary }) {
   );
 }
 
-function SkillsSection({ skills }) {
+function SkillsSection({ skills, C }) {
   if (!skills || skills.length === 0) return null;
   return (
     <div style={{ marginBottom: "22px" }}>
-      <SectionHeader icon="$" title="Competenze tecniche" />
+      <SectionHeader icon="$" title="Competenze tecniche" C={C} />
       <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         {skills.map((cat, i) => (
           <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
@@ -164,7 +154,7 @@ function SkillsSection({ skills }) {
               fontFamily: "'JetBrains Mono', monospace",
               fontSize: "10px",
               fontWeight: 600,
-              color: COLORS.bodyMuted,
+              color: C.bodyMuted,
               minWidth: "90px",
               paddingTop: "3px",
               flexShrink: 0,
@@ -177,18 +167,18 @@ function SkillsSection({ skills }) {
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "4px",
-                  backgroundColor: COLORS.tagBg,
-                  border: `1px solid ${COLORS.tagBorder}`,
+                  backgroundColor: C.tagBg,
+                  border: `1px solid ${C.accent}`,
                   borderRadius: "3px",
                   padding: "2px 8px",
                   fontFamily: "'JetBrains Mono', monospace",
                   fontSize: "10px",
-                  color: COLORS.accent,
+                  color: C.accent,
                   fontWeight: 500,
                 }}>
                   {tag.label}
                   {tag.versionsRange && (
-                    <span style={{ color: COLORS.textMuted, fontSize: "9px" }}>
+                    <span style={{ color: C.textMuted, fontSize: "9px" }}>
                       {tag.versionsRange}
                     </span>
                   )}
@@ -202,11 +192,11 @@ function SkillsSection({ skills }) {
   );
 }
 
-function ExperienceSection({ experience }) {
+function ExperienceSection({ experience, C }) {
   if (!experience || experience.length === 0) return null;
   return (
     <div style={{ marginBottom: "22px" }}>
-      <SectionHeader icon="⚙" title="Esperienza professionale" />
+      <SectionHeader icon="⚙" title="Esperienza professionale" C={C} />
       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
         {experience.map((exp) => (
           <div key={exp.id}>
@@ -215,14 +205,14 @@ function ExperienceSection({ experience }) {
                 <span style={{
                   fontSize: "13px",
                   fontWeight: 700,
-                  color: COLORS.bodyText,
+                  color: C.bodyText,
                   fontFamily: "system-ui, sans-serif",
                 }}>
                   {exp.role}
                 </span>
                 <span style={{
                   fontSize: "12px",
-                  color: COLORS.bodyMuted,
+                  color: C.bodyMuted,
                   fontFamily: "system-ui, sans-serif",
                   marginLeft: "8px",
                 }}>
@@ -233,7 +223,7 @@ function ExperienceSection({ experience }) {
               <span style={{
                 fontFamily: "'JetBrains Mono', monospace",
                 fontSize: "10px",
-                color: COLORS.accent,
+                color: C.accent,
                 whiteSpace: "nowrap",
                 flexShrink: 0,
                 marginLeft: "12px",
@@ -248,11 +238,11 @@ function ExperienceSection({ experience }) {
                   gap: "8px",
                   fontSize: "11.5px",
                   lineHeight: "1.6",
-                  color: COLORS.bodyText,
+                  color: C.bodyText,
                   fontFamily: "system-ui, sans-serif",
                   marginBottom: "2px",
                 }}>
-                  <span style={{ color: COLORS.accent, flexShrink: 0, fontWeight: 700 }}>•</span>
+                  <span style={{ color: C.accent, flexShrink: 0, fontWeight: 700 }}>•</span>
                   {bullet}
                 </li>
               ))}
@@ -264,11 +254,11 @@ function ExperienceSection({ experience }) {
   );
 }
 
-function EducationSection({ education }) {
+function EducationSection({ education, C }) {
   if (!education || education.length === 0) return null;
   return (
     <div style={{ marginBottom: "22px" }}>
-      <SectionHeader icon="⬡" title="Formazione" />
+      <SectionHeader icon="⬡" title="Formazione" C={C} />
       <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
         {education.map((edu) => (
           <div key={edu.id}>
@@ -277,14 +267,14 @@ function EducationSection({ education }) {
                 <span style={{
                   fontSize: "13px",
                   fontWeight: 700,
-                  color: COLORS.bodyText,
+                  color: C.bodyText,
                   fontFamily: "system-ui, sans-serif",
                 }}>
                   {edu.degree}{edu.field ? ` in ${edu.field}` : ""}
                 </span>
                 <div style={{
                   fontSize: "11.5px",
-                  color: COLORS.bodyMuted,
+                  color: C.bodyMuted,
                   fontFamily: "system-ui, sans-serif",
                   marginTop: "2px",
                 }}>
@@ -294,7 +284,7 @@ function EducationSection({ education }) {
               <span style={{
                 fontFamily: "'JetBrains Mono', monospace",
                 fontSize: "10px",
-                color: COLORS.accent,
+                color: C.accent,
                 whiteSpace: "nowrap",
                 flexShrink: 0,
                 marginLeft: "12px",
@@ -305,7 +295,7 @@ function EducationSection({ education }) {
             {edu.thesis && (
               <p style={{
                 fontSize: "11px",
-                color: COLORS.bodyMuted,
+                color: C.bodyMuted,
                 fontFamily: "system-ui, sans-serif",
                 margin: "4px 0 0",
                 fontStyle: "italic",
@@ -320,12 +310,12 @@ function EducationSection({ education }) {
   );
 }
 
-function CertificationsSection({ certifications }) {
+function CertificationsSection({ certifications, C }) {
   const items = certifications?.filter(Boolean) || [];
   if (items.length === 0) return null;
   return (
     <div style={{ marginBottom: "22px" }}>
-      <SectionHeader icon="★" title="Certificazioni" />
+      <SectionHeader icon="★" title="Certificazioni" C={C} />
       <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
         {items.map((cert, i) => (
           <li key={i} style={{
@@ -333,10 +323,10 @@ function CertificationsSection({ certifications }) {
             gap: "8px",
             fontSize: "11.5px",
             lineHeight: "1.6",
-            color: COLORS.bodyText,
+            color: C.bodyText,
             fontFamily: "system-ui, sans-serif",
           }}>
-            <span style={{ color: COLORS.accent, flexShrink: 0, fontWeight: 700 }}>•</span>
+            <span style={{ color: C.accent, flexShrink: 0, fontWeight: 700 }}>•</span>
             {cert}
           </li>
         ))}
@@ -345,24 +335,24 @@ function CertificationsSection({ certifications }) {
   );
 }
 
-function LanguagesSection({ languages }) {
+function LanguagesSection({ languages, C }) {
   if (!languages || languages.length === 0) return null;
   return (
     <div style={{ marginBottom: "22px" }}>
-      <SectionHeader icon="◎" title="Lingue" />
+      <SectionHeader icon="◎" title="Lingue" C={C} />
       <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
         {languages.map((lang, i) => (
           <span key={i} style={{
             fontSize: "11.5px",
             fontFamily: "system-ui, sans-serif",
-            color: COLORS.bodyText,
+            color: C.bodyText,
           }}>
             <strong>{lang.language}</strong>
             {lang.level && (
-              <span style={{ color: COLORS.bodyMuted }}> — {lang.level}</span>
+              <span style={{ color: C.bodyMuted }}> — {lang.level}</span>
             )}
             {i < languages.length - 1 && (
-              <span style={{ color: COLORS.border, marginLeft: "8px" }}>|</span>
+              <span style={{ color: C.border, marginLeft: "8px" }}>|</span>
             )}
           </span>
         ))}
@@ -371,12 +361,12 @@ function LanguagesSection({ languages }) {
   );
 }
 
-function ProjectsSection({ projects }) {
+function ProjectsSection({ projects, C }) {
   const items = projects?.filter(Boolean) || [];
   if (items.length === 0) return null;
   return (
     <div style={{ marginBottom: "22px" }}>
-      <SectionHeader icon="▶" title="Progetti" />
+      <SectionHeader icon="▶" title="Progetti" C={C} />
       <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
         {items.map((proj, i) => (
           <li key={i} style={{
@@ -384,11 +374,11 @@ function ProjectsSection({ projects }) {
             gap: "8px",
             fontSize: "11.5px",
             lineHeight: "1.6",
-            color: COLORS.bodyText,
+            color: C.bodyText,
             fontFamily: "system-ui, sans-serif",
             marginBottom: "2px",
           }}>
-            <span style={{ color: COLORS.accent, flexShrink: 0, fontWeight: 700 }}>•</span>
+            <span style={{ color: C.accent, flexShrink: 0, fontWeight: 700 }}>•</span>
             {proj}
           </li>
         ))}
@@ -399,27 +389,30 @@ function ProjectsSection({ projects }) {
 
 // ─── Componente principale ───────────────────────────────────────────────────
 
-export function TechDeveloper({ data }) {
+export function TechDeveloper({ data, customColors = {} }) {
+  // Merge: i colori custom sovrascrivono solo le chiavi fornite
+  const C = { ...COLORS_DEFAULT, ...customColors };
+
   return (
     <div style={{
       width: "100%",
-      backgroundColor: COLORS.white,
+      backgroundColor: C.white,
       fontFamily: "system-ui, sans-serif",
       fontSize: "12px",
-      color: COLORS.bodyText,
+      color: C.bodyText,
     }}>
       {/* Header navy */}
-      <HeaderSection personal={data.personal} />
+      <HeaderSection personal={data.personal} C={C} />
 
       {/* Body */}
-      <div style={{ padding: "28px 40px 32px", backgroundColor: COLORS.white }}>
-        <SummarySection summary={data.personal.summary} />
-        <SkillsSection skills={data.skills} />
-        <ExperienceSection experience={data.experience} />
-        <EducationSection education={data.education} />
-        <CertificationsSection certifications={data.certifications} />
-        <LanguagesSection languages={data.languages} />
-        <ProjectsSection projects={data.projects} />
+      <div style={{ padding: "28px 40px 32px", backgroundColor: C.white }}>
+        <SummarySection    summary={data.personal.summary}   C={C} />
+        <SkillsSection     skills={data.skills}              C={C} />
+        <ExperienceSection experience={data.experience}      C={C} />
+        <EducationSection  education={data.education}        C={C} />
+        <CertificationsSection certifications={data.certifications} C={C} />
+        <LanguagesSection  languages={data.languages}        C={C} />
+        <ProjectsSection   projects={data.projects}          C={C} />
       </div>
     </div>
   );

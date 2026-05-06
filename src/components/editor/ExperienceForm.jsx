@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import { useCVStore } from "../../store/useCVStore";
 import { SectionCard } from "../ui/SectionCard";
 
@@ -35,7 +36,6 @@ function BulletList({ bullets, onUpdate }) {
       const updated = [...bullets];
       updated.splice(i + 1, 0, "");
       onUpdate(updated);
-      // Focus sul nuovo campo dopo il re-render
       setTimeout(() => {
         const inputs = e.target.closest("ul")?.querySelectorAll("textarea");
         if (inputs?.[i + 1]) inputs[i + 1].focus();
@@ -85,10 +85,22 @@ function BulletList({ bullets, onUpdate }) {
   );
 }
 
-function ExperienceCard({ exp, onUpdate, onRemove }) {
+function ExperienceCard({ exp, onUpdate, onRemove, dragHandleProps, isDragOver }) {
   return (
-    <div className="border border-gray-200 rounded-lg p-3 mb-3 bg-white">
+    <div
+      className={`border rounded-lg p-3 mb-2 bg-white transition-colors ${
+        isDragOver ? "border-blue-400 bg-blue-50" : "border-gray-200"
+      }`}
+    >
       <div className="flex justify-between items-start mb-2">
+        {/* Drag handle */}
+        <span
+          {...dragHandleProps}
+          title="Trascina per riordinare"
+          className="text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing mr-2 mt-0.5 flex-shrink-0 select-none text-base leading-none"
+        >
+          ⠿
+        </span>
         <span className="text-xs font-semibold text-gray-600 truncate flex-1">
           {exp.role || "Nuova esperienza"}{exp.company ? ` @ ${exp.company}` : ""}
         </span>
@@ -144,20 +156,43 @@ function ExperienceCard({ exp, onUpdate, onRemove }) {
 }
 
 export function ExperienceForm() {
-  const experience = useCVStore((s) => s.experience);
-  const addExperience = useCVStore((s) => s.addExperience);
+  const experience      = useCVStore((s) => s.experience);
+  const setExperience   = useCVStore((s) => s.setExperience);
+  const addExperience   = useCVStore((s) => s.addExperience);
   const removeExperience = useCVStore((s) => s.removeExperience);
   const updateExperience = useCVStore((s) => s.updateExperience);
 
+  const dragIndex   = useRef(null);
+  const [dragOver, setDragOver] = useState(null);
+
+  const reorder = (from, to) => {
+    if (from === to || from === null) return;
+    const arr = [...experience];
+    const [moved] = arr.splice(from, 1);
+    arr.splice(to, 0, moved);
+    setExperience(arr);
+  };
+
   return (
     <SectionCard title="Esperienza" icon="💼">
-      {experience.map((exp) => (
-        <ExperienceCard
+      {experience.map((exp, index) => (
+        <div
           key={exp.id}
-          exp={exp}
-          onUpdate={(updates) => updateExperience(exp.id, updates)}
-          onRemove={() => removeExperience(exp.id)}
-        />
+          draggable
+          onDragStart={() => { dragIndex.current = index; }}
+          onDragOver={(e) => { e.preventDefault(); setDragOver(index); }}
+          onDrop={() => { reorder(dragIndex.current, index); setDragOver(null); dragIndex.current = null; }}
+          onDragEnd={() => { setDragOver(null); dragIndex.current = null; }}
+          style={{ opacity: dragIndex.current === index ? 0.5 : 1 }}
+        >
+          <ExperienceCard
+            exp={exp}
+            onUpdate={(updates) => updateExperience(exp.id, updates)}
+            onRemove={() => removeExperience(exp.id)}
+            isDragOver={dragOver === index && dragIndex.current !== index}
+            dragHandleProps={{}}
+          />
+        </div>
       ))}
       <button
         onClick={addExperience}

@@ -1,10 +1,10 @@
 // ManagerialExec.jsx — Profilo manager / executive
 // Layout due colonne, Playfair Display, palette navy + bianco
 
-const C = {
-  navy: '#1e3a5f',
-  navyDark: '#152c4a',
-  accent: '#1e3a5f',
+const COLORS_DEFAULT = {
+  bg: '#1e3a5f',        // header background
+  bgDark: '#152c4a',    // variante scura header
+  accent: '#1e3a5f',    // colore accento (sezioni, bullet, bordi tag)
   accentLight: '#e8eef5',
   white: '#ffffff',
   body: '#2d2d2d',
@@ -24,17 +24,17 @@ function formatDate(d) {
   return `${months[parseInt(m,10)-1]} ${y}`;
 }
 
-function SectionTitle({ children }) {
+function SectionTitle({ children, C }) {
   return (
     <div style={{ marginBottom: '10px', marginTop: '4px' }}>
       <span style={{
         fontFamily: "'Playfair Display', Georgia, serif",
         fontSize: '10px',
         fontWeight: 700,
-        color: C.navy,
+        color: C.accent,
         textTransform: 'uppercase',
         letterSpacing: '2px',
-        borderBottom: `2px solid ${C.navy}`,
+        borderBottom: `2px solid ${C.accent}`,
         paddingBottom: '3px',
         display: 'inline-block',
       }}>
@@ -44,17 +44,17 @@ function SectionTitle({ children }) {
   );
 }
 
-function SectionTitleLight({ children }) {
+function SectionTitleLight({ children, C }) {
   return (
     <div style={{ marginBottom: '8px', marginTop: '4px' }}>
       <span style={{
         fontFamily: "'Playfair Display', Georgia, serif",
         fontSize: '9px',
         fontWeight: 700,
-        color: C.navy,
+        color: C.accent,
         textTransform: 'uppercase',
         letterSpacing: '1.5px',
-        borderBottom: `1px solid ${C.navy}`,
+        borderBottom: `1px solid ${C.accent}`,
         paddingBottom: '2px',
         display: 'inline-block',
       }}>
@@ -65,7 +65,7 @@ function SectionTitleLight({ children }) {
 }
 
 // ─── Colonna sinistra ─────────────────────────────────────────────────────────
-function LeftColumn({ data }) {
+function LeftColumn({ data, C }) {
   const { personal, skills, languages, certifications } = data;
 
   return (
@@ -86,7 +86,7 @@ function LeftColumn({ data }) {
             width: '96px', height: '96px',
             borderRadius: '50%',
             overflow: 'hidden',
-            border: `3px solid ${C.navy}`,
+            border: `3px solid ${C.accent}`,
             boxShadow: '0 2px 12px rgba(30,58,95,0.2)',
           }}>
             <img src={personal.photo} alt={personal.name}
@@ -97,7 +97,7 @@ function LeftColumn({ data }) {
 
       {/* Contatti */}
       <div>
-        <SectionTitleLight>Contatti</SectionTitleLight>
+        <SectionTitleLight C={C}>Contatti</SectionTitleLight>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           {[
             { icon: '✉', val: personal.email },
@@ -105,10 +105,10 @@ function LeftColumn({ data }) {
             { icon: '📍', val: personal.location },
             { icon: '🔗', val: personal.website },
             { icon: 'in', val: personal.linkedin },
-          ].filter(x => x.val).map((c, i) => (
+          ].filter(x => x.val).map((item, i) => (
             <div key={i} style={{ display: 'flex', gap: '6px', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: '9px', color: C.navy, flexShrink: 0, minWidth: '14px' }}>{c.icon}</span>
-              <span style={{ fontSize: '9px', color: C.body, wordBreak: 'break-all', lineHeight: 1.4 }}>{c.val}</span>
+              <span style={{ fontSize: '9px', color: C.accent, flexShrink: 0, minWidth: '14px' }}>{item.icon}</span>
+              <span style={{ fontSize: '9px', color: C.body, wordBreak: 'break-all', lineHeight: 1.4 }}>{item.val}</span>
             </div>
           ))}
         </div>
@@ -117,7 +117,7 @@ function LeftColumn({ data }) {
       {/* Competenze */}
       {skills.length > 0 && (
         <div>
-          <SectionTitleLight>Competenze</SectionTitleLight>
+          <SectionTitleLight C={C}>Competenze</SectionTitleLight>
           {skills.map((cat, i) => (
             <div key={i} style={{ marginBottom: '8px' }}>
               <p style={{ fontSize: '8px', fontWeight: 700, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>
@@ -127,7 +127,7 @@ function LeftColumn({ data }) {
                 {cat.tags.map((tag, ti) => (
                   <span key={ti} style={{
                     backgroundColor: C.tagBg,
-                    color: C.tagText,
+                    color: C.accent,
                     fontSize: '8.5px',
                     padding: '2px 6px',
                     borderRadius: '3px',
@@ -145,7 +145,7 @@ function LeftColumn({ data }) {
       {/* Lingue */}
       {languages.length > 0 && (
         <div>
-          <SectionTitleLight>Lingue</SectionTitleLight>
+          <SectionTitleLight C={C}>Lingue</SectionTitleLight>
           {languages.map((l, i) => (
             <div key={i} style={{ marginBottom: '5px' }}>
               <p style={{ fontSize: '9px', fontWeight: 700, color: C.body, marginBottom: '1px' }}>{l.language}</p>
@@ -158,11 +158,11 @@ function LeftColumn({ data }) {
       {/* Certificazioni */}
       {certifications.filter(Boolean).length > 0 && (
         <div>
-          <SectionTitleLight>Certificazioni</SectionTitleLight>
-          {certifications.filter(Boolean).map((c, i) => (
+          <SectionTitleLight C={C}>Certificazioni</SectionTitleLight>
+          {certifications.filter(Boolean).map((cert, i) => (
             <div key={i} style={{ display: 'flex', gap: '5px', marginBottom: '4px', alignItems: 'flex-start' }}>
-              <span style={{ color: C.navy, fontSize: '8px', flexShrink: 0 }}>★</span>
-              <span style={{ fontSize: '8.5px', color: C.body, lineHeight: 1.4 }}>{c}</span>
+              <span style={{ color: C.accent, fontSize: '8px', flexShrink: 0 }}>★</span>
+              <span style={{ fontSize: '8.5px', color: C.body, lineHeight: 1.4 }}>{cert}</span>
             </div>
           ))}
         </div>
@@ -172,7 +172,7 @@ function LeftColumn({ data }) {
 }
 
 // ─── Colonna destra ───────────────────────────────────────────────────────────
-function RightColumn({ data }) {
+function RightColumn({ data, C }) {
   const { personal, experience, education, projects } = data;
 
   return (
@@ -181,7 +181,7 @@ function RightColumn({ data }) {
       {/* Sommario */}
       {personal.summary && (
         <div style={{ marginBottom: '20px' }}>
-          <SectionTitle>Profilo</SectionTitle>
+          <SectionTitle C={C}>Profilo</SectionTitle>
           <p style={{ fontSize: '10px', lineHeight: 1.7, color: C.body, fontFamily: 'system-ui, sans-serif' }}>
             {personal.summary}
           </p>
@@ -191,7 +191,7 @@ function RightColumn({ data }) {
       {/* Esperienza */}
       {experience.length > 0 && (
         <div style={{ marginBottom: '20px' }}>
-          <SectionTitle>Esperienza</SectionTitle>
+          <SectionTitle C={C}>Esperienza</SectionTitle>
           {experience.map((exp) => (
             <div key={exp.id} style={{ marginBottom: '14px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2px' }}>
@@ -199,7 +199,7 @@ function RightColumn({ data }) {
                   <p style={{ fontSize: '11px', fontWeight: 700, color: C.body, fontFamily: "'Playfair Display', serif" }}>
                     {exp.role}
                   </p>
-                  <p style={{ fontSize: '10px', color: C.navy, fontWeight: 600, marginTop: '1px' }}>
+                  <p style={{ fontSize: '10px', color: C.accent, fontWeight: 600, marginTop: '1px' }}>
                     {exp.company}{exp.location ? ` · ${exp.location}` : ''}
                   </p>
                 </div>
@@ -210,7 +210,7 @@ function RightColumn({ data }) {
               <ul style={{ margin: '5px 0 0', padding: 0, listStyle: 'none' }}>
                 {exp.bullets.filter(Boolean).map((b, bi) => (
                   <li key={bi} style={{ display: 'flex', gap: '6px', fontSize: '10px', lineHeight: 1.6, color: C.body, marginBottom: '2px' }}>
-                    <span style={{ color: C.navy, flexShrink: 0, fontWeight: 700 }}>—</span>
+                    <span style={{ color: C.accent, flexShrink: 0, fontWeight: 700 }}>—</span>
                     {b}
                   </li>
                 ))}
@@ -223,7 +223,7 @@ function RightColumn({ data }) {
       {/* Formazione */}
       {education.length > 0 && (
         <div style={{ marginBottom: '20px' }}>
-          <SectionTitle>Formazione</SectionTitle>
+          <SectionTitle C={C}>Formazione</SectionTitle>
           {education.map((edu) => (
             <div key={edu.id} style={{ marginBottom: '10px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -252,10 +252,10 @@ function RightColumn({ data }) {
       {/* Progetti */}
       {projects.filter(Boolean).length > 0 && (
         <div>
-          <SectionTitle>Progetti</SectionTitle>
+          <SectionTitle C={C}>Progetti</SectionTitle>
           {projects.filter(Boolean).map((p, i) => (
             <div key={i} style={{ display: 'flex', gap: '6px', marginBottom: '4px', alignItems: 'flex-start' }}>
-              <span style={{ color: C.navy, flexShrink: 0, fontWeight: 700 }}>—</span>
+              <span style={{ color: C.accent, flexShrink: 0, fontWeight: 700 }}>—</span>
               <span style={{ fontSize: '10px', color: C.body, lineHeight: 1.6 }}>{p}</span>
             </div>
           ))}
@@ -266,12 +266,15 @@ function RightColumn({ data }) {
 }
 
 // ─── Componente principale ────────────────────────────────────────────────────
-export function ManagerialExec({ data }) {
+export function ManagerialExec({ data, customColors = {} }) {
+  // Merge: i colori custom sovrascrivono solo le chiavi fornite
+  const C = { ...COLORS_DEFAULT, ...customColors };
+
   return (
     <div style={{ width: '100%', backgroundColor: C.white, fontFamily: 'system-ui, sans-serif' }}>
       {/* Header */}
       <div style={{
-        backgroundColor: C.navy,
+        backgroundColor: C.bg,
         padding: '28px 32px 24px',
         display: 'flex',
         alignItems: 'flex-end',
@@ -305,8 +308,8 @@ export function ManagerialExec({ data }) {
 
       {/* Corpo a due colonne */}
       <div style={{ display: 'flex', minHeight: '900px' }}>
-        <LeftColumn data={data} />
-        <RightColumn data={data} />
+        <LeftColumn data={data} C={C} />
+        <RightColumn data={data} C={C} />
       </div>
     </div>
   );

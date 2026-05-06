@@ -1,22 +1,29 @@
 import { useCVStore } from "../../store/useCVStore";
 
 const TEMPLATES = [
-  { id: "tech", label: "Tech" },
-  { id: "manager", label: "Manager" },
+  { id: "tech",     label: "Tech" },
+  { id: "manager",  label: "Manager" },
   { id: "designer", label: "Designer" },
 ];
 
 const DESIGNER_PALETTES = [
-  { id: "noir-gold", label: "Noir & Gold" },
-  { id: "indigo-electric", label: "Indigo Electric" },
-  { id: "forest-stone", label: "Forest & Stone" },
+  { id: "noir-gold",        label: "Noir & Gold" },
+  { id: "indigo-electric",  label: "Indigo Electric" },
+  { id: "forest-stone",     label: "Forest & Stone" },
 ];
 
 export function Toolbar({ onExportPDF, onExportDOCX, onExportJSON, onImportJSON, exporting }) {
-  const template = useCVStore((s) => s.template);
-  const designerPalette = useCVStore((s) => s.designerPalette);
-  const setTemplate = useCVStore((s) => s.setTemplate);
+  const template         = useCVStore((s) => s.template);
+  const designerPalette  = useCVStore((s) => s.designerPalette);
+  const setTemplate      = useCVStore((s) => s.setTemplate);
   const setDesignerPalette = useCVStore((s) => s.setDesignerPalette);
+  const resetCV          = useCVStore((s) => s.resetCV);
+
+  const handleReset = () => {
+    if (window.confirm("Resettare il CV ai dati di default? I dati correnti verranno persi.")) {
+      resetCV();
+    }
+  };
 
   return (
     <header className="h-12 bg-white border-b border-gray-200 flex items-center px-4 gap-4 flex-shrink-0">
@@ -28,7 +35,9 @@ export function Toolbar({ onExportPDF, onExportDOCX, onExportJSON, onImportJSON,
             key={t.id}
             onClick={() => setTemplate(t.id)}
             className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
-              template === t.id ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              template === t.id
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
             {t.label}
@@ -45,7 +54,9 @@ export function Toolbar({ onExportPDF, onExportDOCX, onExportJSON, onImportJSON,
               key={p.id}
               onClick={() => setDesignerPalette(p.id)}
               className={`px-2 py-1 rounded text-xs transition-colors ${
-                designerPalette === p.id ? "bg-purple-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                designerPalette === p.id
+                  ? "bg-purple-600 text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
               {p.label}
@@ -58,6 +69,17 @@ export function Toolbar({ onExportPDF, onExportDOCX, onExportJSON, onImportJSON,
 
       {/* Export / Import */}
       <div className="flex items-center gap-2">
+        <button
+          onClick={handleReset}
+          disabled={!!exporting}
+          title="Ripristina i dati di default"
+          className="px-2.5 py-1.5 rounded text-xs font-medium text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-30"
+        >
+          ↺ Reset
+        </button>
+
+        <div className="w-px h-5 bg-gray-200" />
+
         <button
           onClick={onImportJSON}
           disabled={!!exporting}
@@ -76,23 +98,23 @@ export function Toolbar({ onExportPDF, onExportDOCX, onExportJSON, onImportJSON,
           onClick={onExportDOCX}
           disabled={!!exporting}
           className={`px-3 py-1.5 rounded text-xs font-medium transition-colors border disabled:opacity-50 ${
-            exporting === 'docx'
+            exporting === "docx"
               ? "bg-blue-200 text-blue-700 border-blue-300 cursor-wait"
               : "bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200"
           }`}
         >
-          {exporting === 'docx' ? '⏳ DOCX…' : '↓ DOCX'}
+          {exporting === "docx" ? "⏳ DOCX…" : "↓ DOCX"}
         </button>
         <button
           onClick={onExportPDF}
           disabled={!!exporting}
           className={`px-3 py-1.5 rounded text-xs font-medium transition-colors disabled:opacity-50 ${
-            exporting === 'pdf'
+            exporting === "pdf"
               ? "bg-red-400 text-white cursor-wait"
               : "bg-red-600 text-white hover:bg-red-700"
           }`}
         >
-          {exporting === 'pdf' ? '⏳ PDF…' : '↓ PDF'}
+          {exporting === "pdf" ? "⏳ PDF…" : "↓ PDF"}
         </button>
       </div>
     </header>

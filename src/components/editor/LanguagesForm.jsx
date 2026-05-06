@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import { useCVStore } from "../../store/useCVStore";
 import { SectionCard } from "../ui/SectionCard";
 
@@ -12,16 +13,46 @@ const LEVELS = [
 ];
 
 export function LanguagesForm() {
-  const languages = useCVStore((s) => s.languages);
-  const addLanguage = useCVStore((s) => s.addLanguage);
+  const languages      = useCVStore((s) => s.languages);
+  const setLanguages   = useCVStore((s) => s.setLanguages);
+  const addLanguage    = useCVStore((s) => s.addLanguage);
   const removeLanguage = useCVStore((s) => s.removeLanguage);
   const updateLanguage = useCVStore((s) => s.updateLanguage);
 
+  const dragIndex = useRef(null);
+  const [dragOver, setDragOver] = useState(null);
+
+  const reorder = (from, to) => {
+    if (from === to || from === null) return;
+    const arr = [...languages];
+    const [moved] = arr.splice(from, 1);
+    arr.splice(to, 0, moved);
+    setLanguages(arr);
+  };
+
   return (
     <SectionCard title="Lingue" icon="🌍">
-      <div className="space-y-2">
+      <div className="space-y-1">
         {languages.map((lang, i) => (
-          <div key={i} className="flex gap-2 items-center">
+          <div
+            key={i}
+            draggable
+            onDragStart={() => { dragIndex.current = i; }}
+            onDragOver={(e) => { e.preventDefault(); setDragOver(i); }}
+            onDrop={() => { reorder(dragIndex.current, i); setDragOver(null); dragIndex.current = null; }}
+            onDragEnd={() => { setDragOver(null); dragIndex.current = null; }}
+            style={{ opacity: dragIndex.current === i ? 0.4 : 1 }}
+            className={`flex gap-2 items-center rounded px-1 py-0.5 transition-colors ${
+              dragOver === i && dragIndex.current !== i ? "bg-blue-50 ring-1 ring-blue-300" : ""
+            }`}
+          >
+            {/* Drag handle */}
+            <span
+              title="Trascina per riordinare"
+              className="text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing flex-shrink-0 select-none text-base leading-none"
+            >
+              ⠿
+            </span>
             <input
               type="text"
               value={lang.language}
