@@ -7,40 +7,29 @@ function host(key) {
   return key.trim().endsWith(":fx") ? FREE_HOST : PRO_HOST;
 }
 
-async function deeplBatch(texts, targetLang, apiKey) {
-  const endpoint = `${host(apiKey)}/v2/translate`;
-  const payload = {
-    text: texts,
-    target_lang: targetLang.toUpperCase(),
-    tag_handling: "xml",
-  };
-
-  const res = await fetch(endpoint, {
+async function deeplBatch(texts, targetLang, userApiKey) {
+  // Chiamata al tuo proxy su Vercel
+  const res = await fetch("/api/translate", {
     method: "POST",
     headers: {
-      // Header richiesti dal tuo esempio
-      Authorization: `DeepL-Auth-Key ${apiKey.trim()}`,
       "Content-Type": "application/json",
-      "User-Agent": "CV-Builder/0.0.0",
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      texts: texts,
+      targetLang: targetLang,
+      userApiKey: userApiKey, // La chiave presa dall'input dell'utente
+    }),
   });
 
+  const data = await res.json();
+
   if (!res.ok) {
-    let msg = `DeepL error ${res.status}`;
-    try {
-      const j = await res.json();
-      msg = j.message || msg;
-    } catch {
-      /* ignore */
-    }
-    throw new Error(msg);
+    // Gestione errori (es: "Key invalid")
+    throw new Error(data.message || "Errore di traduzione");
   }
 
-  const { translations } = await res.json();
-  return translations.map((t) => t.text);
+  return data.translations.map((t) => t.text);
 }
-
 // ─── Main export ──────────────────────────────────────────────────────────────
 /**
  * Translate all human-readable text fields in cvData using DeepL.
