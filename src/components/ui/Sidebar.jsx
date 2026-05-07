@@ -19,13 +19,13 @@ import { useCVStore } from "../../store/useCVStore";
 import { UI_LANGUAGES } from "../../locales/index.js";
 
 const CV_SECTIONS = [
-  { id: "personal",       label: "Dati Personali",  Icon: User },
-  { id: "skills",         label: "Competenze",       Icon: Wrench },
-  { id: "experience",     label: "Esperienza",       Icon: Briefcase },
-  { id: "education",      label: "Formazione",       Icon: GraduationCap },
-  { id: "certifications", label: "Certificazioni",   Icon: Certificate },
-  { id: "languages",      label: "Lingue",           Icon: Globe },
-  { id: "projects",       label: "Progetti",         Icon: Rocket },
+  { id: "personal", label: "Dati Personali", Icon: User },
+  { id: "skills", label: "Competenze", Icon: Wrench },
+  { id: "experience", label: "Esperienza", Icon: Briefcase },
+  { id: "education", label: "Formazione", Icon: GraduationCap },
+  { id: "certifications", label: "Certificazioni", Icon: Certificate },
+  { id: "languages", label: "Lingue", Icon: Globe },
+  { id: "projects", label: "Progetti", Icon: Rocket },
 ];
 
 const EXTRA_SECTIONS = [
@@ -177,34 +177,52 @@ function PaletteCustomizerPanel() {
 // ─── FontSizeCustomizerPanel ──────────────────────────────────────────────────
 const FONT_SIZE_KEYS = {
   tech: [
-    { key: "name",          label: "Nome",                 def: 26, min: 16, max: 44 },
-    { key: "role",          label: "Ruolo / Titolo",       def: 12, min: 8,  max: 20 },
-    { key: "sectionHeader", label: "Intestazioni sezioni", def: 10, min: 7,  max: 16 },
-    { key: "body",          label: "Corpo testo",          def: 11, min: 8,  max: 16 },
+    { key: "name", label: "Nome", def: 26, min: 16, max: 44 },
+    { key: "role", label: "Ruolo / Titolo", def: 12, min: 8, max: 20 },
+    {
+      key: "sectionHeader",
+      label: "Intestazioni sezioni",
+      def: 10,
+      min: 7,
+      max: 16,
+    },
+    { key: "body", label: "Corpo testo", def: 11, min: 8, max: 16 },
   ],
   manager: [
-    { key: "name",          label: "Nome",                 def: 30, min: 16, max: 44 },
-    { key: "role",          label: "Ruolo / Titolo",       def: 11, min: 8,  max: 20 },
-    { key: "sectionHeader", label: "Intestazioni sezioni", def: 10, min: 7,  max: 16 },
-    { key: "body",          label: "Corpo testo",          def: 10, min: 8,  max: 16 },
+    { key: "name", label: "Nome", def: 30, min: 16, max: 44 },
+    { key: "role", label: "Ruolo / Titolo", def: 11, min: 8, max: 20 },
+    {
+      key: "sectionHeader",
+      label: "Intestazioni sezioni",
+      def: 10,
+      min: 7,
+      max: 16,
+    },
+    { key: "body", label: "Corpo testo", def: 10, min: 8, max: 16 },
   ],
   designer: [
-    { key: "name",          label: "Nome",                 def: 36, min: 20, max: 48 },
-    { key: "role",          label: "Ruolo / Titolo",       def: 11, min: 8,  max: 20 },
-    { key: "sectionHeader", label: "Intestazioni sezioni", def: 9,  min: 7,  max: 14 },
-    { key: "body",          label: "Corpo testo",          def: 10, min: 8,  max: 16 },
+    { key: "name", label: "Nome", def: 36, min: 20, max: 48 },
+    { key: "role", label: "Ruolo / Titolo", def: 11, min: 8, max: 20 },
+    {
+      key: "sectionHeader",
+      label: "Intestazioni sezioni",
+      def: 9,
+      min: 7,
+      max: 14,
+    },
+    { key: "body", label: "Corpo testo", def: 10, min: 8, max: 16 },
   ],
 };
 
 function FontSizeCustomizerPanel() {
-  const template          = useCVStore((s) => s.template);
-  const customFontSizes   = useCVStore((s) => s.customFontSizes);
+  const template = useCVStore((s) => s.template);
+  const customFontSizes = useCVStore((s) => s.customFontSizes);
   const setCustomFontSize = useCVStore((s) => s.setCustomFontSize);
   const resetCustomFontSizes = useCVStore((s) => s.resetCustomFontSizes);
 
   const [open, setOpen] = useState(false);
 
-  const keys    = FONT_SIZE_KEYS[template] || [];
+  const keys = FONT_SIZE_KEYS[template] || [];
   const current = customFontSizes[template] || {};
 
   const getValue = (key, def) =>
@@ -234,7 +252,7 @@ function FontSizeCustomizerPanel() {
       {open && (
         <div className="px-4 pb-4 space-y-3">
           {keys.map(({ key, label, def, min, max }) => {
-            const val    = getValue(key, def);
+            const val = getValue(key, def);
             const isDirty = current[key] !== undefined && current[key] !== def;
             return (
               <div key={key}>
@@ -243,7 +261,11 @@ function FontSizeCustomizerPanel() {
                   <div className="flex items-center gap-1.5">
                     <span
                       className="text-xs font-mono font-semibold"
-                      style={{ color: isDirty ? "#34d399" : "#94a3b8", minWidth: "28px", textAlign: "right" }}
+                      style={{
+                        color: isDirty ? "#34d399" : "#94a3b8",
+                        minWidth: "28px",
+                        textAlign: "right",
+                      }}
                     >
                       {val}px
                     </span>
@@ -290,7 +312,8 @@ function FontSizeCustomizerPanel() {
             ↺ Ripristina default
           </button>
           <p className="text-xs text-gray-600 leading-tight">
-            Modifica le dimensioni per il template attivo. Il corpo scala proporzionalmente.
+            Modifica le dimensioni per il template attivo. Il corpo scala
+            proporzionalmente.
           </p>
         </div>
       )}
@@ -374,7 +397,7 @@ function TranslateConfirmModal({
               fontSize: "12px",
               fontWeight: 600,
               opacity: translating ? 0.6 : 1,
-              textAlign: "left",
+              textAlign: "center",
             }}
           >
             Scarica backup e procedi
@@ -391,7 +414,7 @@ function TranslateConfirmModal({
               cursor: translating ? "not-allowed" : "pointer",
               fontSize: "12px",
               opacity: translating ? 0.6 : 1,
-              textAlign: "left",
+              textAlign: "center",
             }}
           >
             {translating ? "Traduzione in corso..." : "Procedi senza scaricare"}

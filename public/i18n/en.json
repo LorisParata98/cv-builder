@@ -1,0 +1,16 @@
+{
+  "welcome": "Welcome",
+  "save": "Save",
+
+  {
+  "levels": {
+    "native": "Native",
+    "c2": "Proficient",
+    "c1": "Advanced",
+    "b2": "Upper Intermediate",
+    "b1": "Intermediate",
+    "a2": "Elementary",
+    "a1": "Beginner"
+  }
+}
+}

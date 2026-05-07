@@ -51,7 +51,7 @@ function Toast({ message, type, onDismiss }) {
 function MobileWarning() {
   const [dismissed, setDismissed] = useState(false);
   const [narrow, setNarrow] = useState(
-    typeof window !== "undefined" && window.innerWidth < 1024
+    typeof window !== "undefined" && window.innerWidth < 1024,
   );
 
   useEffect(() => {
@@ -87,7 +87,13 @@ function MobileWarning() {
           boxShadow: "0 24px 64px rgba(0,0,0,0.6)",
         }}
       >
-        <div style={{ marginBottom: "16px", display: "flex", justifyContent: "center" }}>
+        <div
+          style={{
+            marginBottom: "16px",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
           <Desktop size={52} weight="duotone" color="#94a3b8" />
         </div>
         <h2
@@ -528,10 +534,11 @@ export default function App() {
               <EditorPanel activeSection={activeSection} />
             </div>
             <EditorResizeHandle onDrag={handleEditorDrag} />
-            {activeSection === "coverLetter"
-              ? <CoverLetterPreview />
-              : <CVPreview />
-            }
+            {activeSection === "coverLetter" ? (
+              <CoverLetterPreview />
+            ) : (
+              <CVPreview />
+            )}
           </div>
         </div>
 

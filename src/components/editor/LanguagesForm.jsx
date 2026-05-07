@@ -2,18 +2,20 @@ import { useRef, useState } from "react";
 import { DotsSixVertical, Globe } from "@phosphor-icons/react";
 import { useCVStore } from "../../store/useCVStore";
 import { SectionCard } from "../ui/SectionCard";
+import { useTranslation } from "react-i18next";
 
-const LEVELS = [
-  "Madrelingua",
-  "C2 – Padronanza",
-  "C1 – Avanzato",
-  "B2 – Intermedio superiore",
-  "B1 – Intermedio",
-  "A2 – Elementare",
-  "A1 – Base",
+export const LEVELS_KEYS = [
+  "levels.native",
+  "levels.c2",
+  "levels.c1",
+  "levels.b2",
+  "levels.b1",
+  "levels.a2",
+  "levels.a1",
 ];
 
 export function LanguagesForm() {
+  const { t } = useTranslation();
   const languages = useCVStore((s) => s.languages);
   const setLanguages = useCVStore((s) => s.setLanguages);
   const addLanguage = useCVStore((s) => s.addLanguage);
@@ -72,7 +74,7 @@ export function LanguagesForm() {
               value={lang.language}
               onChange={(e) => updateLanguage(i, { language: e.target.value })}
               placeholder="Es. Inglese"
-              className=" w-32 border border-gray-300 rounded px-2.5 py-2 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className=" w-24 border border-gray-300 rounded px-2.5 py-2 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
             <select
               value={lang.level}
@@ -80,9 +82,9 @@ export function LanguagesForm() {
               className="w-32 border border-gray-300 rounded px-2 py-2 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
             >
               <option value="">Seleziona livello</option>
-              {LEVELS.map((l) => (
-                <option key={l} value={l}>
-                  {l}
+              {LEVELS_KEYS.map((l) => (
+                <option key={l} value={t(l)}>
+                  {t(l)}
                 </option>
               ))}
             </select>
