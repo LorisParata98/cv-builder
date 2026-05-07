@@ -52,9 +52,9 @@ function BulletList({ bullets, onUpdate }) {
   };
 
   return (
-    <div className="mt-3">
+    <div className="mt-3 mb-4">
       <label className="block text-xs font-medium text-gray-500 mb-1.5">
-        Bullet point{" "}
+        Bullet point <br />
         <span className="text-gray-400 font-normal">
           (Invio = nuovo, Backspace su riga vuota = rimuovi)
         </span>
@@ -92,14 +92,20 @@ function BulletList({ bullets, onUpdate }) {
   );
 }
 
-function ExperienceCard({ exp, onUpdate, onRemove, dragHandleProps, isDragOver }) {
+function ExperienceCard({
+  exp,
+  onUpdate,
+  onRemove,
+  dragHandleProps,
+  isDragOver,
+}) {
   return (
     <div
-      className={`border rounded-lg p-4 mb-3.5 bg-white transition-colors ${
+      className={`border-b mb-5 mb-3.5 bg-white transition-colors ${
         isDragOver ? "border-blue-400 bg-blue-50" : "border-gray-200"
       }`}
     >
-      <div className="flex justify-between items-start mb-3">
+      <div className="flex justify-between items-center mb-3">
         <span
           {...dragHandleProps}
           title="Trascina per riordinare"
@@ -107,7 +113,11 @@ function ExperienceCard({ exp, onUpdate, onRemove, dragHandleProps, isDragOver }
         >
           <DotsSixVertical size={18} weight="bold" />
         </span>
-        <span className="text-xs font-semibold text-gray-600 truncate flex-1">
+        <span
+          className={`text-xs font-semibold truncate flex-1 ${
+            exp.role ? "text-gray-600" : "text-gray-300"
+          }`}
+        >
           {exp.role || "Nuova esperienza"}
           {exp.company ? ` @ ${exp.company}` : ""}
         </span>
@@ -119,13 +129,33 @@ function ExperienceCard({ exp, onUpdate, onRemove, dragHandleProps, isDragOver }
         </button>
       </div>
 
-      <Field label="Ruolo"         value={exp.role}     onChange={(v) => onUpdate({ role: v })}     placeholder="Es. Senior Frontend Developer" />
-      <Field label="Azienda"       value={exp.company}  onChange={(v) => onUpdate({ company: v })}  placeholder="Es. Acme Corp" />
-      <Field label="Città / Nazione" value={exp.location} onChange={(v) => onUpdate({ location: v })} placeholder="Es. Milano, Italia" />
+      <Field
+        label="Ruolo"
+        value={exp.role}
+        onChange={(v) => onUpdate({ role: v })}
+        placeholder="Es. Senior Frontend Developer"
+      />
+      <Field
+        label="Azienda"
+        value={exp.company}
+        onChange={(v) => onUpdate({ company: v })}
+        placeholder="Es. Acme Corp"
+      />
+      <Field
+        label="Città / Nazione"
+        value={exp.location}
+        onChange={(v) => onUpdate({ location: v })}
+        placeholder="Es. Milano, Italia"
+      />
 
       <div className="flex gap-3">
         <div className="flex-1">
-          <Field label="Data inizio" value={exp.startDate} onChange={(v) => onUpdate({ startDate: v })} placeholder="YYYY-MM" />
+          <Field
+            label="Data inizio"
+            value={exp.startDate}
+            onChange={(v) => onUpdate({ startDate: v })}
+            placeholder="YYYY-MM"
+          />
         </div>
         <div className="flex-1">
           <div className="mb-3.5">
@@ -143,7 +173,9 @@ function ExperienceCard({ exp, onUpdate, onRemove, dragHandleProps, isDragOver }
               />
               <button
                 onClick={() =>
-                  onUpdate({ endDate: exp.endDate === "present" ? "" : "present" })
+                  onUpdate({
+                    endDate: exp.endDate === "present" ? "" : "present",
+                  })
                 }
                 className={`px-2 py-1.5 text-xs rounded border transition-colors flex-shrink-0 ${
                   exp.endDate === "present"
@@ -167,9 +199,9 @@ function ExperienceCard({ exp, onUpdate, onRemove, dragHandleProps, isDragOver }
 }
 
 export function ExperienceForm() {
-  const experience      = useCVStore((s) => s.experience);
-  const setExperience   = useCVStore((s) => s.setExperience);
-  const addExperience   = useCVStore((s) => s.addExperience);
+  const experience = useCVStore((s) => s.experience);
+  const setExperience = useCVStore((s) => s.setExperience);
+  const addExperience = useCVStore((s) => s.addExperience);
   const removeExperience = useCVStore((s) => s.removeExperience);
   const updateExperience = useCVStore((s) => s.updateExperience);
 
@@ -185,15 +217,30 @@ export function ExperienceForm() {
   };
 
   return (
-    <SectionCard title="Esperienza" icon={<Briefcase size={15} weight="duotone" />}>
+    <SectionCard
+      title="Esperienza"
+      icon={<Briefcase size={15} weight="duotone" />}
+    >
       {experience.map((exp, index) => (
         <div
           key={exp.id}
           draggable
-          onDragStart={() => { dragIndex.current = index; }}
-          onDragOver={(e) => { e.preventDefault(); setDragOver(index); }}
-          onDrop={() => { reorder(dragIndex.current, index); setDragOver(null); dragIndex.current = null; }}
-          onDragEnd={() => { setDragOver(null); dragIndex.current = null; }}
+          onDragStart={() => {
+            dragIndex.current = index;
+          }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragOver(index);
+          }}
+          onDrop={() => {
+            reorder(dragIndex.current, index);
+            setDragOver(null);
+            dragIndex.current = null;
+          }}
+          onDragEnd={() => {
+            setDragOver(null);
+            dragIndex.current = null;
+          }}
           style={{ opacity: dragIndex.current === index ? 0.5 : 1 }}
         >
           <ExperienceCard

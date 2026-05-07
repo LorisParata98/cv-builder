@@ -56,7 +56,7 @@ function TagEditor({ tag, onUpdate, onRemove }) {
   };
 
   return (
-    <div className="border border-gray-200 rounded p-3 mb-3 bg-white">
+    <div className="mb-4 ">
       <div className="flex gap-1.5 items-center mb-2">
         <input
           type="text"

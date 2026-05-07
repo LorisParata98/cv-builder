@@ -29,7 +29,7 @@ const saveToStorage = (state) => {
 const savedState = loadFromStorage();
 const savedDeepLKey = localStorage.getItem(DEEPL_KEY) || "";
 
-const DEFAULT_CUSTOM_PALETTES   = { tech: {}, manager: {}, designer: {} };
+const DEFAULT_CUSTOM_PALETTES = { tech: {}, manager: {}, designer: {} };
 const DEFAULT_CUSTOM_FONT_SIZES = { tech: {}, manager: {}, designer: {} };
 
 const DEFAULT_COVER_LETTER = {
@@ -57,7 +57,7 @@ const initialState = {
     ...DEFAULT_CUSTOM_FONT_SIZES,
     ...((savedState || {}).customFontSizes || {}),
   },
-  targetLanguage: (savedState || {}).targetLanguage || 'IT',
+  targetLanguage: (savedState || {}).targetLanguage || "IT",
   coverLetter: {
     ...DEFAULT_COVER_LETTER,
     ...((savedState || {}).coverLetter || {}),
@@ -129,7 +129,7 @@ export const useCVStore = create((set, get) => ({
     saveToStorage({ ...get(), skills });
   },
 
-  addSkillCategory: (category = "Nuova categoria") => {
+  addSkillCategory: (category = "") => {
     const skills = [...get().skills, { category, tags: [] }];
     set({ skills });
     saveToStorage({ ...get(), skills });
@@ -143,7 +143,7 @@ export const useCVStore = create((set, get) => ({
 
   updateSkillCategory: (index, updates) => {
     const skills = get().skills.map((cat, i) =>
-      i === index ? { ...cat, ...updates } : cat
+      i === index ? { ...cat, ...updates } : cat,
     );
     set({ skills });
     saveToStorage({ ...get(), skills });
@@ -173,7 +173,7 @@ export const useCVStore = create((set, get) => ({
       return {
         ...cat,
         tags: cat.tags.map((tag, ti) =>
-          ti === tagIndex ? { ...tag, ...updates } : tag
+          ti === tagIndex ? { ...tag, ...updates } : tag,
         ),
       };
     });
@@ -210,7 +210,7 @@ export const useCVStore = create((set, get) => ({
 
   updateExperience: (id, updates) => {
     const experience = get().experience.map((e) =>
-      e.id === id ? { ...e, ...updates } : e
+      e.id === id ? { ...e, ...updates } : e,
     );
     set({ experience });
     saveToStorage({ ...get(), experience });
@@ -246,7 +246,7 @@ export const useCVStore = create((set, get) => ({
 
   updateEducation: (id, updates) => {
     const education = get().education.map((e) =>
-      e.id === id ? { ...e, ...updates } : e
+      e.id === id ? { ...e, ...updates } : e,
     );
     set({ education });
     saveToStorage({ ...get(), education });
@@ -272,7 +272,7 @@ export const useCVStore = create((set, get) => ({
 
   updateCertification: (index, value) => {
     const certifications = get().certifications.map((c, i) =>
-      i === index ? value : c
+      i === index ? value : c,
     );
     set({ certifications });
     saveToStorage({ ...get(), certifications });
@@ -298,7 +298,7 @@ export const useCVStore = create((set, get) => ({
 
   updateLanguage: (index, updates) => {
     const languages = get().languages.map((l, i) =>
-      i === index ? { ...l, ...updates } : l
+      i === index ? { ...l, ...updates } : l,
     );
     set({ languages });
     saveToStorage({ ...get(), languages });
@@ -323,9 +323,7 @@ export const useCVStore = create((set, get) => ({
   },
 
   updateProject: (index, value) => {
-    const projects = get().projects.map((p, i) =>
-      i === index ? value : p
-    );
+    const projects = get().projects.map((p, i) => (i === index ? value : p));
     set({ projects });
     saveToStorage({ ...get(), projects });
   },
@@ -339,7 +337,7 @@ export const useCVStore = create((set, get) => ({
 
   updateCoverLetterHighlight: (index, value) => {
     const highlights = get().coverLetter.highlights.map((h, i) =>
-      i === index ? value : h
+      i === index ? value : h,
     );
     const coverLetter = { ...get().coverLetter, highlights };
     set({ coverLetter });

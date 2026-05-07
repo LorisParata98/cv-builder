@@ -57,7 +57,7 @@ export function LanguagesForm() {
               dragIndex.current = null;
             }}
             style={{ opacity: dragIndex.current === i ? 0.4 : 1 }}
-            className={`flex gap-2 items-center rounded-lg py-1.5 transition-colors ${
+            className={`flex gap-2 items-center rounded-lg transition-colors ${
               dragOver === i && dragIndex.current !== i
                 ? "bg-blue-50 ring-1 ring-blue-300"
                 : ""

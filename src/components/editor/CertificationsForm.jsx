@@ -4,9 +4,9 @@ import { useCVStore } from "../../store/useCVStore";
 import { SectionCard } from "../ui/SectionCard";
 
 export function CertificationsForm() {
-  const certifications      = useCVStore((s) => s.certifications);
-  const setCertifications   = useCVStore((s) => s.setCertifications);
-  const addCertification    = useCVStore((s) => s.addCertification);
+  const certifications = useCVStore((s) => s.certifications);
+  const setCertifications = useCVStore((s) => s.setCertifications);
+  const addCertification = useCVStore((s) => s.addCertification);
   const removeCertification = useCVStore((s) => s.removeCertification);
   const updateCertification = useCVStore((s) => s.updateCertification);
 
@@ -22,19 +22,36 @@ export function CertificationsForm() {
   };
 
   return (
-    <SectionCard title="Certificazioni" icon={<Certificate size={15} weight="duotone" />}>
+    <SectionCard
+      title="Certificazioni"
+      icon={<Certificate size={15} weight="duotone" />}
+    >
       <div className="space-y-2.5">
         {certifications.map((cert, i) => (
           <div
             key={i}
             draggable
-            onDragStart={() => { dragIndex.current = i; }}
-            onDragOver={(e) => { e.preventDefault(); setDragOver(i); }}
-            onDrop={() => { reorder(dragIndex.current, i); setDragOver(null); dragIndex.current = null; }}
-            onDragEnd={() => { setDragOver(null); dragIndex.current = null; }}
+            onDragStart={() => {
+              dragIndex.current = i;
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragOver(i);
+            }}
+            onDrop={() => {
+              reorder(dragIndex.current, i);
+              setDragOver(null);
+              dragIndex.current = null;
+            }}
+            onDragEnd={() => {
+              setDragOver(null);
+              dragIndex.current = null;
+            }}
             style={{ opacity: dragIndex.current === i ? 0.4 : 1 }}
-            className={`flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors ${
-              dragOver === i && dragIndex.current !== i ? "bg-blue-50 ring-1 ring-blue-300" : ""
+            className={`flex items-center gap-2 rounded-lg  transition-colors ${
+              dragOver === i && dragIndex.current !== i
+                ? "bg-blue-50 ring-1 ring-blue-300"
+                : ""
             }`}
           >
             <span
@@ -43,7 +60,7 @@ export function CertificationsForm() {
             >
               <DotsSixVertical size={18} weight="bold" />
             </span>
-            <Star size={13} weight="fill" className="text-blue-400 flex-shrink-0" />
+
             <input
               type="text"
               value={cert}

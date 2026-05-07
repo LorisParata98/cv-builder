@@ -5,9 +5,9 @@ import { SectionCard } from "../ui/SectionCard";
 import { AutoTextarea } from "../ui/AutoTextarea";
 
 export function ProjectsForm() {
-  const projects      = useCVStore((s) => s.projects);
-  const setProjects   = useCVStore((s) => s.setProjects);
-  const addProject    = useCVStore((s) => s.addProject);
+  const projects = useCVStore((s) => s.projects);
+  const setProjects = useCVStore((s) => s.setProjects);
+  const addProject = useCVStore((s) => s.addProject);
   const removeProject = useCVStore((s) => s.removeProject);
   const updateProject = useCVStore((s) => s.updateProject);
 
@@ -32,13 +32,27 @@ export function ProjectsForm() {
           <div
             key={i}
             draggable
-            onDragStart={() => { dragIndex.current = i; }}
-            onDragOver={(e) => { e.preventDefault(); setDragOver(i); }}
-            onDrop={() => { reorder(dragIndex.current, i); setDragOver(null); dragIndex.current = null; }}
-            onDragEnd={() => { setDragOver(null); dragIndex.current = null; }}
+            onDragStart={() => {
+              dragIndex.current = i;
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragOver(i);
+            }}
+            onDrop={() => {
+              reorder(dragIndex.current, i);
+              setDragOver(null);
+              dragIndex.current = null;
+            }}
+            onDragEnd={() => {
+              setDragOver(null);
+              dragIndex.current = null;
+            }}
             style={{ opacity: dragIndex.current === i ? 0.4 : 1 }}
-            className={`flex gap-2 items-start rounded-lg px-2 py-1.5 transition-colors ${
-              dragOver === i && dragIndex.current !== i ? "bg-blue-50 ring-1 ring-blue-300" : ""
+            className={`flex gap-2 items-start rounded-lg   transition-colors ${
+              dragOver === i && dragIndex.current !== i
+                ? "bg-blue-50 ring-1 ring-blue-300"
+                : ""
             }`}
           >
             <span
@@ -47,7 +61,7 @@ export function ProjectsForm() {
             >
               <DotsSixVertical size={18} weight="bold" />
             </span>
-            <CaretRight size={13} weight="bold" className="text-blue-400 mt-2 flex-shrink-0" />
+
             <AutoTextarea
               value={proj}
               onChange={(e) => updateProject(i, e.target.value)}
