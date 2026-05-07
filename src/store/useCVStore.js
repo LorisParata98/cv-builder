@@ -1,11 +1,9 @@
 import { create } from "zustand";
 import { defaultCV } from "../data/defaultCV";
 
-// Chiave localStorage
 const STORAGE_KEY = "cv-builder:state";
 const DEEPL_KEY = "cv-builder:deepl-key";
 
-// Carica stato da localStorage (se presente)
 const loadFromStorage = () => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -16,7 +14,6 @@ const loadFromStorage = () => {
   }
 };
 
-// Salva stato su localStorage (esclusa deepLApiKey — ha chiave dedicata)
 const saveToStorage = (state) => {
   try {
     const { deepLApiKey, ...rest } = state;
@@ -25,27 +22,46 @@ const saveToStorage = (state) => {
       localStorage.setItem(DEEPL_KEY, deepLApiKey);
     }
   } catch {
-    // Silenzioso — localStorage potrebbe non essere disponibile
+    // Silenzioso
   }
 };
 
 const savedState = loadFromStorage();
 const savedDeepLKey = localStorage.getItem(DEEPL_KEY) || "";
 
-// Palette custom di default (vuote = usa i colori predefiniti del template)
-const DEFAULT_CUSTOM_PALETTES = { tech: {}, manager: {}, designer: {} };
+const DEFAULT_CUSTOM_PALETTES   = { tech: {}, manager: {}, designer: {} };
+const DEFAULT_CUSTOM_FONT_SIZES = { tech: {}, manager: {}, designer: {} };
+
+const DEFAULT_COVER_LETTER = {
+  company: "",
+  role: "",
+  jobDescription: "",
+  hiringManager: "",
+  tone: "Professionale",
+  highlights: ["", "", ""],
+  motivation: "",
+  letterBody: "",
+  date: "",
+  closingLine: "Cordiali saluti",
+};
 
 const initialState = {
   ...defaultCV,
   ...(savedState || {}),
   deepLApiKey: savedDeepLKey,
-  // Assicura che customPalettes sia sempre presente anche su stato salvato vecchio
   customPalettes: {
     ...DEFAULT_CUSTOM_PALETTES,
     ...((savedState || {}).customPalettes || {}),
   },
-  // Lingua attiva per i titoli sezione (i18n locale) e per DeepL
+  customFontSizes: {
+    ...DEFAULT_CUSTOM_FONT_SIZES,
+    ...((savedState || {}).customFontSizes || {}),
+  },
   targetLanguage: (savedState || {}).targetLanguage || 'IT',
+  coverLetter: {
+    ...DEFAULT_COVER_LETTER,
+    ...((savedState || {}).coverLetter || {}),
+  },
 };
 
 export const useCVStore = create((set, get) => ({
@@ -63,10 +79,6 @@ export const useCVStore = create((set, get) => ({
   },
 
   // ─── Palette personalizzate ─────────────────────────────────────────────────
-  // Imposta un singolo colore custom per un template
-  // template: "tech" | "manager" | "designer"
-  // key: chiave colore (es. "bg", "accent")
-  // value: stringa hex (es. "#ff0000")
   setCustomPaletteColor: (template, key, value) => {
     const customPalettes = {
       ...get().customPalettes,
@@ -76,7 +88,6 @@ export const useCVStore = create((set, get) => ({
     saveToStorage({ ...get(), customPalettes });
   },
 
-  // Resetta tutti i colori custom di un template ai default
   resetCustomPalette: (template) => {
     const customPalettes = {
       ...get().customPalettes,
@@ -84,6 +95,25 @@ export const useCVStore = create((set, get) => ({
     };
     set({ customPalettes });
     saveToStorage({ ...get(), customPalettes });
+  },
+
+  // ─── Font sizes personalizzati ──────────────────────────────────────────────
+  setCustomFontSize: (template, key, value) => {
+    const customFontSizes = {
+      ...get().customFontSizes,
+      [template]: { ...get().customFontSizes[template], [key]: value },
+    };
+    set({ customFontSizes });
+    saveToStorage({ ...get(), customFontSizes });
+  },
+
+  resetCustomFontSizes: (template) => {
+    const customFontSizes = {
+      ...get().customFontSizes,
+      [template]: {},
+    };
+    set({ customFontSizes });
+    saveToStorage({ ...get(), customFontSizes });
   },
 
   // ─── Dati personali ─────────────────────────────────────────────────────────
@@ -300,6 +330,28 @@ export const useCVStore = create((set, get) => ({
     saveToStorage({ ...get(), projects });
   },
 
+  // ─── Cover Letter ────────────────────────────────────────────────────────────
+  updateCoverLetter: (updates) => {
+    const coverLetter = { ...get().coverLetter, ...updates };
+    set({ coverLetter });
+    saveToStorage({ ...get(), coverLetter });
+  },
+
+  updateCoverLetterHighlight: (index, value) => {
+    const highlights = get().coverLetter.highlights.map((h, i) =>
+      i === index ? value : h
+    );
+    const coverLetter = { ...get().coverLetter, highlights };
+    set({ coverLetter });
+    saveToStorage({ ...get(), coverLetter });
+  },
+
+  resetCoverLetter: () => {
+    const coverLetter = { ...DEFAULT_COVER_LETTER };
+    set({ coverLetter });
+    saveToStorage({ ...get(), coverLetter });
+  },
+
   // ─── Traduzione ─────────────────────────────────────────────────────────────
   setTargetLanguage: (targetLanguage) => {
     set({ targetLanguage });
@@ -314,7 +366,7 @@ export const useCVStore = create((set, get) => ({
   // ─── Reset / Import ──────────────────────────────────────────────────────────
   resetCV: () => {
     const deepLApiKey = get().deepLApiKey;
-    const customPalettes = get().customPalettes; // preserva customizzazioni palette
+    const customPalettes = get().customPalettes;
     const newState = { ...defaultCV, deepLApiKey, customPalettes };
     set(newState);
     saveToStorage(newState);
@@ -322,7 +374,7 @@ export const useCVStore = create((set, get) => ({
 
   importCV: (data) => {
     const deepLApiKey = get().deepLApiKey;
-    const customPalettes = get().customPalettes; // preserva customizzazioni palette
+    const customPalettes = get().customPalettes;
     const newState = { ...data, deepLApiKey, customPalettes };
     set(newState);
     saveToStorage(newState);

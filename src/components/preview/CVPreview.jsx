@@ -10,21 +10,22 @@ const ZOOM_STEPS = [
   0.4, 0.5, 0.6, 0.7, 0.75, 0.8, 0.9, 1.0, 1.1, 1.25, 1.5, 1.75, 2.0,
 ];
 
-function TemplateRouter({ template, designerPalette, data, customColors, locale }) {
+function TemplateRouter({ template, designerPalette, data, customColors, customFontSizes, locale }) {
   if (template === "tech")
-    return <TechDeveloper data={data} customColors={customColors} locale={locale} />;
+    return <TechDeveloper data={data} customColors={customColors} customFontSizes={customFontSizes} locale={locale} />;
   if (template === "manager")
-    return <ManagerialExec data={data} customColors={customColors} />;
+    return <ManagerialExec data={data} customColors={customColors} customFontSizes={customFontSizes} locale={locale} />;
   if (template === "designer")
     return (
       <CreativeDesigner
         data={data}
         palette={designerPalette}
         customColors={customColors}
+        customFontSizes={customFontSizes}
         locale={locale}
       />
     );
-  return <TechDeveloper data={data} customColors={customColors} locale={locale} />;
+  return <TechDeveloper data={data} customColors={customColors} customFontSizes={customFontSizes} locale={locale} />;
 }
 
 // ─── Controlli zoom ──────────────────────────────────────────────────────────
@@ -99,13 +100,15 @@ function ZoomControls({ zoom, onZoom, onReset }) {
 
 // ─── Preview ─────────────────────────────────────────────────────────────────
 export function CVPreview() {
-  const template = useCVStore((s) => s.template);
-  const targetLanguage = useCVStore((s) => s.targetLanguage);
+  const template        = useCVStore((s) => s.template);
+  const targetLanguage  = useCVStore((s) => s.targetLanguage);
   const designerPalette = useCVStore((s) => s.designerPalette);
-  const customPalettes = useCVStore((s) => s.customPalettes);
-  const data = useCVStore((s) => s);
+  const customPalettes  = useCVStore((s) => s.customPalettes);
+  const customFontSizesAll = useCVStore((s) => s.customFontSizes);
+  const data            = useCVStore((s) => s);
 
-  const customColors = (customPalettes && customPalettes[template]) || {};
+  const customColors    = (customPalettes    && customPalettes[template])    || {};
+  const customFontSizes = (customFontSizesAll && customFontSizesAll[template]) || {};
   const locale = getLocale(targetLanguage);
 
   // Zoom state locale — non serve persistenza nello store
@@ -186,6 +189,7 @@ export function CVPreview() {
                 designerPalette={designerPalette}
                 data={data}
                 customColors={customColors}
+                customFontSizes={customFontSizes}
                 locale={locale}
               />
             </div>

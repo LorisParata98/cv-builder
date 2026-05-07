@@ -12,18 +12,24 @@ import {
   Warning,
   EyeIcon,
   EyeSlashIcon,
+  EnvelopeSimple,
+  TextAa,
 } from "@phosphor-icons/react";
 import { useCVStore } from "../../store/useCVStore";
 import { UI_LANGUAGES } from "../../locales/index.js";
 
-const SECTIONS = [
-  { id: "personal", label: "Dati Personali", Icon: User },
-  { id: "skills", label: "Competenze", Icon: Wrench },
-  { id: "experience", label: "Esperienza", Icon: Briefcase },
-  { id: "education", label: "Formazione", Icon: GraduationCap },
-  { id: "certifications", label: "Certificazioni", Icon: Certificate },
-  { id: "languages", label: "Lingue", Icon: Globe },
-  { id: "projects", label: "Progetti", Icon: Rocket },
+const CV_SECTIONS = [
+  { id: "personal",       label: "Dati Personali",  Icon: User },
+  { id: "skills",         label: "Competenze",       Icon: Wrench },
+  { id: "experience",     label: "Esperienza",       Icon: Briefcase },
+  { id: "education",      label: "Formazione",       Icon: GraduationCap },
+  { id: "certifications", label: "Certificazioni",   Icon: Certificate },
+  { id: "languages",      label: "Lingue",           Icon: Globe },
+  { id: "projects",       label: "Progetti",         Icon: Rocket },
+];
+
+const EXTRA_SECTIONS = [
+  { id: "coverLetter", label: "Cover Letter", Icon: EnvelopeSimple },
 ];
 
 const PALETTE_KEYS = {
@@ -161,6 +167,130 @@ function PaletteCustomizerPanel() {
           </button>
           <p className="text-xs text-gray-600 leading-tight">
             Modifica i colori del template attivo.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── FontSizeCustomizerPanel ──────────────────────────────────────────────────
+const FONT_SIZE_KEYS = {
+  tech: [
+    { key: "name",          label: "Nome",                 def: 26, min: 16, max: 44 },
+    { key: "role",          label: "Ruolo / Titolo",       def: 12, min: 8,  max: 20 },
+    { key: "sectionHeader", label: "Intestazioni sezioni", def: 10, min: 7,  max: 16 },
+    { key: "body",          label: "Corpo testo",          def: 11, min: 8,  max: 16 },
+  ],
+  manager: [
+    { key: "name",          label: "Nome",                 def: 30, min: 16, max: 44 },
+    { key: "role",          label: "Ruolo / Titolo",       def: 11, min: 8,  max: 20 },
+    { key: "sectionHeader", label: "Intestazioni sezioni", def: 10, min: 7,  max: 16 },
+    { key: "body",          label: "Corpo testo",          def: 10, min: 8,  max: 16 },
+  ],
+  designer: [
+    { key: "name",          label: "Nome",                 def: 36, min: 20, max: 48 },
+    { key: "role",          label: "Ruolo / Titolo",       def: 11, min: 8,  max: 20 },
+    { key: "sectionHeader", label: "Intestazioni sezioni", def: 9,  min: 7,  max: 14 },
+    { key: "body",          label: "Corpo testo",          def: 10, min: 8,  max: 16 },
+  ],
+};
+
+function FontSizeCustomizerPanel() {
+  const template          = useCVStore((s) => s.template);
+  const customFontSizes   = useCVStore((s) => s.customFontSizes);
+  const setCustomFontSize = useCVStore((s) => s.setCustomFontSize);
+  const resetCustomFontSizes = useCVStore((s) => s.resetCustomFontSizes);
+
+  const [open, setOpen] = useState(false);
+
+  const keys    = FONT_SIZE_KEYS[template] || [];
+  const current = customFontSizes[template] || {};
+
+  const getValue = (key, def) =>
+    current[key] !== undefined ? current[key] : def;
+
+  const hasCustom = Object.keys(current).length > 0;
+
+  return (
+    <div className="border-t border-gray-700">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between px-4 py-2.5 text-xs font-medium text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+      >
+        <span className="flex items-center gap-2">
+          <TextAa size={14} weight="duotone" />
+          <span>Dimensioni Font</span>
+          {hasCustom && (
+            <span
+              className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"
+              title="Font modificati"
+            />
+          )}
+        </span>
+        <span className="text-gray-600 text-xs">{open ? "▲" : "▼"}</span>
+      </button>
+
+      {open && (
+        <div className="px-4 pb-4 space-y-3">
+          {keys.map(({ key, label, def, min, max }) => {
+            const val    = getValue(key, def);
+            const isDirty = current[key] !== undefined && current[key] !== def;
+            return (
+              <div key={key}>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-xs text-gray-500">{label}</label>
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className="text-xs font-mono font-semibold"
+                      style={{ color: isDirty ? "#34d399" : "#94a3b8", minWidth: "28px", textAlign: "right" }}
+                    >
+                      {val}px
+                    </span>
+                    {isDirty && (
+                      <button
+                        onClick={() => setCustomFontSize(template, key, def)}
+                        title="Ripristina default"
+                        className="text-gray-600 hover:text-gray-300 text-xs px-0.5 flex-shrink-0"
+                      >
+                        ↺
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <input
+                  type="range"
+                  min={min}
+                  max={max}
+                  step={1}
+                  value={val}
+                  onChange={(e) =>
+                    setCustomFontSize(template, key, Number(e.target.value))
+                  }
+                  className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
+                  style={{
+                    accentColor: isDirty ? "#34d399" : "#4b5563",
+                    background: `linear-gradient(to right, ${isDirty ? "#34d399" : "#6b7280"} ${((val - min) / (max - min)) * 100}%, #374151 0%)`,
+                  }}
+                />
+                <div className="flex justify-between text-gray-700 text-xs mt-0.5">
+                  <span>{min}</span>
+                  <span className="text-gray-600">{def} def</span>
+                  <span>{max}</span>
+                </div>
+              </div>
+            );
+          })}
+
+          <button
+            onClick={() => resetCustomFontSizes(template)}
+            disabled={!hasCustom}
+            className="w-full py-1.5 rounded text-xs font-medium border border-gray-600 text-gray-400 hover:text-white hover:border-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors mt-1"
+          >
+            ↺ Ripristina default
+          </button>
+          <p className="text-xs text-gray-600 leading-tight">
+            Modifica le dimensioni per il template attivo. Il corpo scala proporzionalmente.
           </p>
         </div>
       )}
@@ -471,9 +601,12 @@ export function Sidebar({ activeSection, onSectionChange, onTranslate }) {
         </p>
       </div>
 
-      {/* Navigazione sezioni */}
+      {/* Navigazione sezioni CV */}
       <nav className="flex-1 py-2">
-        {SECTIONS.map(({ id, label, Icon }) => (
+        <p className="px-4 py-1 text-xs font-semibold text-gray-600 uppercase tracking-widest">
+          CV
+        </p>
+        {CV_SECTIONS.map(({ id, label, Icon }) => (
           <button
             key={id}
             onClick={() => onSectionChange(id)}
@@ -487,10 +620,32 @@ export function Sidebar({ activeSection, onSectionChange, onTranslate }) {
             <span className="truncate">{label}</span>
           </button>
         ))}
+
+        {/* Separatore */}
+        <div className="mx-4 my-2 border-t border-gray-700" />
+
+        <p className="px-4 py-1 text-xs font-semibold text-gray-600 uppercase tracking-widest">
+          Documenti
+        </p>
+        {EXTRA_SECTIONS.map(({ id, label, Icon }) => (
+          <button
+            key={id}
+            onClick={() => onSectionChange(id)}
+            className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors text-left ${
+              activeSection === id
+                ? "bg-indigo-600 text-white"
+                : "text-gray-400 hover:text-white hover:bg-gray-800"
+            }`}
+          >
+            <Icon size={16} weight="duotone" />
+            <span className="truncate">{label}</span>
+          </button>
+        ))}
       </nav>
 
       {/* Pannelli bottom */}
       <PaletteCustomizerPanel />
+      <FontSizeCustomizerPanel />
       <DeepLPanel onTranslate={onTranslate} />
     </div>
   );

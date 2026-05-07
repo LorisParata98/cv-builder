@@ -4,9 +4,12 @@ import { Sidebar } from "./components/ui/Sidebar";
 import { Toolbar } from "./components/ui/Toolbar";
 import { EditorPanel } from "./components/editor/EditorPanel";
 import { CVPreview } from "./components/preview/CVPreview";
+import { CoverLetterPreview } from "./components/preview/CoverLetterPreview";
 import { useCVStore } from "./store/useCVStore";
 import { exportPDF } from "./exporters/exportPDF";
 import { exportDOCX } from "./exporters/exportDOCX";
+import { exportCoverLetterPDF } from "./exporters/exportCoverLetterPDF";
+import { exportCoverLetterDOCX } from "./exporters/exportCoverLetterDOCX";
 import { translateCV } from "./services/translateCV";
 
 function Toast({ message, type, onDismiss }) {
@@ -308,6 +311,11 @@ function useExportHandlers(setExporting, showToast) {
       setDeepLApiKey,
       resetCV,
       importCV,
+      setCustomPaletteColor,
+      resetCustomPalette,
+      updateCoverLetter,
+      updateCoverLetterHighlight,
+      resetCoverLetter,
       ...data
     } = store;
     return data;
@@ -331,6 +339,32 @@ function useExportHandlers(setExporting, showToast) {
     try {
       await exportDOCX(getStoreData());
       showToast("DOCX esportato!", "success");
+    } catch (e) {
+      console.error(e);
+      showToast("Errore generazione DOCX", "error");
+    } finally {
+      setExporting(null);
+    }
+  };
+
+  const handleExportCoverLetterPDF = async () => {
+    setExporting("cl-pdf");
+    try {
+      await exportCoverLetterPDF(getStoreData());
+      showToast("Cover Letter PDF esportata!", "success");
+    } catch (e) {
+      console.error(e);
+      showToast("Errore generazione PDF", "error");
+    } finally {
+      setExporting(null);
+    }
+  };
+
+  const handleExportCoverLetterDOCX = async () => {
+    setExporting("cl-docx");
+    try {
+      await exportCoverLetterDOCX(getStoreData());
+      showToast("Cover Letter DOCX esportata!", "success");
     } catch (e) {
       console.error(e);
       showToast("Errore generazione DOCX", "error");
@@ -382,6 +416,8 @@ function useExportHandlers(setExporting, showToast) {
     handleExportJSON,
     handleImportJSON,
     handleFileImport,
+    handleExportCoverLetterPDF,
+    handleExportCoverLetterDOCX,
   };
 }
 
@@ -412,6 +448,8 @@ export default function App() {
     handleExportJSON,
     handleImportJSON,
     handleFileImport,
+    handleExportCoverLetterPDF,
+    handleExportCoverLetterDOCX,
   } = useExportHandlers(setExporting, showToast);
 
   const handleEditorDrag = useCallback((delta) => {
@@ -474,10 +512,13 @@ export default function App() {
           }}
         >
           <Toolbar
+            activeSection={activeSection}
             onExportPDF={handleExportPDF}
             onExportDOCX={handleExportDOCX}
             onExportJSON={handleExportJSON}
             onImportJSON={handleImportJSON}
+            onExportCoverLetterPDF={handleExportCoverLetterPDF}
+            onExportCoverLetterDOCX={handleExportCoverLetterDOCX}
             exporting={exporting}
           />
           <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
@@ -487,7 +528,10 @@ export default function App() {
               <EditorPanel activeSection={activeSection} />
             </div>
             <EditorResizeHandle onDrag={handleEditorDrag} />
-            <CVPreview />
+            {activeSection === "coverLetter"
+              ? <CoverLetterPreview />
+              : <CVPreview />
+            }
           </div>
         </div>
 

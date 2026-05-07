@@ -5,6 +5,7 @@ import { EducationForm } from "./EducationForm";
 import { CertificationsForm } from "./CertificationsForm";
 import { LanguagesForm } from "./LanguagesForm";
 import { ProjectsForm } from "./ProjectsForm";
+import { CoverLetterForm } from "./CoverLetterForm";
 
 const FORMS = {
   personal: PersonalInfoForm,
@@ -14,6 +15,7 @@ const FORMS = {
   certifications: CertificationsForm,
   languages: LanguagesForm,
   projects: ProjectsForm,
+  coverLetter: CoverLetterForm,
 };
 
 export function EditorPanel({ activeSection }) {
