@@ -19,32 +19,164 @@ import { useCVStore } from "../../store/useCVStore";
 import { UI_LANGUAGES } from "../../locales/index.js";
 
 const CV_SECTIONS = [
-  { id: "personal", label: "Dati Personali", Icon: User },
-  { id: "skills", label: "Competenze", Icon: Wrench },
-  { id: "experience", label: "Esperienza", Icon: Briefcase },
-  { id: "education", label: "Formazione", Icon: GraduationCap },
-  { id: "certifications", label: "Certificazioni", Icon: Certificate },
-  { id: "languages", label: "Lingue", Icon: Globe },
-  { id: "projects", label: "Progetti", Icon: Rocket },
+  { id: "personal",       Icon: User },
+  { id: "skills",         Icon: Wrench },
+  { id: "experience",     Icon: Briefcase },
+  { id: "education",      Icon: GraduationCap },
+  { id: "certifications", Icon: Certificate },
+  { id: "languages",      Icon: Globe },
+  { id: "projects",       Icon: Rocket },
 ];
 
 const EXTRA_SECTIONS = [
-  { id: "coverLetter", label: "Cover Letter", Icon: EnvelopeSimple },
+  { id: "coverLetter", Icon: EnvelopeSimple },
 ];
+
+// ─── Traduzioni nav ───────────────────────────────────────────────────────────
+const NAV_LABELS = {
+  IT: {
+    cvGroup:  "CV",
+    docsGroup: "Documenti",
+    subtitle: "Costruisci il tuo CV professionale",
+    sections: {
+      personal:       "Dati Personali",
+      skills:         "Competenze",
+      experience:     "Esperienza",
+      education:      "Formazione",
+      certifications: "Certificazioni",
+      languages:      "Lingue",
+      projects:       "Progetti",
+      coverLetter:    "Cover Letter",
+    },
+  },
+  EN: {
+    cvGroup:  "CV",
+    docsGroup: "Documents",
+    subtitle: "Build your professional CV",
+    sections: {
+      personal:       "Personal Info",
+      skills:         "Skills",
+      experience:     "Experience",
+      education:      "Education",
+      certifications: "Certifications",
+      languages:      "Languages",
+      projects:       "Projects",
+      coverLetter:    "Cover Letter",
+    },
+  },
+};
+
+// ─── Traduzioni pannelli sidebar ──────────────────────────────────────────────
+const SIDEBAR_LABELS = {
+  IT: {
+    palette: {
+      title:    "Personalizza Palette",
+      modified: "Palette modificata",
+      reset:    "↺ Ripristina default",
+      hint:     "Modifica i colori del template attivo.",
+      keyLabels: {
+        header:     "Header",
+        accent:     "Accento",
+        sidebar:    "Sidebar",
+        background: "Sfondo",
+      },
+    },
+    fontSizes: {
+      title:     "Dimensioni Font",
+      modified:  "Font modificati",
+      reset:     "↺ Ripristina default",
+      hint:      "Modifica le dimensioni per il template attivo. Il corpo scala proporzionalmente.",
+      defSuffix: "def",
+      keyLabels: {
+        name:          "Nome",
+        role:          "Ruolo / Titolo",
+        sectionHeader: "Intestazioni sezioni",
+        body:          "Corpo testo",
+      },
+    },
+    deepl: {
+      title:       "Traduzione DeepL",
+      apiKey:      "API Key",
+      targetLang:  "Lingua di destinazione",
+      hint:        "I titoli delle sezioni si aggiornano subito nella preview.",
+      translate:   "Traduci contenuto CV",
+      translating: "Traduzione...",
+      show:        "Mostra",
+      hide:        "Nascondi",
+      errorEmpty:  "Inserisci la tua API key DeepL.",
+      errorGeneric:"Errore DeepL.",
+    },
+    modal: {
+      title:              "Attenzione: la traduzione sovrascriverà i testi",
+      body:               "La traduzione sovrascriverà i testi attuali. Ti consigliamo di scaricare un backup in formato JSON prima di procedere.",
+      downloadAndProceed: "Scarica backup e procedi",
+      proceedWithout:     "Procedi senza scaricare",
+      translating:        "Traduzione in corso...",
+      cancel:             "Annulla",
+    },
+  },
+  EN: {
+    palette: {
+      title:    "Customize Palette",
+      modified: "Palette modified",
+      reset:    "↺ Reset to default",
+      hint:     "Modify the active template's colors.",
+      keyLabels: {
+        header:     "Header",
+        accent:     "Accent",
+        sidebar:    "Sidebar",
+        background: "Background",
+      },
+    },
+    fontSizes: {
+      title:     "Font Sizes",
+      modified:  "Fonts modified",
+      reset:     "↺ Reset to default",
+      hint:      "Modify sizes for the active template. Body scales proportionally.",
+      defSuffix: "def",
+      keyLabels: {
+        name:          "Name",
+        role:          "Role / Title",
+        sectionHeader: "Section Headers",
+        body:          "Body text",
+      },
+    },
+    deepl: {
+      title:       "DeepL Translation",
+      apiKey:      "API Key",
+      targetLang:  "Target language",
+      hint:        "Section titles update immediately in the preview.",
+      translate:   "Translate CV content",
+      translating: "Translating...",
+      show:        "Show",
+      hide:        "Hide",
+      errorEmpty:  "Enter your DeepL API key.",
+      errorGeneric:"DeepL error.",
+    },
+    modal: {
+      title:              "Warning: translation will overwrite texts",
+      body:               "Translation will overwrite current texts. We recommend downloading a JSON backup before proceeding.",
+      downloadAndProceed: "Download backup and proceed",
+      proceedWithout:     "Proceed without downloading",
+      translating:        "Translation in progress...",
+      cancel:             "Cancel",
+    },
+  },
+};
 
 const PALETTE_KEYS = {
   tech: [
-    { key: "bg", label: "Header", def: "#0f2644" },
-    { key: "accent", label: "Accento", def: "#4ec9b0" },
+    { key: "bg",     labelKey: "header", def: "#0f2644" },
+    { key: "accent", labelKey: "accent", def: "#4ec9b0" },
   ],
   manager: [
-    { key: "bg", label: "Header", def: "#1e3a5f" },
-    { key: "accent", label: "Accento", def: "#c8a951" },
+    { key: "bg",     labelKey: "header", def: "#1e3a5f" },
+    { key: "accent", labelKey: "accent", def: "#c8a951" },
   ],
   designer: [
-    { key: "accent", label: "Accento", def: "#C8B89A" },
-    { key: "sidebarBg", label: "Sidebar", def: "#1A1A1A" },
-    { key: "bg", label: "Sfondo", def: "#0D0D0D" },
+    { key: "accent",     labelKey: "accent",     def: "#C8B89A" },
+    { key: "sidebarBg",  labelKey: "sidebar",    def: "#1A1A1A" },
+    { key: "bg",         labelKey: "background", def: "#0D0D0D" },
   ],
 };
 
@@ -52,14 +184,16 @@ const HEX_VALID = /^#[0-9a-fA-F]{6}$/;
 
 // ─── PaletteCustomizerPanel ───────────────────────────────────────────────────
 function PaletteCustomizerPanel() {
-  const template = useCVStore((s) => s.template);
-  const customPalettes = useCVStore((s) => s.customPalettes);
+  const template           = useCVStore((s) => s.template);
+  const customPalettes     = useCVStore((s) => s.customPalettes);
   const setCustomPaletteColor = useCVStore((s) => s.setCustomPaletteColor);
   const resetCustomPalette = useCVStore((s) => s.resetCustomPalette);
+  const uiLanguage         = useCVStore((s) => s.uiLanguage);
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen]           = useState(false);
   const [textInputs, setTextInputs] = useState({});
 
+  const L    = (SIDEBAR_LABELS[uiLanguage] || SIDEBAR_LABELS.IT).palette;
   const keys = PALETTE_KEYS[template] || [];
   const current = customPalettes[template] || {};
 
@@ -84,11 +218,11 @@ function PaletteCustomizerPanel() {
       >
         <span className="flex items-center gap-2">
           <Palette size={14} weight="duotone" />
-          <span>Personalizza Palette</span>
+          <span>{L.title}</span>
           {hasCustom && (
             <span
               className="w-1.5 h-1.5 rounded-full bg-purple-400 inline-block"
-              title="Palette modificata"
+              title={L.modified}
             />
           )}
         </span>
@@ -97,16 +231,14 @@ function PaletteCustomizerPanel() {
 
       {open && (
         <div className="px-4 pb-4 space-y-3">
-          {keys.map(({ key, label, def }) => {
+          {keys.map(({ key, labelKey, def }) => {
+            const label      = L.keyLabels[labelKey] || labelKey;
             const storeValue = getStoreValue(key, def);
-            const textValue = getTextValue(key, def);
-            const isDirty =
-              HEX_VALID.test(current[key]) && current[key] !== def;
+            const textValue  = getTextValue(key, def);
+            const isDirty    = HEX_VALID.test(current[key]) && current[key] !== def;
             return (
               <div key={key}>
-                <label className="block text-xs text-gray-500 mb-1">
-                  {label}
-                </label>
+                <label className="block text-xs text-gray-500 mb-1">{label}</label>
                 <div className="flex gap-2 items-center">
                   <input
                     type="color"
@@ -127,8 +259,7 @@ function PaletteCustomizerPanel() {
                     onChange={(e) => {
                       const v = e.target.value;
                       setTextInputs((prev) => ({ ...prev, [key]: v }));
-                      if (HEX_VALID.test(v))
-                        setCustomPaletteColor(template, key, v);
+                      if (HEX_VALID.test(v)) setCustomPaletteColor(template, key, v);
                     }}
                     onBlur={() =>
                       setTextInputs((prev) => {
@@ -145,7 +276,7 @@ function PaletteCustomizerPanel() {
                         setCustomPaletteColor(template, key, def);
                         setTextInputs((prev) => ({ ...prev, [key]: def }));
                       }}
-                      title="Ripristina default"
+                      title={L.reset}
                       className="text-gray-600 hover:text-gray-300 text-xs px-1 flex-shrink-0"
                     >
                       ↺
@@ -163,11 +294,9 @@ function PaletteCustomizerPanel() {
             disabled={!hasCustom}
             className="w-full py-1.5 rounded text-xs font-medium border border-gray-600 text-gray-400 hover:text-white hover:border-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
-            ↺ Ripristina default
+            {L.reset}
           </button>
-          <p className="text-xs text-gray-600 leading-tight">
-            Modifica i colori del template attivo.
-          </p>
+          <p className="text-xs text-gray-600 leading-tight">{L.hint}</p>
         </div>
       )}
     </div>
@@ -177,52 +306,36 @@ function PaletteCustomizerPanel() {
 // ─── FontSizeCustomizerPanel ──────────────────────────────────────────────────
 const FONT_SIZE_KEYS = {
   tech: [
-    { key: "name", label: "Nome", def: 26, min: 16, max: 44 },
-    { key: "role", label: "Ruolo / Titolo", def: 12, min: 8, max: 20 },
-    {
-      key: "sectionHeader",
-      label: "Intestazioni sezioni",
-      def: 10,
-      min: 7,
-      max: 16,
-    },
-    { key: "body", label: "Corpo testo", def: 11, min: 8, max: 16 },
+    { key: "name",          labelKey: "name",          def: 26, min: 16, max: 44 },
+    { key: "role",          labelKey: "role",          def: 12, min: 8,  max: 20 },
+    { key: "sectionHeader", labelKey: "sectionHeader", def: 10, min: 7,  max: 16 },
+    { key: "body",          labelKey: "body",          def: 11, min: 8,  max: 16 },
   ],
   manager: [
-    { key: "name", label: "Nome", def: 30, min: 16, max: 44 },
-    { key: "role", label: "Ruolo / Titolo", def: 11, min: 8, max: 20 },
-    {
-      key: "sectionHeader",
-      label: "Intestazioni sezioni",
-      def: 10,
-      min: 7,
-      max: 16,
-    },
-    { key: "body", label: "Corpo testo", def: 10, min: 8, max: 16 },
+    { key: "name",          labelKey: "name",          def: 30, min: 16, max: 44 },
+    { key: "role",          labelKey: "role",          def: 11, min: 8,  max: 20 },
+    { key: "sectionHeader", labelKey: "sectionHeader", def: 10, min: 7,  max: 16 },
+    { key: "body",          labelKey: "body",          def: 10, min: 8,  max: 16 },
   ],
   designer: [
-    { key: "name", label: "Nome", def: 36, min: 20, max: 48 },
-    { key: "role", label: "Ruolo / Titolo", def: 11, min: 8, max: 20 },
-    {
-      key: "sectionHeader",
-      label: "Intestazioni sezioni",
-      def: 9,
-      min: 7,
-      max: 14,
-    },
-    { key: "body", label: "Corpo testo", def: 10, min: 8, max: 16 },
+    { key: "name",          labelKey: "name",          def: 36, min: 20, max: 48 },
+    { key: "role",          labelKey: "role",          def: 11, min: 8,  max: 20 },
+    { key: "sectionHeader", labelKey: "sectionHeader", def: 9,  min: 7,  max: 14 },
+    { key: "body",          labelKey: "body",          def: 10, min: 8,  max: 16 },
   ],
 };
 
 function FontSizeCustomizerPanel() {
-  const template = useCVStore((s) => s.template);
+  const template        = useCVStore((s) => s.template);
   const customFontSizes = useCVStore((s) => s.customFontSizes);
-  const setCustomFontSize = useCVStore((s) => s.setCustomFontSize);
+  const setCustomFontSize   = useCVStore((s) => s.setCustomFontSize);
   const resetCustomFontSizes = useCVStore((s) => s.resetCustomFontSizes);
+  const uiLanguage      = useCVStore((s) => s.uiLanguage);
 
   const [open, setOpen] = useState(false);
 
-  const keys = FONT_SIZE_KEYS[template] || [];
+  const L       = (SIDEBAR_LABELS[uiLanguage] || SIDEBAR_LABELS.IT).fontSizes;
+  const keys    = FONT_SIZE_KEYS[template] || [];
   const current = customFontSizes[template] || {};
 
   const getValue = (key, def) =>
@@ -238,11 +351,11 @@ function FontSizeCustomizerPanel() {
       >
         <span className="flex items-center gap-2">
           <TextAa size={14} weight="duotone" />
-          <span>Dimensioni Font</span>
+          <span>{L.title}</span>
           {hasCustom && (
             <span
               className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"
-              title="Font modificati"
+              title={L.modified}
             />
           )}
         </span>
@@ -251,8 +364,9 @@ function FontSizeCustomizerPanel() {
 
       {open && (
         <div className="px-4 pb-4 space-y-3">
-          {keys.map(({ key, label, def, min, max }) => {
-            const val = getValue(key, def);
+          {keys.map(({ key, labelKey, def, min, max }) => {
+            const label  = L.keyLabels[labelKey] || labelKey;
+            const val    = getValue(key, def);
             const isDirty = current[key] !== undefined && current[key] !== def;
             return (
               <div key={key}>
@@ -272,7 +386,7 @@ function FontSizeCustomizerPanel() {
                     {isDirty && (
                       <button
                         onClick={() => setCustomFontSize(template, key, def)}
-                        title="Ripristina default"
+                        title={L.reset}
                         className="text-gray-600 hover:text-gray-300 text-xs px-0.5 flex-shrink-0"
                       >
                         ↺
@@ -297,7 +411,7 @@ function FontSizeCustomizerPanel() {
                 />
                 <div className="flex justify-between text-gray-700 text-xs mt-0.5">
                   <span>{min}</span>
-                  <span className="text-gray-600">{def} def</span>
+                  <span className="text-gray-600">{def} {L.defSuffix}</span>
                   <span>{max}</span>
                 </div>
               </div>
@@ -309,12 +423,9 @@ function FontSizeCustomizerPanel() {
             disabled={!hasCustom}
             className="w-full py-1.5 rounded text-xs font-medium border border-gray-600 text-gray-400 hover:text-white hover:border-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors mt-1"
           >
-            ↺ Ripristina default
+            {L.reset}
           </button>
-          <p className="text-xs text-gray-600 leading-tight">
-            Modifica le dimensioni per il template attivo. Il corpo scala
-            proporzionalmente.
-          </p>
+          <p className="text-xs text-gray-600 leading-tight">{L.hint}</p>
         </div>
       )}
     </div>
@@ -322,12 +433,7 @@ function FontSizeCustomizerPanel() {
 }
 
 // ─── Modale conferma traduzione ───────────────────────────────────────────────
-function TranslateConfirmModal({
-  onDownloadAndProceed,
-  onProceed,
-  onCancel,
-  translating,
-}) {
+function TranslateConfirmModal({ L, onDownloadAndProceed, onProceed, onCancel, translating }) {
   return (
     <div
       style={{
@@ -340,9 +446,7 @@ function TranslateConfirmModal({
         zIndex: 9998,
         padding: "24px",
       }}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onCancel();
-      }}
+      onClick={(e) => { if (e.target === e.currentTarget) onCancel(); }}
     >
       <div
         style={{
@@ -355,85 +459,52 @@ function TranslateConfirmModal({
           border: "1px solid #334155",
         }}
       >
-        <Warning
-          size={32}
-          weight="duotone"
-          color="#f59e0b"
-          style={{ marginBottom: 10 }}
-        />
-        <h2
-          style={{
-            color: "#f1f5f9",
-            fontSize: "14px",
-            fontWeight: 700,
-            marginBottom: "10px",
-            lineHeight: 1.4,
-          }}
-        >
-          Attenzione: la traduzione sovrascriverà i testi
+        <Warning size={32} weight="duotone" color="#f59e0b" style={{ marginBottom: 10 }} />
+        <h2 style={{ color: "#f1f5f9", fontSize: "14px", fontWeight: 700, marginBottom: "10px", lineHeight: 1.4 }}>
+          {L.title}
         </h2>
-        <p
-          style={{
-            color: "#94a3b8",
-            fontSize: "12px",
-            lineHeight: 1.65,
-            marginBottom: "22px",
-          }}
-        >
-          La traduzione sovrascriverà i testi attuali. Ti consigliamo di
-          scaricare un backup in formato JSON prima di procedere.
+        <p style={{ color: "#94a3b8", fontSize: "12px", lineHeight: 1.65, marginBottom: "22px" }}>
+          {L.body}
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           <button
             onClick={onDownloadAndProceed}
             disabled={translating}
             style={{
-              padding: "10px 14px",
-              borderRadius: "8px",
-              backgroundColor: "#2563eb",
-              color: "#fff",
-              border: "none",
+              padding: "10px 14px", borderRadius: "8px",
+              backgroundColor: "#2563eb", color: "#fff", border: "none",
               cursor: translating ? "not-allowed" : "pointer",
-              fontSize: "12px",
-              fontWeight: 600,
-              opacity: translating ? 0.6 : 1,
-              textAlign: "center",
+              fontSize: "12px", fontWeight: 600,
+              opacity: translating ? 0.6 : 1, textAlign: "center",
             }}
           >
-            Scarica backup e procedi
+            {L.downloadAndProceed}
           </button>
           <button
             onClick={onProceed}
             disabled={translating}
             style={{
-              padding: "10px 14px",
-              borderRadius: "8px",
-              backgroundColor: "#374151",
-              color: "#e2e8f0",
+              padding: "10px 14px", borderRadius: "8px",
+              backgroundColor: "#374151", color: "#e2e8f0",
               border: "1px solid #4b5563",
               cursor: translating ? "not-allowed" : "pointer",
-              fontSize: "12px",
-              opacity: translating ? 0.6 : 1,
-              textAlign: "center",
+              fontSize: "12px", opacity: translating ? 0.6 : 1, textAlign: "center",
             }}
           >
-            {translating ? "Traduzione in corso..." : "Procedi senza scaricare"}
+            {translating ? L.translating : L.proceedWithout}
           </button>
           <button
             onClick={onCancel}
             disabled={translating}
             style={{
-              padding: "10px 14px",
-              borderRadius: "8px",
-              backgroundColor: "transparent",
-              color: "#6b7280",
+              padding: "10px 14px", borderRadius: "8px",
+              backgroundColor: "transparent", color: "#6b7280",
               border: "1px solid #374151",
               cursor: translating ? "not-allowed" : "pointer",
-              fontSize: "12px",
-              opacity: translating ? 0.5 : 1,
+              fontSize: "12px", opacity: translating ? 0.5 : 1,
             }}
           >
-            Annulla
+            {L.cancel}
           </button>
         </div>
       </div>
@@ -443,50 +514,30 @@ function TranslateConfirmModal({
 
 // ─── DeepL panel ──────────────────────────────────────────────────────────────
 function DeepLPanel({ onTranslate }) {
-  const deepLApiKey = useCVStore((s) => s.deepLApiKey);
+  const deepLApiKey    = useCVStore((s) => s.deepLApiKey);
   const setDeepLApiKey = useCVStore((s) => s.setDeepLApiKey);
-  const targetLanguage = useCVStore((s) => s.targetLanguage);
+  const targetLanguage    = useCVStore((s) => s.targetLanguage);
   const setTargetLanguage = useCVStore((s) => s.setTargetLanguage);
+  const uiLanguage        = useCVStore((s) => s.uiLanguage);
 
-  const [open, setOpen] = useState(false);
-  const [showKey, setShowKey] = useState(false);
+  const [open, setOpen]         = useState(false);
+  const [showKey, setShowKey]   = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [translating, setTranslating] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError]       = useState("");
+
+  const L = (SIDEBAR_LABELS[uiLanguage] || SIDEBAR_LABELS.IT).deepl;
+  const LM = (SIDEBAR_LABELS[uiLanguage] || SIDEBAR_LABELS.IT).modal;
 
   const downloadBackup = () => {
     const state = useCVStore.getState();
-    const {
-      personal,
-      skills,
-      experience,
-      education,
-      certifications,
-      languages,
-      projects,
-      template,
-      designerPalette,
-    } = state;
-    const data = {
-      personal,
-      skills,
-      experience,
-      education,
-      certifications,
-      languages,
-      projects,
-      template,
-      designerPalette,
-    };
-    const blob = new Blob([JSON.stringify(data, null, 2)], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const { personal, skills, experience, education, certifications, languages, projects, template, designerPalette } = state;
+    const data = { personal, skills, experience, education, certifications, languages, projects, template, designerPalette };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
     const lang = targetLanguage.toLowerCase().replace("-", "_");
-    const name = (personal.name || "cv")
-      .replace(/[^a-z0-9]+/gi, "_")
-      .toLowerCase();
+    const name = (personal.name || "cv").replace(/[^a-z0-9]+/gi, "_").toLowerCase();
     a.href = url;
     a.download = `${name}_${lang}.json`;
     a.click();
@@ -495,7 +546,7 @@ function DeepLPanel({ onTranslate }) {
 
   const doTranslate = async () => {
     if (!deepLApiKey.trim()) {
-      setError("Inserisci la tua API key DeepL.");
+      setError(L.errorEmpty);
       setShowModal(false);
       return;
     }
@@ -505,7 +556,7 @@ function DeepLPanel({ onTranslate }) {
       await onTranslate(targetLanguage, deepLApiKey);
       setShowModal(false);
     } catch (e) {
-      setError(e.message || "Errore DeepL.");
+      setError(e.message || L.errorGeneric);
       setShowModal(false);
     } finally {
       setTranslating(false);
@@ -513,10 +564,7 @@ function DeepLPanel({ onTranslate }) {
   };
 
   const handleClickTranslate = () => {
-    if (!deepLApiKey.trim()) {
-      setError("Inserisci la tua API key DeepL.");
-      return;
-    }
+    if (!deepLApiKey.trim()) { setError(L.errorEmpty); return; }
     setError("");
     setShowModal(true);
   };
@@ -530,7 +578,7 @@ function DeepLPanel({ onTranslate }) {
         >
           <span className="flex items-center gap-2">
             <Translate size={14} weight="duotone" />
-            <span>Traduzione DeepL</span>
+            <span>{L.title}</span>
           </span>
           <span className="text-gray-600 text-xs">{open ? "▲" : "▼"}</span>
         </button>
@@ -538,9 +586,7 @@ function DeepLPanel({ onTranslate }) {
         {open && (
           <div className="px-4 pb-4 space-y-2">
             <div>
-              <label className="block text-xs text-gray-500 mb-1">
-                API Key
-              </label>
+              <label className="block text-xs text-gray-500 mb-1">{L.apiKey}</label>
               <div className="flex gap-1">
                 <input
                   type={showKey ? "text" : "password"}
@@ -551,35 +597,25 @@ function DeepLPanel({ onTranslate }) {
                 />
                 <button
                   onClick={() => setShowKey((v) => !v)}
-                  title={showKey ? "Nascondi" : "Mostra"}
+                  title={showKey ? L.hide : L.show}
                   className="px-1.5 bg-gray-700 border border-gray-600 rounded text-gray-400 hover:text-white text-xs"
                 >
-                  {showKey ? (
-                    <EyeSlashIcon></EyeSlashIcon>
-                  ) : (
-                    <EyeIcon></EyeIcon>
-                  )}
+                  {showKey ? <EyeSlashIcon /> : <EyeIcon />}
                 </button>
               </div>
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">
-                Lingua di destinazione
-              </label>
+              <label className="block text-xs text-gray-500 mb-1">{L.targetLang}</label>
               <select
                 value={targetLanguage}
                 onChange={(e) => setTargetLanguage(e.target.value)}
                 className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1 text-xs text-gray-100 focus:outline-none focus:border-blue-500"
               >
                 {UI_LANGUAGES.map((l) => (
-                  <option key={l.code} value={l.code}>
-                    {l.label}
-                  </option>
+                  <option key={l.code} value={l.code}>{l.label}</option>
                 ))}
               </select>
-              <p className="text-xs text-gray-600 mt-1 leading-tight">
-                I titoli delle sezioni si aggiornano subito nella preview.
-              </p>
+              <p className="text-xs text-gray-600 mt-1 leading-tight">{L.hint}</p>
             </div>
             {error && <p className="text-xs text-red-400">{error}</p>}
             <button
@@ -587,7 +623,7 @@ function DeepLPanel({ onTranslate }) {
               disabled={translating}
               className="w-full py-1.5 rounded text-xs font-semibold bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:text-gray-500 text-white transition-colors"
             >
-              {translating ? "Traduzione..." : "Traduci contenuto CV"}
+              {translating ? L.translating : L.translate}
             </button>
           </div>
         )}
@@ -595,15 +631,11 @@ function DeepLPanel({ onTranslate }) {
 
       {showModal && (
         <TranslateConfirmModal
+          L={LM}
           translating={translating}
-          onDownloadAndProceed={async () => {
-            downloadBackup();
-            await doTranslate();
-          }}
+          onDownloadAndProceed={async () => { downloadBackup(); await doTranslate(); }}
           onProceed={doTranslate}
-          onCancel={() => {
-            if (!translating) setShowModal(false);
-          }}
+          onCancel={() => { if (!translating) setShowModal(false); }}
         />
       )}
     </>
@@ -612,24 +644,43 @@ function DeepLPanel({ onTranslate }) {
 
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
 export function Sidebar({ activeSection, onSectionChange, onTranslate }) {
+  const uiLanguage    = useCVStore((s) => s.uiLanguage);
+  const setUiLanguage = useCVStore((s) => s.setUiLanguage);
+  const nav = NAV_LABELS[uiLanguage] || NAV_LABELS.IT;
+
   return (
-    <div className="flex flex-col h-full bg-gray-900 text-white overflow-y-auto">
-      {/* Logo / Brand */}
+    <div className="flex flex-col h-full bg-gray-900 text-white overflow-hidden">
+      {/* Logo / Brand — fisso */}
       <div className="px-4 py-4 border-b border-gray-700 flex-shrink-0">
-        <h1 className="text-sm font-bold text-white tracking-wide">
-          CV Builder
-        </h1>
-        <p className="text-xs text-gray-500 mt-0.5">
-          Costruisci il tuo CV professionale
-        </p>
+        <h1 className="text-sm font-bold text-white tracking-wide">CV Builder</h1>
+        <p className="text-xs text-gray-500 mt-0.5">{nav.subtitle}</p>
       </div>
 
-      {/* Navigazione sezioni CV */}
-      <nav className="flex-1 py-2">
+      {/* Language SelectButton — fisso */}
+      <div className="px-4 py-2.5 border-b border-gray-700 flex-shrink-0">
+        <div className="flex rounded-md overflow-hidden border border-gray-700 text-xs font-semibold">
+          {["IT", "EN"].map((lang) => (
+            <button
+              key={lang}
+              onClick={() => setUiLanguage(lang)}
+              className={`flex-1 py-1.5 transition-colors ${
+                uiLanguage === lang
+                  ? "bg-blue-600 text-white"
+                  : "bg-transparent text-gray-500 hover:text-gray-200"
+              }`}
+            >
+              {lang}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Navigazione sezioni CV — scrollabile, occupa lo spazio disponibile */}
+      <nav className="flex-1 min-h-0 overflow-y-auto py-2" style={{ scrollbarGutter: "stable" }}>
         <p className="px-4 py-1 text-xs font-semibold text-gray-600 uppercase tracking-widest">
-          CV
+          {nav.cvGroup}
         </p>
-        {CV_SECTIONS.map(({ id, label, Icon }) => (
+        {CV_SECTIONS.map(({ id, Icon }) => (
           <button
             key={id}
             onClick={() => onSectionChange(id)}
@@ -640,17 +691,16 @@ export function Sidebar({ activeSection, onSectionChange, onTranslate }) {
             }`}
           >
             <Icon size={16} weight="duotone" />
-            <span className="truncate">{label}</span>
+            <span className="truncate">{nav.sections[id]}</span>
           </button>
         ))}
 
-        {/* Separatore */}
         <div className="mx-4 my-2 border-t border-gray-700" />
 
         <p className="px-4 py-1 text-xs font-semibold text-gray-600 uppercase tracking-widest">
-          Documenti
+          {nav.docsGroup}
         </p>
-        {EXTRA_SECTIONS.map(({ id, label, Icon }) => (
+        {EXTRA_SECTIONS.map(({ id, Icon }) => (
           <button
             key={id}
             onClick={() => onSectionChange(id)}
@@ -661,15 +711,17 @@ export function Sidebar({ activeSection, onSectionChange, onTranslate }) {
             }`}
           >
             <Icon size={16} weight="duotone" />
-            <span className="truncate">{label}</span>
+            <span className="truncate">{nav.sections[id]}</span>
           </button>
         ))}
       </nav>
 
-      {/* Pannelli bottom */}
-      <PaletteCustomizerPanel />
-      <FontSizeCustomizerPanel />
-      <DeepLPanel onTranslate={onTranslate} />
+      {/* Pannelli settings — ancorati in fondo, non scrollano con la nav */}
+      <div className="flex-shrink-0 overflow-y-auto" style={{ scrollbarGutter: "stable" }}>
+        <PaletteCustomizerPanel />
+        <FontSizeCustomizerPanel />
+        <DeepLPanel onTranslate={onTranslate} />
+      </div>
     </div>
   );
 }

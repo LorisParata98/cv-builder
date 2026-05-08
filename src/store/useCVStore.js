@@ -58,6 +58,7 @@ const initialState = {
     ...((savedState || {}).customFontSizes || {}),
   },
   targetLanguage: (savedState || {}).targetLanguage || "IT",
+  uiLanguage: (savedState || {}).uiLanguage || "IT",
   coverLetter: {
     ...DEFAULT_COVER_LETTER,
     ...((savedState || {}).coverLetter || {}),
@@ -354,6 +355,11 @@ export const useCVStore = create((set, get) => ({
   setTargetLanguage: (targetLanguage) => {
     set({ targetLanguage });
     saveToStorage({ ...get(), targetLanguage });
+  },
+
+  setUiLanguage: (uiLanguage) => {
+    set({ uiLanguage });
+    saveToStorage({ ...get(), uiLanguage });
   },
 
   setDeepLApiKey: (deepLApiKey) => {

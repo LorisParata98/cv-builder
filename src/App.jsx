@@ -427,7 +427,7 @@ function useExportHandlers(setExporting, showToast) {
   };
 }
 
-const SIDEBAR_WIDTH = 220;
+const SIDEBAR_WIDTH = 230;
 const EDITOR_MIN = 240;
 const EDITOR_MAX = 600;
 

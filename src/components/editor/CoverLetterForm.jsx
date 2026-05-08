@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { useCVStore } from "../../store/useCVStore";
 import { generateCoverLetterPrompt, generateSpontaneousPrompt } from "../../services/PromptBuilder";
+import { AutoTextarea } from "../ui/AutoTextarea";
 
 const TONES = ["Formale", "Professionale", "Diretto", "Entusiasta"];
 const CLOSING_LINES = [
@@ -9,6 +10,118 @@ const CLOSING_LINES = [
   "Con i migliori saluti",
   "A disposizione per ulteriori informazioni",
 ];
+
+// Display label per tono in base alla lingua
+const TONE_DISPLAY = {
+  IT: { Formale: "Formale", Professionale: "Professionale", Diretto: "Diretto", Entusiasta: "Entusiasta" },
+  EN: { Formale: "Formal", Professionale: "Professional", Diretto: "Direct", Entusiasta: "Enthusiastic" },
+};
+
+// Display label per formula di chiusura in base alla lingua
+const CLOSING_DISPLAY = {
+  IT: {
+    "Cordiali saluti": "Cordiali saluti",
+    "Distinti saluti": "Distinti saluti",
+    "Con i migliori saluti": "Con i migliori saluti",
+    "A disposizione per ulteriori informazioni": "A disposizione per ulteriori informazioni",
+  },
+  EN: {
+    "Cordiali saluti": "Best regards",
+    "Distinti saluti": "Kind regards",
+    "Con i migliori saluti": "With best regards",
+    "A disposizione per ulteriori informazioni": "Available for further information",
+  },
+};
+
+// Testi UI per lingua
+const LABELS = {
+  IT: {
+    title: "Cover Letter",
+    subtitle:
+      "Compila i campi, genera il prompt e incollalo in Claude o ChatGPT per ottenere il testo — poi incollalo qui sotto per la preview.",
+    sec1: "1 · Candidatura",
+    sec2: "2 · Job Description",
+    sec3: "3 · Personalizzazione",
+    sec4: "4 · Testo lettera",
+    company: "Azienda",
+    companyPh: "es. Acme S.p.A.",
+    role: "Posizione / Ruolo",
+    rolePh: "es. Senior Frontend Developer",
+    hiringManager: "Hiring Manager (opzionale)",
+    hiringManagerHint: "Usato per personalizzare l'intestazione nel prompt.",
+    hiringManagerPh: "es. Dott.ssa Rossi",
+    jobDesc: "Testo dell'offerta",
+    jobDescHint:
+      "Incolla il testo dell'annuncio — l'AI lo legge per calibrare il tono e le parole chiave.",
+    jobDescPh: "Incolla qui il testo completo dell'offerta di lavoro...",
+    tone: "Tono",
+    highlights: "Punti di forza da evidenziare",
+    highlightsHint:
+      "Fino a 3 highlight concreti (es. '5 anni React', 'team lead 8 persone', 'ridotto costi del 30%').",
+    motivation: "Perché questa azienda?",
+    motivationHint:
+      "1–2 frasi che spiegano la tua motivazione specifica. Migliora molto il risultato dell'AI.",
+    motivationPh:
+      "es. Mi interessa il vostro approccio open-source e la cultura di engineering-first...",
+    letterBody: "Corpo della lettera",
+    letterBodyHint:
+      "Incolla qui il testo generato dall'AI. Appare subito nella preview.",
+    letterBodyPh: "Incolla qui il testo della cover letter generato dall'AI...",
+    date: "Data",
+    closingLine: "Formula di chiusura",
+    btnOffer: "Prompt offerta",
+    btnSpontaneous: "Spontanea",
+    copied: "Copiato!",
+    copyError: "Errore",
+    promptHint: "Copia il prompt e incollalo in",
+    promptHintEnd: "o ChatGPT, poi incolla il testo qui sotto.",
+    reset: "Azzera cover letter",
+    resetConfirm: "Resettare tutti i campi della cover letter?",
+  },
+  EN: {
+    title: "Cover Letter",
+    subtitle:
+      "Fill in the fields, generate the prompt and paste it into Claude or ChatGPT — then paste the generated text below for the preview.",
+    sec1: "1 · Application",
+    sec2: "2 · Job Description",
+    sec3: "3 · Customization",
+    sec4: "4 · Letter text",
+    company: "Company",
+    companyPh: "e.g. Acme Inc.",
+    role: "Position / Role",
+    rolePh: "e.g. Senior Frontend Developer",
+    hiringManager: "Hiring Manager (optional)",
+    hiringManagerHint: "Used to personalize the header in the prompt.",
+    hiringManagerPh: "e.g. Dr. Smith",
+    jobDesc: "Job posting text",
+    jobDescHint:
+      "Paste the job ad — the AI reads it to calibrate tone and keywords.",
+    jobDescPh: "Paste the full job posting text here...",
+    tone: "Tone",
+    highlights: "Key strengths to highlight",
+    highlightsHint:
+      "Up to 3 concrete highlights (e.g. '5 years React', 'led team of 8', 'reduced costs by 30%').",
+    motivation: "Why this company?",
+    motivationHint:
+      "1–2 sentences explaining your specific motivation. Greatly improves the AI output.",
+    motivationPh:
+      "e.g. I'm drawn to your open-source approach and engineering-first culture...",
+    letterBody: "Letter body",
+    letterBodyHint:
+      "Paste the AI-generated text here. It appears instantly in the preview.",
+    letterBodyPh: "Paste the AI-generated cover letter text here...",
+    date: "Date",
+    closingLine: "Closing formula",
+    btnOffer: "Job offer prompt",
+    btnSpontaneous: "Unsolicited",
+    copied: "Copied!",
+    copyError: "Error",
+    promptHint: "Copy the prompt and paste it into",
+    promptHintEnd: "or ChatGPT, then paste the text below.",
+    reset: "Reset cover letter",
+    resetConfirm: "Reset all cover letter fields?",
+  },
+};
 
 // ─── Componente label + field ─────────────────────────────────────────────────
 function Field({ label, hint, children }) {
@@ -52,7 +165,6 @@ const inputStyle = {
 
 const textareaStyle = {
   ...inputStyle,
-  resize: "vertical",
   lineHeight: 1.55,
   fontFamily: "inherit",
 };
@@ -98,19 +210,23 @@ function Section({ title, defaultOpen = true, children }) {
 
 // ─── CoverLetterForm ──────────────────────────────────────────────────────────
 export function CoverLetterForm() {
-  const coverLetter = useCVStore((s) => s.coverLetter);
-  const updateCoverLetter = useCVStore((s) => s.updateCoverLetter);
+  const coverLetter               = useCVStore((s) => s.coverLetter);
+  const updateCoverLetter         = useCVStore((s) => s.updateCoverLetter);
   const updateCoverLetterHighlight = useCVStore((s) => s.updateCoverLetterHighlight);
-  const resetCoverLetter = useCVStore((s) => s.resetCoverLetter);
+  const resetCoverLetter          = useCVStore((s) => s.resetCoverLetter);
+  const uiLanguage                = useCVStore((s) => s.uiLanguage);
+  const store                     = useCVStore();
 
-  const store = useCVStore();
+  const L = LABELS[uiLanguage] || LABELS.IT;
+  const toneDisplay    = TONE_DISPLAY[uiLanguage]    || TONE_DISPLAY.IT;
+  const closingDisplay = CLOSING_DISPLAY[uiLanguage] || CLOSING_DISPLAY.IT;
 
   // Stato bottone candidatura a offerta
-  const [copied, setCopied]         = useState(false);
-  const [copyError, setCopyError]   = useState(false);
+  const [copied,      setCopied]      = useState(false);
+  const [copyError,   setCopyError]   = useState(false);
 
   // Stato bottone candidatura spontanea
-  const [copiedSp, setCopiedSp]     = useState(false);
+  const [copiedSp,    setCopiedSp]    = useState(false);
   const [copyErrorSp, setCopyErrorSp] = useState(false);
 
   // Estrae i dati CV plain escludendo tutte le action dallo store
@@ -128,27 +244,28 @@ export function CoverLetterForm() {
       setTargetLanguage: _hh, setDeepLApiKey: _ii, resetCV: _jj, importCV: _kk,
       setCustomPaletteColor: _ll, resetCustomPalette: _mm,
       setCustomFontSize: _nn, resetCustomFontSizes: _oo,
-      deepLApiKey: _pp, customPalettes: _qq, customFontSizes: _rr,
+      setUiLanguage: _pp,
+      deepLApiKey: _qq, customPalettes: _rr, customFontSizes: _ss,
       ...cvData
     } = store;
     return cvData;
   }, [store]);
 
   const handleCopyPrompt = useCallback(() => {
-    const prompt = generateCoverLetterPrompt(extractCvData(), coverLetter);
+    const prompt = generateCoverLetterPrompt(extractCvData(), coverLetter, uiLanguage);
     navigator.clipboard.writeText(prompt).then(
-      () => { setCopied(true);     setCopyError(false);   setTimeout(() => setCopied(false),    2500); },
-      () => { setCopyError(true);  setCopied(false);      setTimeout(() => setCopyError(false), 3000); }
+      () => { setCopied(true);    setCopyError(false);   setTimeout(() => setCopied(false),    2500); },
+      () => { setCopyError(true); setCopied(false);      setTimeout(() => setCopyError(false), 3000); }
     );
-  }, [extractCvData, coverLetter]);
+  }, [extractCvData, coverLetter, uiLanguage]);
 
   const handleCopySpontaneous = useCallback(() => {
-    const prompt = generateSpontaneousPrompt(extractCvData(), coverLetter);
+    const prompt = generateSpontaneousPrompt(extractCvData(), coverLetter, uiLanguage);
     navigator.clipboard.writeText(prompt).then(
-      () => { setCopiedSp(true);      setCopyErrorSp(false);   setTimeout(() => setCopiedSp(false),    2500); },
-      () => { setCopyErrorSp(true);   setCopiedSp(false);      setTimeout(() => setCopyErrorSp(false), 3000); }
+      () => { setCopiedSp(true);    setCopyErrorSp(false);   setTimeout(() => setCopiedSp(false),    2500); },
+      () => { setCopyErrorSp(true); setCopiedSp(false);      setTimeout(() => setCopyErrorSp(false), 3000); }
     );
-  }, [extractCvData, coverLetter]);
+  }, [extractCvData, coverLetter, uiLanguage]);
 
   const cl = coverLetter;
 
@@ -157,101 +274,92 @@ export function CoverLetterForm() {
       {/* Titolo sezione */}
       <div style={{ marginBottom: "18px" }}>
         <h2 style={{ fontSize: "15px", fontWeight: 700, color: "#1e293b", margin: 0 }}>
-          Cover Letter
+          {L.title}
         </h2>
         <p style={{ fontSize: "12px", color: "#64748b", marginTop: "4px", lineHeight: 1.5 }}>
-          Compila i campi, genera il prompt e incollalo in Claude o ChatGPT
-          per ottenere il testo — poi incollalo qui sotto per la preview.
+          {L.subtitle}
         </p>
       </div>
 
       {/* ── 1. Candidatura ── */}
-      <Section title="1 · Candidatura">
-        <Field label="Azienda">
+      <Section title={L.sec1}>
+        <Field label={L.company}>
           <input
             style={inputStyle}
             type="text"
             value={cl.company}
-            placeholder="es. Acme S.p.A."
+            placeholder={L.companyPh}
             onChange={(e) => updateCoverLetter({ company: e.target.value })}
           />
         </Field>
-        <Field label="Posizione / Ruolo">
+        <Field label={L.role}>
           <input
             style={inputStyle}
             type="text"
             value={cl.role}
-            placeholder="es. Senior Frontend Developer"
+            placeholder={L.rolePh}
             onChange={(e) => updateCoverLetter({ role: e.target.value })}
           />
         </Field>
-        <Field
-          label="Hiring Manager (opzionale)"
-          hint="Usato per personalizzare l'intestazione nel prompt."
-        >
+        <Field label={L.hiringManager} hint={L.hiringManagerHint}>
           <input
             style={inputStyle}
             type="text"
             value={cl.hiringManager}
-            placeholder="es. Dott.ssa Rossi"
+            placeholder={L.hiringManagerPh}
             onChange={(e) => updateCoverLetter({ hiringManager: e.target.value })}
           />
         </Field>
       </Section>
 
       {/* ── 2. Job Description ── */}
-      <Section title="2 · Job Description">
-        <Field
-          label="Testo dell'offerta"
-          hint="Incolla il testo dell'annuncio — l'AI lo legge per calibrare il tono e le parole chiave."
-        >
-          <textarea
-            style={{ ...textareaStyle, minHeight: "120px" }}
+      <Section title={L.sec2}>
+        <Field label={L.jobDesc} hint={L.jobDescHint}>
+          <AutoTextarea
+            style={textareaStyle}
             value={cl.jobDescription}
-            placeholder="Incolla qui il testo completo dell'offerta di lavoro..."
+            placeholder={L.jobDescPh}
+            rows={4}
+            maxRows={10}
             onChange={(e) => updateCoverLetter({ jobDescription: e.target.value })}
           />
         </Field>
       </Section>
 
       {/* ── 3. Personalizzazione ── */}
-      <Section title="3 · Personalizzazione">
-        <Field label="Tono">
+      <Section title={L.sec3}>
+        <Field label={L.tone}>
           <select
             style={inputStyle}
             value={cl.tone}
             onChange={(e) => updateCoverLetter({ tone: e.target.value })}
           >
             {TONES.map((t) => (
-              <option key={t} value={t}>{t}</option>
+              <option key={t} value={t}>{toneDisplay[t]}</option>
             ))}
           </select>
         </Field>
 
-        <Field
-          label="Punti di forza da evidenziare"
-          hint="Fino a 3 highlight concreti (es. '5 anni React', 'team lead 8 persone', 'ridotto costi del 30%')."
-        >
+        <Field label={L.highlights} hint={L.highlightsHint}>
           {(cl.highlights || ["", "", ""]).map((h, i) => (
             <input
               key={i}
               style={{ ...inputStyle, marginBottom: i < 2 ? "6px" : 0 }}
               type="text"
               value={h}
-              placeholder={`Highlight ${i + 1}`}
+              placeholder={`${uiLanguage === "EN" ? "Highlight" : "Highlight"} ${i + 1}`}
               onChange={(e) => updateCoverLetterHighlight(i, e.target.value)}
             />
           ))}
         </Field>
 
-        <Field
-          label="Perché questa azienda?"
-          hint="1–2 frasi che spiegano la tua motivazione specifica. Migliora molto il risultato dell'AI."
-        >
-          <textarea
-            style={{ ...textareaStyle, minHeight: "60px" }}
+        <Field label={L.motivation} hint={L.motivationHint}>
+          <AutoTextarea
+            style={textareaStyle}
             value={cl.motivation}
-            placeholder="es. Mi interessa il vostro approccio open-source e la cultura di engineering-first..."
+            placeholder={L.motivationPh}
+            rows={2}
+            maxRows={10}
             onChange={(e) => updateCoverLetter({ motivation: e.target.value })}
           />
         </Field>
@@ -286,7 +394,7 @@ export function CoverLetterForm() {
               {copied ? "✓" : copyError ? "✗" : "✦"}
             </span>
             <span>
-              {copied ? "Copiato!" : copyError ? "Errore" : "Prompt offerta"}
+              {copied ? L.copied : copyError ? L.copyError : L.btnOffer}
             </span>
           </button>
 
@@ -316,12 +424,12 @@ export function CoverLetterForm() {
               {copiedSp ? "✓" : copyErrorSp ? "✗" : "◈"}
             </span>
             <span>
-              {copiedSp ? "Copiato!" : copyErrorSp ? "Errore" : "Spontanea"}
+              {copiedSp ? L.copied : copyErrorSp ? L.copyError : L.btnSpontaneous}
             </span>
           </button>
         </div>
         <p style={{ fontSize: "11px", color: "#94a3b8", lineHeight: 1.5, textAlign: "center" }}>
-          Copia il prompt e incollalo in{" "}
+          {L.promptHint}{" "}
           <a
             href="https://claude.ai"
             target="_blank"
@@ -330,24 +438,23 @@ export function CoverLetterForm() {
           >
             Claude
           </a>{" "}
-          o ChatGPT, poi incolla il testo qui sotto.
+          {L.promptHintEnd}
         </p>
       </div>
 
       {/* ── 4. Testo lettera ── */}
-      <Section title="4 · Testo lettera">
-        <Field
-          label="Corpo della lettera"
-          hint="Incolla qui il testo generato dall'AI. Appare subito nella preview."
-        >
-          <textarea
-            style={{ ...textareaStyle, minHeight: "160px" }}
+      <Section title={L.sec4}>
+        <Field label={L.letterBody} hint={L.letterBodyHint}>
+          <AutoTextarea
+            style={textareaStyle}
             value={cl.letterBody}
-            placeholder="Incolla qui il testo della cover letter generato dall'AI..."
+            placeholder={L.letterBodyPh}
+            rows={6}
+            maxRows={10}
             onChange={(e) => updateCoverLetter({ letterBody: e.target.value })}
           />
         </Field>
-        <Field label="Data">
+        <Field label={L.date}>
           <input
             style={inputStyle}
             type="date"
@@ -355,14 +462,14 @@ export function CoverLetterForm() {
             onChange={(e) => updateCoverLetter({ date: e.target.value })}
           />
         </Field>
-        <Field label="Formula di chiusura">
+        <Field label={L.closingLine}>
           <select
             style={inputStyle}
             value={cl.closingLine}
             onChange={(e) => updateCoverLetter({ closingLine: e.target.value })}
           >
             {CLOSING_LINES.map((c) => (
-              <option key={c} value={c}>{c}</option>
+              <option key={c} value={c}>{closingDisplay[c]}</option>
             ))}
           </select>
         </Field>
@@ -371,7 +478,7 @@ export function CoverLetterForm() {
       {/* ── Reset ── */}
       <button
         onClick={() => {
-          if (window.confirm("Resettare tutti i campi della cover letter?")) {
+          if (window.confirm(L.resetConfirm)) {
             resetCoverLetter();
           }
         }}
@@ -386,7 +493,7 @@ export function CoverLetterForm() {
           cursor: "pointer",
         }}
       >
-        Azzera cover letter
+        {L.reset}
       </button>
     </div>
   );

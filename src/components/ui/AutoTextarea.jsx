@@ -1,18 +1,34 @@
 // AutoTextarea — textarea che si espande automaticamente al contenuto.
 // Nessuna scrollbar interna, nessun handle di resize visibile.
+// Prop maxRows: se fornita, limita l'altezza massima e abilita scroll oltre.
 import { useRef, useEffect } from "react";
 
-export function AutoTextarea({ value, onChange, className = "", style = {}, rows = 2, ...props }) {
+export function AutoTextarea({ value, onChange, className = "", style = {}, rows = 2, maxRows = 0, ...props }) {
   const ref = useRef(null);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    // Resetta l'altezza a "auto" prima di rileggere scrollHeight,
-    // altrimenti non si restringe quando si cancella testo.
     el.style.height = "auto";
-    el.style.height = `${el.scrollHeight}px`;
-  }, [value]);
+    const scrollH = el.scrollHeight;
+    if (maxRows > 0) {
+      const computed = getComputedStyle(el);
+      const lh = parseFloat(computed.lineHeight);
+      const fs = parseFloat(computed.fontSize);
+      const lineH = isNaN(lh) ? fs * 1.4 : lh;
+      const maxH = maxRows * lineH;
+      if (scrollH > maxH) {
+        el.style.height = `${maxH}px`;
+        el.style.overflowY = "auto";
+      } else {
+        el.style.height = `${scrollH}px`;
+        el.style.overflowY = "hidden";
+      }
+    } else {
+      el.style.height = `${scrollH}px`;
+      el.style.overflowY = "hidden";
+    }
+  }, [value, maxRows]);
 
   return (
     <textarea
@@ -21,7 +37,7 @@ export function AutoTextarea({ value, onChange, className = "", style = {}, rows
       onChange={onChange}
       rows={rows}
       className={className}
-      style={{ ...style, overflow: "hidden", resize: "none" }}
+      style={{ ...style, resize: "none" }}
       {...props}
     />
   );

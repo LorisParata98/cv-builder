@@ -1,6 +1,6 @@
 # CV Builder
 
-A web application for creating professional resumes, with real-time preview, PDF and DOCX export, and automatic translation via DeepL.
+A web application for creating professional resumes, with real-time preview, PDF and DOCX export, automatic translation via DeepL, and an AI-assisted Cover Letter builder.
 
 ---
 
@@ -17,9 +17,13 @@ CV Builder is a fully client-side tool for building your resume visually and int
 - **JSON export / import** — save and reload your CV at any time
 - **Automatic translation** — DeepL integration to translate CV content (IT, EN, DE, ES)
 - **Custom color palette** — per-template color customization
+- **Custom font sizes** — per-template font size tuning via range sliders
 - **Drag & drop** — reorder experiences, education, skills and certifications by dragging
 - **Photo repositioning** — drag your photo inside the frame to pick the perfect crop
 - **Local persistence** — data is automatically saved in localStorage
+- **IT / EN editor UI** — the entire editor interface can be switched between Italian and English
+- **Cover Letter builder** — dedicated section to compile target role, highlights and tone; generates an AI-ready prompt for Claude or ChatGPT to produce a tailored cover letter
+- **Spontaneous application prompt** — one-click prompt generation for unsolicited applications
 - **Phosphor icons** — clean, consistent iconography throughout the UI
 
 ---
@@ -86,8 +90,8 @@ src/
 │   └── ui/            # Shared UI components (Sidebar, Toolbar...)
 ├── data/              # Default data and ATS keywords
 ├── exporters/         # PDF and DOCX export logic
-├── locales/           # Section translations (IT, EN-GB, DE, ES)
-├── services/          # DeepL integration
+├── locales/           # Section translations (IT, EN-GB, DE, ES) + editor UI labels (IT/EN)
+├── services/          # DeepL integration, cover letter prompt builder
 └── store/             # Zustand store with localStorage persistence
 ```
 
