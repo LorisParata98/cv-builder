@@ -2,6 +2,7 @@
 // Layout due colonne, Playfair Display, palette navy + bianco
 
 import { getLocale } from "../../../locales/index.js";
+import { makeHref, shortenWebsite, shortenLinkedIn } from "../../../utils/urlUtils.js";
 
 const COLORS_DEFAULT = {
   bg: "#1e3a5f",
@@ -116,20 +117,26 @@ function LeftColumn({ data, C, L, fs }) {
         <SectionTitleLight C={C} fs={fs}>{L.contacts}</SectionTitleLight>
         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
           {[
-            { icon: "✉", val: personal.email },
-            { icon: "☎", val: personal.phone },
-            { icon: "📍", val: personal.location },
-            { icon: "🔗", val: personal.website },
-            { icon: "in", val: personal.linkedin },
+            { icon: "✉", raw: `mailto:${personal.email}`,  display: personal.email },
+            { icon: "☎", raw: null,                          display: personal.phone },
+            { icon: "📍", raw: null,                         display: personal.location },
+            { icon: "🔗", raw: makeHref(personal.website),   display: shortenWebsite(personal.website) },
+            { icon: "in", raw: makeHref(personal.linkedin),  display: shortenLinkedIn(personal.linkedin) },
           ]
-            .filter((x) => x.val)
+            .filter((x) => x.display)
             .map((item, i) => (
               <div key={i} style={{ display: "flex", gap: "6px", alignItems: "flex-start" }}>
                 <span style={{ fontSize: `${Math.max(7, fs.body - 1)}px`, color: C.accent, flexShrink: 0, minWidth: "14px" }}>
                   {item.icon}
                 </span>
-                <span style={{ fontSize: `${Math.max(7, fs.body - 1)}px`, color: C.body, wordBreak: "break-all", lineHeight: 1.4 }}>
-                  {item.val}
+                <span style={{ fontSize: `${Math.max(7, fs.body - 1)}px`, color: C.body, wordBreak: "break-word", lineHeight: 1.4 }}>
+                  {item.raw ? (
+                    <a href={item.raw} target="_blank" rel="noopener noreferrer"
+                       style={{ color: "inherit", textDecoration: "none" }}
+                       onMouseEnter={e => e.currentTarget.style.textDecoration = "underline"}
+                       onMouseLeave={e => e.currentTarget.style.textDecoration = "none"}
+                    >{item.display}</a>
+                  ) : item.display}
                 </span>
               </div>
             ))}
@@ -195,9 +202,11 @@ function RightColumn({ data, C, L, fs }) {
       {personal.summary && (
         <div style={{ marginBottom: "20px" }}>
           <SectionTitle C={C} fs={fs}>{L.profile}</SectionTitle>
-          <p style={{ fontSize: `${fs.body}px`, lineHeight: 1.7, color: C.body, fontFamily: "system-ui, sans-serif" }}>
-            {personal.summary}
-          </p>
+          <div
+            className="rtf-preview"
+            style={{ "--rtf-accent": C.accent, fontSize: `${fs.body}px`, lineHeight: 1.7, color: C.body, fontFamily: "system-ui, sans-serif" }}
+            dangerouslySetInnerHTML={{ __html: personal.summary }}
+          />
         </div>
       )}
 
@@ -219,14 +228,13 @@ function RightColumn({ data, C, L, fs }) {
                   {formatDate(exp.startDate, L)} – {formatDate(exp.endDate, L)}
                 </span>
               </div>
-              <ul style={{ margin: "5px 0 0", padding: 0, listStyle: "none" }}>
-                {exp.bullets.filter(Boolean).map((b, bi) => (
-                  <li key={bi} style={{ display: "flex", gap: "6px", fontSize: `${fs.body}px`, lineHeight: 1.6, color: C.body, marginBottom: "2px" }}>
-                    <span style={{ color: C.accent, flexShrink: 0, fontWeight: 700 }}>—</span>
-                    {b}
-                  </li>
-                ))}
-              </ul>
+              {exp.description && (
+                <div
+                  className="rtf-preview"
+                  style={{ "--rtf-accent": C.accent, fontSize: `${fs.body}px`, lineHeight: 1.6, color: C.body, fontFamily: "system-ui, sans-serif", marginTop: "5px" }}
+                  dangerouslySetInnerHTML={{ __html: exp.description }}
+                />
+              )}
             </div>
           ))}
         </div>

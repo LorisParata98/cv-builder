@@ -2,7 +2,7 @@ import { useRef, useCallback } from "react";
 import { User, ArrowsOutCardinal } from "@phosphor-icons/react";
 import { useCVStore } from "../../store/useCVStore";
 import { SectionCard } from "../ui/SectionCard";
-import { AutoTextarea } from "../ui/AutoTextarea";
+import { RichTextEditor } from "../ui/RichTextEditor";
 import { useEditorLabels } from "../../locales/editorLabels";
 
 const CIRCLE_PX = 96;
@@ -183,12 +183,11 @@ export function PersonalInfoForm() {
         <label className="block text-xs font-medium text-gray-600 mb-1.5">
           {L.summary}
         </label>
-        <AutoTextarea
+        <RichTextEditor
           value={personal.summary}
-          onChange={(e) => setPersonal({ summary: e.target.value })}
+          onChange={(html) => setPersonal({ summary: html })}
           placeholder={L.summaryPh}
-          rows={4}
-          className="w-full border border-gray-300 rounded px-2.5 py-2 text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          minHeight={90}
         />
       </div>
     </SectionCard>

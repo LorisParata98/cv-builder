@@ -1,4 +1,5 @@
-import { Document, Page, Text, View, StyleSheet, Image, Font, pdf } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Image, Font, Link, pdf } from '@react-pdf/renderer';
+import { makeHref, shortenWebsite, shortenLinkedIn } from '../utils/urlUtils.js';
 import { saveAs } from 'file-saver';
 
 // ─── Font registration ────────────────────────────────────────────────────────
@@ -264,6 +265,78 @@ function SectionHeader({ icon, label }) {
   );
 }
 
+// ─── HTML → react-pdf ─────────────────────────────────────────────────────────
+// Converte HTML prodotto da TipTap in nodi react-pdf.
+// Gestisce: <p>, <ul>/<ol>/<li>, <strong>, <em>, <u>, text node.
+
+function getInlineText(domNode, baseStyle, keyBase) {
+  const items = [];
+  let i = 0;
+  for (const child of domNode.childNodes) {
+    const k = `${keyBase}-i${i++}`;
+    if (child.nodeType === Node.TEXT_NODE) {
+      const t = child.textContent;
+      if (t) items.push(<Text key={k} style={baseStyle}>{t}</Text>);
+    } else if (child.nodeType === Node.ELEMENT_NODE) {
+      const tag = child.tagName.toLowerCase();
+      const st = { ...baseStyle };
+      if (tag === 'strong' || tag === 'b') st.fontFamily = 'Helvetica-Bold';
+      if (tag === 'em'     || tag === 'i') st.fontFamily = 'Helvetica-Oblique';
+      if (tag === 'u') st.textDecoration = 'underline';
+      items.push(...getInlineText(child, st, k));
+    }
+  }
+  return items;
+}
+
+function htmlToPdfBlocks(html, textStyle) {
+  if (!html) return null;
+  const container = document.createElement('div');
+  container.innerHTML = html;
+  const blocks = [];
+  let ki = 0;
+
+  for (const node of container.childNodes) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const t = node.textContent?.trim();
+      if (t) blocks.push(<Text key={ki++} style={textStyle}>{t}</Text>);
+      continue;
+    }
+    if (node.nodeType !== Node.ELEMENT_NODE) continue;
+    const tag = node.tagName.toLowerCase();
+
+    if (tag === 'p') {
+      const text = node.textContent?.trim();
+      if (!text) { ki++; continue; }
+      const inline = getInlineText(node, textStyle, String(ki));
+      blocks.push(
+        <Text key={ki++} style={{ ...textStyle, marginBottom: 3 }}>
+          {inline.length > 0 ? inline : text}
+        </Text>
+      );
+    } else if (tag === 'ul' || tag === 'ol') {
+      let num = 1;
+      for (const li of node.children) {
+        if (li.tagName.toLowerCase() !== 'li') continue;
+        const liInner = li.querySelector('p') || li;
+        const text = liInner.textContent?.trim();
+        if (!text) { ki++; continue; }
+        const inline = getInlineText(liInner, { ...textStyle, flex: 1 }, String(ki));
+        const dot = tag === 'ol' ? `${num++}.` : ICONS.bullet;
+        blocks.push(
+          <View key={ki++} style={s.bullet}>
+            <Text style={s.bulletDot}>{dot}</Text>
+            <Text style={{ ...textStyle, flex: 1 }}>
+              {inline.length > 0 ? inline : text}
+            </Text>
+          </View>
+        );
+      }
+    }
+  }
+  return blocks.length > 0 ? blocks : null;
+}
+
 // ─── Documento PDF ────────────────────────────────────────────────────────────
 function CVDocument({ data }) {
   const { personal, skills, experience, education, certifications, languages, projects } = data;
@@ -286,11 +359,11 @@ function CVDocument({ data }) {
             <Text style={s.name}>{personal.name}</Text>
             <Text style={s.title}>{personal.title}</Text>
             <View style={s.contactRow}>
-              {personal.email    && <Text style={s.contact}>Email: {personal.email}</Text>}
-              {personal.phone    && <Text style={s.contact}>Recapito telefonico: {personal.phone}</Text>}
-              {personal.location && <Text style={s.contact}>Localita: {personal.location}</Text>}
-              {personal.website  && <Text style={s.contactAccent}>Github: {personal.website}</Text>}
-              {personal.linkedin && <Text style={s.contactAccent}>{personal.linkedin}</Text>}
+              {personal.email    && <Text style={s.contact}>✉ {personal.email}</Text>}
+              {personal.phone    && <Text style={s.contact}>☎ {personal.phone}</Text>}
+              {personal.location && <Text style={s.contact}>📍 {personal.location}</Text>}
+              {personal.website  && <Link src={makeHref(personal.website)}  style={s.contactAccent}>gh {shortenWebsite(personal.website)}</Link>}
+              {personal.linkedin && <Link src={makeHref(personal.linkedin)} style={s.contactAccent}>in {shortenLinkedIn(personal.linkedin)}</Link>}
             </View>
           </View>
         </View>
@@ -302,7 +375,7 @@ function CVDocument({ data }) {
           {personal.summary ? (
             <View style={s.section} wrap={false}>
               <SectionHeader icon={ICONS.profile} label="Profilo" />
-              <Text style={s.summary}>{personal.summary}</Text>
+              {htmlToPdfBlocks(personal.summary, s.summary)}
             </View>
           ) : null}
 
@@ -347,15 +420,11 @@ function CVDocument({ data }) {
                       {formatDate(exp.startDate)} - {formatDate(exp.endDate)}
                     </Text>
                   </View>
-                  {/* Contenitore bullet con spaziatura superiore */}
-                  <View style={s.bulletList}>
-                    {exp.bullets.filter(Boolean).map((b, bi) => (
-                      <View key={bi} style={s.bullet}>
-                        <Text style={s.bulletDot}>{ICONS.bullet}</Text>
-                        <Text style={s.bulletText}>{b}</Text>
-                      </View>
-                    ))}
-                  </View>
+                  {exp.description ? (
+                    <View style={s.bulletList}>
+                      {htmlToPdfBlocks(exp.description, s.bulletText)}
+                    </View>
+                  ) : null}
                 </View>
               ))}
             </View>

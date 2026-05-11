@@ -26,7 +26,26 @@ const saveToStorage = (state) => {
   }
 };
 
-const savedState = loadFromStorage();
+// ─── Migrazione dati legacy ───────────────────────────────────────────────────
+// Converte experience[].bullets (string[]) → experience[].description (HTML)
+// per compatibilità con i dati salvati prima dell'introduzione del RTF editor.
+function migrateState(state) {
+  if (!state?.experience) return state;
+  const migrated = state.experience.map((exp) => {
+    if (Array.isArray(exp.bullets) && exp.description === undefined) {
+      const items = exp.bullets
+        .filter(Boolean)
+        .map((b) => `<li><p>${b}</p></li>`)
+        .join("");
+      const { bullets, ...rest } = exp;
+      return { ...rest, description: items ? `<ul>${items}</ul>` : "" };
+    }
+    return exp;
+  });
+  return { ...state, experience: migrated };
+}
+
+const savedState = migrateState(loadFromStorage());
 const savedDeepLKey = localStorage.getItem(DEEPL_KEY) || "";
 
 const DEFAULT_CUSTOM_PALETTES = { tech: {}, manager: {}, designer: {} };
@@ -196,7 +215,7 @@ export const useCVStore = create((set, get) => ({
       location: "",
       startDate: "",
       endDate: "",
-      bullets: [""],
+      description: "",
     };
     const experience = [...get().experience, newExp];
     set({ experience });

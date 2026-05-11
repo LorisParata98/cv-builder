@@ -4,6 +4,7 @@
 // Layout: colonna singola, ATS-safe
 
 import { getLocale } from "../../../locales/index.js";
+import { makeHref, shortenWebsite, shortenLinkedIn } from "../../../utils/urlUtils.js";
 
 const COLORS_DEFAULT = {
   bg: "#0f2644",
@@ -136,11 +137,11 @@ function HeaderSection({ personal, C, fs }) {
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 18px" }}>
           {[
-            personal.email    && { val: personal.email,    prefix: "✉" },
-            personal.phone    && { val: personal.phone,    prefix: "☎" },
-            personal.location && { val: personal.location, prefix: "📍" },
-            personal.website  && { val: personal.website,  prefix: "gh" },
-            personal.linkedin && { val: personal.linkedin, prefix: "in" },
+            personal.email    && { raw: `mailto:${personal.email}`, display: personal.email,                    prefix: "✉" },
+            personal.phone    && { raw: null,                         display: personal.phone,                    prefix: "☎" },
+            personal.location && { raw: null,                         display: personal.location,                 prefix: "📍" },
+            personal.website  && { raw: makeHref(personal.website),   display: shortenWebsite(personal.website),  prefix: "gh" },
+            personal.linkedin && { raw: makeHref(personal.linkedin),  display: shortenLinkedIn(personal.linkedin), prefix: "in" },
           ]
             .filter(Boolean)
             .map((item, i) => (
@@ -153,7 +154,13 @@ function HeaderSection({ personal, C, fs }) {
                 }}
               >
                 <span style={{ color: C.accent }}>{item.prefix} </span>
-                {item.val}
+                {item.raw ? (
+                  <a href={item.raw} target="_blank" rel="noopener noreferrer"
+                     style={{ color: "inherit", textDecoration: "none" }}
+                     onMouseEnter={e => e.currentTarget.style.textDecoration = "underline"}
+                     onMouseLeave={e => e.currentTarget.style.textDecoration = "none"}
+                  >{item.display}</a>
+                ) : item.display}
               </span>
             ))}
         </div>
@@ -167,17 +174,17 @@ function SummarySection({ summary, C, L, fs }) {
   return (
     <div style={{ marginBottom: "22px" }}>
       <SectionHeader icon="</>" title={L.profile} C={C} fs={fs} />
-      <p
+      <div
+        className="rtf-preview"
         style={{
+          "--rtf-accent": C.accent,
           fontSize: `${fs.body + 1}px`,
           lineHeight: "1.7",
           color: C.bodyText,
-          margin: 0,
           fontFamily: "system-ui, sans-serif",
         }}
-      >
-        {summary}
-      </p>
+        dangerouslySetInnerHTML={{ __html: summary }}
+      />
     </div>
   );
 }
@@ -291,25 +298,19 @@ function ExperienceSection({ experience, C, L, fs }) {
               {formatDate(exp.startDate, L)} – {formatDate(exp.endDate, L)}
             </span>
           </div>
-          <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
-            {exp.bullets.filter(Boolean).map((b, bi) => (
-              <li
-                key={bi}
-                style={{
-                  display: "flex",
-                  gap: "8px",
-                  fontSize: `${fs.body}px`,
-                  lineHeight: "1.65",
-                  color: C.bodyText,
-                  marginBottom: "3px",
-                  fontFamily: "system-ui, sans-serif",
-                }}
-              >
-                <span style={{ color: C.accent, flexShrink: 0, fontWeight: 700 }}>–</span>
-                {b}
-              </li>
-            ))}
-          </ul>
+          {exp.description && (
+            <div
+              className="rtf-preview"
+              style={{
+                "--rtf-accent": C.accent,
+                fontSize: `${fs.body}px`,
+                lineHeight: "1.65",
+                color: C.bodyText,
+                fontFamily: "system-ui, sans-serif",
+              }}
+              dangerouslySetInnerHTML={{ __html: exp.description }}
+            />
+          )}
         </div>
       ))}
     </div>

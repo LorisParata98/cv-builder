@@ -11,7 +11,7 @@ export const defaultCV = {
     website: "github.com/johndoe",
     linkedin: "linkedin.com/in/johndoe",
     summary:
-      "Frontend developer con oltre 5 anni di esperienza nella progettazione e sviluppo di applicazioni web scalabili. Specializzato in Angular, React e architetture component-based. Appassionato di performance, accessibilità e developer experience.",
+      "<p>Frontend developer con oltre 5 anni di esperienza nella progettazione e sviluppo di applicazioni web scalabili. Specializzato in <strong>Angular</strong>, <strong>React</strong> e architetture component-based. Appassionato di performance, accessibilità e developer experience.</p>",
     photo: null,
     photoPosition: { x: 50, y: 50 },
   },
@@ -20,12 +20,12 @@ export const defaultCV = {
     {
       category: "Frontend",
       tags: [
-        { label: "Angular",     versionsRange: "v8–v20", atsKeywords: ["Angular","Angular 8","Angular 11","Angular 14","Angular 17","Angular 18","Angular 20"] },
-        { label: "React",       versionsRange: "16–19",  atsKeywords: ["React","React 16","React 18","React 19","React.js"] },
-        { label: "TypeScript",  versionsRange: null,     atsKeywords: ["TypeScript","TypeScript 5"] },
-        { label: "Vue.js",      versionsRange: "2 & 3",  atsKeywords: ["Vue.js","Vue 2","Vue 3","Vue.js 2","Vue.js 3"] },
-        { label: "HTML5 / CSS3",versionsRange: null,     atsKeywords: ["HTML5","CSS3","HTML","CSS"] },
-        { label: "Tailwind CSS",versionsRange: null,     atsKeywords: ["Tailwind CSS","Tailwind"] },
+        { label: "Angular",      versionsRange: "v8–v20", atsKeywords: ["Angular","Angular 8","Angular 11","Angular 14","Angular 17","Angular 18","Angular 20"] },
+        { label: "React",        versionsRange: "16–19",  atsKeywords: ["React","React 16","React 18","React 19","React.js"] },
+        { label: "TypeScript",   versionsRange: null,     atsKeywords: ["TypeScript","TypeScript 5"] },
+        { label: "Vue.js",       versionsRange: "2 & 3",  atsKeywords: ["Vue.js","Vue 2","Vue 3","Vue.js 2","Vue.js 3"] },
+        { label: "HTML5 / CSS3", versionsRange: null,     atsKeywords: ["HTML5","CSS3","HTML","CSS"] },
+        { label: "Tailwind CSS", versionsRange: null,     atsKeywords: ["Tailwind CSS","Tailwind"] },
       ],
     },
     {
@@ -54,12 +54,7 @@ export const defaultCV = {
       location: "Milano, Italia",
       startDate: "2022-03",
       endDate: "present",
-      bullets: [
-        "Sviluppato e mantenuto un'applicazione Angular enterprise con oltre 50 moduli e 200k+ utenti attivi mensili",
-        "Migrato il codebase da Angular 11 a Angular 18, riducendo il bundle size del 35%",
-        "Introdotto Cypress per i test E2E, portando la copertura dal 20% all'80%",
-        "Guidato un team di 4 sviluppatori frontend su architettura micro-frontend",
-      ],
+      description: "<ul><li><p>Sviluppato e mantenuto un'applicazione <strong>Angular enterprise</strong> con oltre 50 moduli e 200k+ utenti attivi mensili</p></li><li><p>Migrato il codebase da Angular 11 a Angular 18, riducendo il bundle size del <strong>35%</strong></p></li><li><p>Introdotto Cypress per i test E2E, portando la copertura dal 20% all'<strong>80%</strong></p></li><li><p>Guidato un team di 4 sviluppatori frontend su architettura micro-frontend</p></li></ul>",
     },
     {
       id: "exp-2",
@@ -68,12 +63,7 @@ export const defaultCV = {
       location: "Remote",
       startDate: "2019-09",
       endDate: "2022-02",
-      bullets: [
-        "Realizzato da zero una SPA React con TypeScript per la gestione di workflow aziendali",
-        "Implementato design system condiviso con Storybook, adottato da 3 team di prodotto",
-        "Integrato API REST e GraphQL, gestendo stato applicativo con Redux Toolkit",
-        "Collaborato con il team UX in cicli Agile bi-settimanali",
-      ],
+      description: "<ul><li><p>Realizzato da zero una <strong>SPA React</strong> con TypeScript per la gestione di workflow aziendali</p></li><li><p>Implementato design system condiviso con Storybook, adottato da 3 team di prodotto</p></li><li><p>Integrato API REST e GraphQL, gestendo stato applicativo con Redux Toolkit</p></li><li><p>Collaborato con il team UX in cicli Agile bi-settimanali</p></li></ul>",
     },
   ],
 

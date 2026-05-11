@@ -13,7 +13,8 @@ export function ProjectsForm() {
   const updateProject = useCVStore((s) => s.updateProject);
   const { projects: L, common: LC } = useEditorLabels();
 
-  const dragIndex = useRef(null);
+  const dragIndex  = useRef(null);
+  const canDragRef = useRef(false);
   const [dragOver, setDragOver] = useState(null);
 
   const reorder = (from, to) => {
@@ -32,10 +33,10 @@ export function ProjectsForm() {
           <div
             key={i}
             draggable
-            onDragStart={() => { dragIndex.current = i; }}
+            onDragStart={(e) => { if (!canDragRef.current) { e.preventDefault(); return; } dragIndex.current = i; }}
             onDragOver={(e) => { e.preventDefault(); setDragOver(i); }}
             onDrop={() => { reorder(dragIndex.current, i); setDragOver(null); dragIndex.current = null; }}
-            onDragEnd={() => { setDragOver(null); dragIndex.current = null; }}
+            onDragEnd={() => { canDragRef.current = false; setDragOver(null); dragIndex.current = null; }}
             style={{ opacity: dragIndex.current === i ? 0.4 : 1 }}
             className={`flex gap-2 items-start rounded-lg transition-colors ${
               dragOver === i && dragIndex.current !== i ? "bg-blue-50 ring-1 ring-blue-300" : ""
@@ -43,6 +44,8 @@ export function ProjectsForm() {
           >
             <span
               title={LC.dragToReorder}
+              onMouseDown={() => { canDragRef.current = true; }}
+              onMouseUp={() => { canDragRef.current = false; }}
               className="text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing flex-shrink-0 select-none mt-1.5 flex items-center"
             >
               <DotsSixVertical size={18} weight="bold" />

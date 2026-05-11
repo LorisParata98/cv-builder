@@ -16,3 +16,90 @@ body {
   height: 100vh;
   overflow: hidden;
 }
+
+/* ─── Rich Text Editor (TipTap) ─────────────────────────────────────────────── */
+.rtf-editor-wrapper .ProseMirror {
+  padding: 8px 10px;
+  outline: none;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  color: #1f2937;
+  font-family: system-ui, sans-serif;
+}
+
+.rtf-editor-wrapper .ProseMirror p {
+  margin: 0 0 4px;
+}
+
+.rtf-editor-wrapper .ProseMirror p:last-child {
+  margin-bottom: 0;
+}
+
+.rtf-editor-wrapper .ProseMirror ul,
+.rtf-editor-wrapper .ProseMirror ol {
+  padding-left: 20px;
+  margin: 2px 0;
+}
+
+.rtf-editor-wrapper .ProseMirror li {
+  margin-bottom: 2px;
+}
+
+.rtf-editor-wrapper .ProseMirror li p {
+  margin: 0;
+}
+
+/* Placeholder */
+.rtf-editor-wrapper .ProseMirror.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  pointer-events: none;
+  float: left;
+  height: 0;
+}
+
+/* ─── RTF content in CV preview (dangerouslySetInnerHTML) ────────────────────── */
+.rtf-preview p {
+  margin: 0 0 0.3em;
+}
+
+.rtf-preview p:last-child {
+  margin-bottom: 0;
+}
+
+.rtf-preview ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rtf-preview ul li {
+  display: flex;
+  gap: 0.5em;
+  margin-bottom: 0.2em;
+}
+
+.rtf-preview ul li::before {
+  content: "\2013"; /* en-dash */
+  color: var(--rtf-accent, currentColor);
+  flex-shrink: 0;
+  font-weight: 700;
+}
+
+.rtf-preview ul li p {
+  margin: 0;
+  flex: 1;
+}
+
+.rtf-preview ol {
+  margin: 0;
+  padding-left: 1.4em;
+}
+
+.rtf-preview ol li {
+  margin-bottom: 0.2em;
+}
+
+.rtf-preview ol li p {
+  margin: 0;
+}

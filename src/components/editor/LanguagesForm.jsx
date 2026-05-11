@@ -17,14 +17,15 @@ export const LEVELS_KEYS = [
 
 export function LanguagesForm() {
   const { t } = useTranslation();
-  const languages    = useCVStore((s) => s.languages);
+  const languages = useCVStore((s) => s.languages);
   const setLanguages = useCVStore((s) => s.setLanguages);
-  const addLanguage  = useCVStore((s) => s.addLanguage);
+  const addLanguage = useCVStore((s) => s.addLanguage);
   const removeLanguage = useCVStore((s) => s.removeLanguage);
   const updateLanguage = useCVStore((s) => s.updateLanguage);
   const { languages: L, common: LC } = useEditorLabels();
 
   const dragIndex = useRef(null);
+  const canDragRef = useRef(false);
   const [dragOver, setDragOver] = useState(null);
 
   const reorder = (from, to) => {
@@ -37,46 +38,97 @@ export function LanguagesForm() {
 
   return (
     <SectionCard title={L.title} icon={<Globe size={15} weight="duotone" />}>
-      <div className="space-y-2.5">
+      <div className="space-y-2.5 ">
         {languages.map((lang, i) => (
           <div
             key={i}
             draggable
-            onDragStart={() => { dragIndex.current = i; }}
-            onDragOver={(e) => { e.preventDefault(); setDragOver(i); }}
-            onDrop={() => { reorder(dragIndex.current, i); setDragOver(null); dragIndex.current = null; }}
-            onDragEnd={() => { setDragOver(null); dragIndex.current = null; }}
+            onDragStart={(e) => {
+              if (!canDragRef.current) {
+                e.preventDefault();
+                return;
+              }
+              dragIndex.current = i;
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragOver(i);
+            }}
+            onDrop={() => {
+              reorder(dragIndex.current, i);
+              setDragOver(null);
+              dragIndex.current = null;
+            }}
+            onDragEnd={() => {
+              canDragRef.current = false;
+              setDragOver(null);
+              dragIndex.current = null;
+            }}
             style={{ opacity: dragIndex.current === i ? 0.4 : 1 }}
-            className={`flex gap-2 items-center rounded-lg transition-colors ${
-              dragOver === i && dragIndex.current !== i ? "bg-blue-50 ring-1 ring-blue-300" : ""
+            className={`flex flex-col gap-2 items-start rounded-lg transition-colors py-2  ${
+              dragOver === i && dragIndex.current !== i
+                ? "bg-blue-50 ring-1 ring-blue-300"
+                : ""
             }`}
           >
-            <span
-              title={LC.dragToReorder}
-              className="text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing flex-shrink-0 select-none flex items-center"
-            >
-              <DotsSixVertical size={18} weight="bold" />
-            </span>
-            <input
-              type="text"
-              value={lang.language}
-              onChange={(e) => updateLanguage(i, { language: e.target.value })}
-              placeholder={L.languagePh}
-              className="w-24 border border-gray-300 rounded px-2.5 py-2 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            />
-            <select
-              value={lang.level}
-              onChange={(e) => updateLanguage(i, { level: e.target.value })}
-              className="w-32 border border-gray-300 rounded px-2 py-2 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
-            >
-              <option value="">{L.selectLevel}</option>
-              {LEVELS_KEYS.map((lk) => (
-                <option key={lk} value={t(lk)}>{t(lk)}</option>
-              ))}
-            </select>
-            {languages.length > 1 && (
-              <button onClick={() => removeLanguage(i)} className="text-gray-300 hover:text-red-400 text-sm flex-shrink-0">✕</button>
-            )}
+            <div className="flex w-full gap-2">
+              <span
+                title={LC.dragToReorder}
+                onMouseDown={() => {
+                  canDragRef.current = true;
+                }}
+                onMouseUp={() => {
+                  canDragRef.current = false;
+                }}
+                className="text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing flex-shrink-0 select-none flex items-center"
+              >
+                <DotsSixVertical size={18} weight="bold" />
+              </span>
+              <input
+                type="text"
+                value={lang.language}
+                onChange={(e) =>
+                  updateLanguage(i, { language: e.target.value })
+                }
+                placeholder={L.languagePh}
+                className="flex-1 border border-gray-300 rounded px-2.5 py-2 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+              {languages.length > 1 && (
+                <button
+                  onClick={() => removeLanguage(i)}
+                  className="text-gray-300 hover:text-red-400 text-sm flex-shrink-0"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+            <div className="flex w-full gap-2">
+              <span
+                title={LC.dragToReorder}
+                onMouseDown={() => {
+                  canDragRef.current = true;
+                }}
+                onMouseUp={() => {
+                  canDragRef.current = false;
+                }}
+                className="text-white flex-shrink-0 select-none flex items-center"
+              >
+                <DotsSixVertical size={18} weight="bold" />
+              </span>
+              <select
+                value={lang.level}
+                onChange={(e) => updateLanguage(i, { level: e.target.value })}
+                className="w-full border border-gray-300 rounded px-2 py-2  text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+              >
+                <option value="">{L.selectLevel}</option>
+                {LEVELS_KEYS.map((lk) => (
+                  <option key={lk} value={t(lk)}>
+                    {t(lk)}
+                  </option>
+                ))}
+              </select>
+              <div className="w-4"></div>
+            </div>
           </div>
         ))}
       </div>

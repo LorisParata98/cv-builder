@@ -12,7 +12,8 @@ export function CertificationsForm() {
   const updateCertification = useCVStore((s) => s.updateCertification);
   const { certifications: L, common: LC } = useEditorLabels();
 
-  const dragIndex = useRef(null);
+  const dragIndex  = useRef(null);
+  const canDragRef = useRef(false);
   const [dragOver, setDragOver] = useState(null);
 
   const reorder = (from, to) => {
@@ -30,10 +31,10 @@ export function CertificationsForm() {
           <div
             key={i}
             draggable
-            onDragStart={() => { dragIndex.current = i; }}
+            onDragStart={(e) => { if (!canDragRef.current) { e.preventDefault(); return; } dragIndex.current = i; }}
             onDragOver={(e) => { e.preventDefault(); setDragOver(i); }}
             onDrop={() => { reorder(dragIndex.current, i); setDragOver(null); dragIndex.current = null; }}
-            onDragEnd={() => { setDragOver(null); dragIndex.current = null; }}
+            onDragEnd={() => { canDragRef.current = false; setDragOver(null); dragIndex.current = null; }}
             style={{ opacity: dragIndex.current === i ? 0.4 : 1 }}
             className={`flex items-center gap-2 rounded-lg transition-colors ${
               dragOver === i && dragIndex.current !== i ? "bg-blue-50 ring-1 ring-blue-300" : ""
@@ -41,6 +42,8 @@ export function CertificationsForm() {
           >
             <span
               title={LC.dragToReorder}
+              onMouseDown={() => { canDragRef.current = true; }}
+              onMouseUp={() => { canDragRef.current = false; }}
               className="text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing flex-shrink-0 select-none flex items-center"
             >
               <DotsSixVertical size={18} weight="bold" />
