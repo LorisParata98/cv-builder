@@ -1,0 +1,25 @@
+{
+  "profile":          "Profil",
+  "skills":           "Technische Kenntnisse",
+  "skillsShort":      "Kenntnisse",
+  "experience":       "Berufserfahrung",
+  "experienceShort":  "Erfahrung",
+  "education":        "Ausbildung",
+  "certifications":   "Zertifizierungen",
+  "languages":        "Sprachen",
+  "projects":         "Projekte",
+  "notes":            "Notizen",
+  "contacts":         "Kontakt",
+  "present":          "Heute",
+  "thesis":           "Abschlussarbeit",
+  "months": ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"],
+  "levels": {
+    "native": "Muttersprache",
+    "c2": "C2 – Ausgezeichnet",
+    "c1": "C1 – Fortgeschritten",
+    "b2": "B2 – Obere Mittelstufe",
+    "b1": "B1 – Mittelstufe",
+    "a2": "A2 – Grundkenntnisse",
+    "a1": "A1 – Anfänger"
+  }
+}

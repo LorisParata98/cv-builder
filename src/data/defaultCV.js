@@ -91,9 +91,11 @@ export const defaultCV = {
   ],
 
   projects: [
-    "CV Builder — Webapp React per la generazione di CV professionali con export PDF/DOCX (github.com/lorisparata/cv-builder)",
-    "IoT Dashboard — Dashboard Angular per il monitoraggio di sensori industriali in real-time",
+    { title: "CV Builder", description: "<p>Webapp React per la generazione di CV professionali con export PDF/DOCX</p>", url: "github.com/lorisparata/cv-builder" },
+    { title: "IoT Dashboard", description: "<p>Dashboard Angular per il monitoraggio di sensori industriali in real-time</p>", url: "" },
   ],
+
+  note: "",
 
   targetLanguage: null,
   deepLApiKey: "",

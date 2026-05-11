@@ -1,8 +1,14 @@
 // CreativeDesigner.jsx — Profilo designer / UX-UI / creativo
 // Layout asimmetrico con sidebar colorata, 3 sub-palette, font Fraunces
 
-import { getLocale } from "../../../locales/index.js";
-import { makeHref, shortenWebsite, shortenLinkedIn } from "../../../utils/urlUtils.js";
+import { memo } from "react";
+import { getCVLocale, translateLevel } from "../../../utils/cvLocales.js";
+import {
+  makeHref,
+  shortenWebsite,
+  shortenLinkedIn,
+} from "../../../utils/urlUtils.js";
+import { formatDate } from "../../../utils/translationUtils";
 
 const PALETTES = {
   "noir-gold": {
@@ -60,14 +66,6 @@ const PALETTES = {
 
 const FS_DEFAULT = { name: 36, role: 11, sectionHeader: 9, body: 10 };
 
-function formatDate(d, L) {
-  if (!d) return "";
-  if (d === "present") return L.present;
-  const [y, m] = d.split("-");
-  if (!m) return y;
-  return `${L.months[parseInt(m, 10) - 1]} ${y}`;
-}
-
 function SectionTitle({ children, p, fs }) {
   return (
     <div style={{ marginBottom: "10px" }}>
@@ -84,7 +82,14 @@ function SectionTitle({ children, p, fs }) {
       >
         {children}
       </p>
-      <div style={{ height: "2px", width: "28px", backgroundColor: p.accent, borderRadius: "1px" }} />
+      <div
+        style={{
+          height: "2px",
+          width: "28px",
+          backgroundColor: p.accent,
+          borderRadius: "1px",
+        }}
+      />
     </div>
   );
 }
@@ -111,8 +116,10 @@ function DesignerSidebar({ data, p, L, fs }) {
         {personal.photo ? (
           <div
             style={{
-              width: "88px", height: "88px",
-              borderRadius: "50%", overflow: "hidden",
+              width: "88px",
+              height: "88px",
+              borderRadius: "50%",
+              overflow: "hidden",
               border: `3px solid ${p.accent}`,
               boxShadow: `0 0 0 4px ${p.tagBg}`,
             }}
@@ -121,7 +128,8 @@ function DesignerSidebar({ data, p, L, fs }) {
               src={personal.photo}
               alt={personal.name}
               style={{
-                width: "100%", height: "100%",
+                width: "100%",
+                height: "100%",
                 objectFit: "cover",
                 objectPosition: `${personal.photoPosition?.x ?? 50}% ${personal.photoPosition?.y ?? 50}%`,
               }}
@@ -130,11 +138,15 @@ function DesignerSidebar({ data, p, L, fs }) {
         ) : (
           <div
             style={{
-              width: "72px", height: "72px",
+              width: "72px",
+              height: "72px",
               borderRadius: "50%",
               border: `2px dashed ${p.accent}`,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              color: p.accent, fontSize: "24px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: p.accent,
+              fontSize: "24px",
             }}
           >
             ✦
@@ -144,28 +156,84 @@ function DesignerSidebar({ data, p, L, fs }) {
 
       {/* Contatti */}
       <div>
-        <p style={{ fontSize: `${Math.max(7, sb - 1)}px`, fontWeight: 700, color: p.accent, textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: "8px" }}>
+        <p
+          style={{
+            fontSize: `${Math.max(7, sb - 1)}px`,
+            fontWeight: 700,
+            color: p.accent,
+            textTransform: "uppercase",
+            letterSpacing: "1.5px",
+            marginBottom: "8px",
+          }}
+        >
           {L.contacts}
         </p>
         {[
-          { icon: "✉", raw: `mailto:${personal.email}`,  display: personal.email },
-          { icon: "☎", raw: null,                          display: personal.phone },
-          { icon: "📍", raw: null,                         display: personal.location },
-          { icon: "🔗", raw: makeHref(personal.website),   display: shortenWebsite(personal.website) },
-          { icon: "in", raw: makeHref(personal.linkedin),  display: shortenLinkedIn(personal.linkedin) },
+          {
+            icon: "✉",
+            raw: `mailto:${personal.email}`,
+            display: personal.email,
+          },
+          { icon: "☎", raw: null, display: personal.phone },
+          { icon: "📍", raw: null, display: personal.location },
+          {
+            icon: "🔗",
+            raw: makeHref(personal.website),
+            display: shortenWebsite(personal.website),
+          },
+          {
+            icon: "in",
+            raw: makeHref(personal.linkedin),
+            display: shortenLinkedIn(personal.linkedin),
+          },
         ]
           .filter((x) => x.display)
           .map((item, i) => (
-            <div key={i} style={{ display: "flex", gap: "6px", alignItems: "flex-start", marginBottom: "5px" }}>
-              <span style={{ fontSize: `${sb}px`, color: p.accent, flexShrink: 0, minWidth: "14px" }}>{item.icon}</span>
-              <span style={{ fontSize: `${sb - 0.5}px`, color: p.textMuted, wordBreak: "break-word", lineHeight: 1.4 }}>
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                gap: "6px",
+                alignItems: "flex-start",
+                marginBottom: "5px",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: `${sb}px`,
+                  color: p.accent,
+                  flexShrink: 0,
+                  minWidth: "14px",
+                }}
+              >
+                {item.icon}
+              </span>
+              <span
+                style={{
+                  fontSize: `${sb - 0.5}px`,
+                  color: p.textMuted,
+                  wordBreak: "break-word",
+                  lineHeight: 1.4,
+                }}
+              >
                 {item.raw ? (
-                  <a href={item.raw} target="_blank" rel="noopener noreferrer"
-                     style={{ color: "inherit", textDecoration: "none" }}
-                     onMouseEnter={e => e.currentTarget.style.textDecoration = "underline"}
-                     onMouseLeave={e => e.currentTarget.style.textDecoration = "none"}
-                  >{item.display}</a>
-                ) : item.display}
+                  <a
+                    href={item.raw}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: "inherit", textDecoration: "none" }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.textDecoration = "underline")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.textDecoration = "none")
+                    }
+                  >
+                    {item.display}
+                  </a>
+                ) : (
+                  item.display
+                )}
               </span>
             </div>
           ))}
@@ -174,17 +242,46 @@ function DesignerSidebar({ data, p, L, fs }) {
       {/* Skills */}
       {skills.length > 0 && (
         <div>
-          <p style={{ fontSize: `${Math.max(7, sb - 1)}px`, fontWeight: 700, color: p.accent, textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: "8px" }}>
+          <p
+            style={{
+              fontSize: `${Math.max(7, sb - 1)}px`,
+              fontWeight: 700,
+              color: p.accent,
+              textTransform: "uppercase",
+              letterSpacing: "1.5px",
+              marginBottom: "8px",
+            }}
+          >
             {L.skillsShort}
           </p>
           {skills.map((cat, i) => (
             <div key={i} style={{ marginBottom: "10px" }}>
-              <p style={{ fontSize: `${Math.max(7, sb - 1.5)}px`, color: p.textMuted, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "4px" }}>
+              <p
+                style={{
+                  fontSize: `${Math.max(7, sb - 1.5)}px`,
+                  color: p.textMuted,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
+                  marginBottom: "4px",
+                }}
+              >
                 {cat.category}
               </p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "3px" }}>
                 {cat.tags.map((tag, ti) => (
-                  <span key={ti} style={{ backgroundColor: p.tagBg, border: `1px solid ${p.tagBorder}`, color: p.tagText, fontSize: `${Math.max(7, sb - 1)}px`, padding: "2px 7px", borderRadius: "20px", fontWeight: 500, lineHeight: 1.6 }}>
+                  <span
+                    key={ti}
+                    style={{
+                      backgroundColor: p.tagBg,
+                      border: `1px solid ${p.tagBorder}`,
+                      color: p.tagText,
+                      fontSize: `${Math.max(7, sb - 1)}px`,
+                      padding: "2px 7px",
+                      borderRadius: "20px",
+                      fontWeight: 500,
+                      lineHeight: 1.6,
+                    }}
+                  >
                     {tag.label}
                   </span>
                 ))}
@@ -197,13 +294,39 @@ function DesignerSidebar({ data, p, L, fs }) {
       {/* Lingue */}
       {languages.length > 0 && (
         <div>
-          <p style={{ fontSize: `${Math.max(7, sb - 1)}px`, fontWeight: 700, color: p.accent, textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: "8px" }}>
+          <p
+            style={{
+              fontSize: `${Math.max(7, sb - 1)}px`,
+              fontWeight: 700,
+              color: p.accent,
+              textTransform: "uppercase",
+              letterSpacing: "1.5px",
+              marginBottom: "8px",
+            }}
+          >
             {L.languages}
           </p>
           {languages.map((l, i) => (
             <div key={i} style={{ marginBottom: "5px" }}>
-              <p style={{ fontSize: `${sb}px`, fontWeight: 600, color: p.textPrimary }}>{l.language}</p>
-              {l.level && <p style={{ fontSize: `${Math.max(7, sb - 1)}px`, color: p.textMuted }}>{l.level}</p>}
+              <p
+                style={{
+                  fontSize: `${sb}px`,
+                  fontWeight: 600,
+                  color: p.textPrimary,
+                }}
+              >
+                {l.language}
+              </p>
+              {l.level && (
+                <p
+                  style={{
+                    fontSize: `${Math.max(7, sb - 1)}px`,
+                    color: p.textMuted,
+                  }}
+                >
+                  {translateLevel(l.level, L.lang)}
+                </p>
+              )}
             </div>
           ))}
         </div>
@@ -212,13 +335,46 @@ function DesignerSidebar({ data, p, L, fs }) {
       {/* Certificazioni */}
       {certifications.filter(Boolean).length > 0 && (
         <div>
-          <p style={{ fontSize: `${Math.max(7, sb - 1)}px`, fontWeight: 700, color: p.accent, textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: "8px" }}>
+          <p
+            style={{
+              fontSize: `${Math.max(7, sb - 1)}px`,
+              fontWeight: 700,
+              color: p.accent,
+              textTransform: "uppercase",
+              letterSpacing: "1.5px",
+              marginBottom: "8px",
+            }}
+          >
             {L.certifications}
           </p>
           {certifications.filter(Boolean).map((cert, i) => (
-            <div key={i} style={{ display: "flex", gap: "5px", marginBottom: "4px", alignItems: "flex-start" }}>
-              <span style={{ color: p.accent, fontSize: `${Math.max(7, sb - 1)}px`, flexShrink: 0 }}>✦</span>
-              <span style={{ fontSize: `${sb - 0.5}px`, color: p.textMuted, lineHeight: 1.4 }}>{cert}</span>
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                gap: "5px",
+                marginBottom: "4px",
+                alignItems: "flex-start",
+              }}
+            >
+              <span
+                style={{
+                  color: p.accent,
+                  fontSize: `${Math.max(7, sb - 1)}px`,
+                  flexShrink: 0,
+                }}
+              >
+                ✦
+              </span>
+              <span
+                style={{
+                  fontSize: `${sb - 0.5}px`,
+                  color: p.textMuted,
+                  lineHeight: 1.4,
+                }}
+              >
+                {cert}
+              </span>
             </div>
           ))}
         </div>
@@ -232,14 +388,28 @@ function DesignerContent({ data, p, L, fs }) {
   const { personal, experience, education, projects } = data;
 
   return (
-    <div style={{ flex: 1, backgroundColor: p.contentBg, padding: "28px 28px 32px" }}>
+    <div
+      style={{
+        flex: 1,
+        backgroundColor: p.contentBg,
+        padding: "28px 28px 32px",
+      }}
+    >
       {/* Sommario */}
       {personal.summary && (
         <div style={{ marginBottom: "20px" }}>
-          <SectionTitle p={p} fs={fs}>{L.profile}</SectionTitle>
+          <SectionTitle p={p} fs={fs}>
+            {L.profile}
+          </SectionTitle>
           <div
             className="rtf-preview"
-            style={{ "--rtf-accent": p.accent, fontSize: `${fs.body}px`, lineHeight: 1.7, color: p.contentText, fontFamily: "system-ui, sans-serif" }}
+            style={{
+              "--rtf-accent": p.accent,
+              fontSize: `${fs.body}px`,
+              lineHeight: 1.7,
+              color: p.contentText,
+              fontFamily: "system-ui, sans-serif",
+            }}
             dangerouslySetInnerHTML={{ __html: personal.summary }}
           />
         </div>
@@ -248,26 +418,65 @@ function DesignerContent({ data, p, L, fs }) {
       {/* Esperienza */}
       {experience.length > 0 && (
         <div style={{ marginBottom: "20px" }}>
-          <SectionTitle p={p} fs={fs}>{L.experienceShort}</SectionTitle>
+          <SectionTitle p={p} fs={fs}>
+            {L.experienceShort}
+          </SectionTitle>
           {experience.map((exp) => (
             <div key={exp.id} style={{ marginBottom: "14px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "2px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  marginBottom: "2px",
+                }}
+              >
                 <div>
-                  <p style={{ fontSize: `${fs.body + 1}px`, fontWeight: 700, color: p.contentText, fontFamily: p.headerFont }}>
+                  <p
+                    style={{
+                      fontSize: `${fs.body + 1}px`,
+                      fontWeight: 700,
+                      color: p.contentText,
+                      fontFamily: p.headerFont,
+                    }}
+                  >
                     {exp.role}
                   </p>
-                  <p style={{ fontSize: `${fs.body - 0.5}px`, color: p.accent, fontWeight: 600, marginTop: "1px" }}>
-                    {exp.company}{exp.location ? ` · ${exp.location}` : ""}
+                  <p
+                    style={{
+                      fontSize: `${fs.body - 0.5}px`,
+                      color: p.accent,
+                      fontWeight: 600,
+                      marginTop: "1px",
+                    }}
+                  >
+                    {exp.company}
+                    {exp.location ? ` · ${exp.location}` : ""}
                   </p>
                 </div>
-                <span style={{ fontSize: `${Math.max(7, fs.body - 1.5)}px`, color: p.contentMuted, whiteSpace: "nowrap", marginLeft: "10px", marginTop: "2px" }}>
+                <span
+                  style={{
+                    fontSize: `${Math.max(7, fs.body - 1.5)}px`,
+                    color: p.contentMuted,
+                    whiteSpace: "nowrap",
+                    marginLeft: "10px",
+                    marginTop: "2px",
+                  }}
+                >
                   {formatDate(exp.startDate, L)} – {formatDate(exp.endDate, L)}
                 </span>
               </div>
               {exp.description && (
                 <div
                   className="rtf-preview"
-                  style={{ "--rtf-accent": p.accent, fontSize: `${fs.body}px`, lineHeight: 1.6, color: p.contentText, fontFamily: "system-ui, sans-serif", marginTop: "5px" }}
+                  style={{
+                    "--rtf-accent": p.accent,
+                    fontSize: `${fs.body}px`,
+                    lineHeight: 1.6,
+                    color: p.contentText,
+                    fontFamily: "system-ui, sans-serif",
+                    marginTop: "5px",
+                  }}
                   dangerouslySetInnerHTML={{ __html: exp.description }}
                 />
               )}
@@ -279,24 +488,61 @@ function DesignerContent({ data, p, L, fs }) {
       {/* Formazione */}
       {education.length > 0 && (
         <div style={{ marginBottom: "20px" }}>
-          <SectionTitle p={p} fs={fs}>{L.education}</SectionTitle>
+          <SectionTitle p={p} fs={fs}>
+            {L.education}
+          </SectionTitle>
           {education.map((edu) => (
             <div key={edu.id} style={{ marginBottom: "10px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                }}
+              >
                 <div>
-                  <p style={{ fontSize: `${fs.body + 1}px`, fontWeight: 700, color: p.contentText, fontFamily: p.headerFont }}>
-                    {edu.degree}{edu.field ? ` in ${edu.field}` : ""}
+                  <p
+                    style={{
+                      fontSize: `${fs.body + 1}px`,
+                      fontWeight: 700,
+                      color: p.contentText,
+                      fontFamily: p.headerFont,
+                    }}
+                  >
+                    {edu.degree}
+                    {edu.field ? ` in ${edu.field}` : ""}
                   </p>
-                  <p style={{ fontSize: `${fs.body - 0.5}px`, color: p.contentMuted, marginTop: "1px" }}>
-                    {edu.institution}{edu.grade ? ` · ${edu.grade}` : ""}
+                  <p
+                    style={{
+                      fontSize: `${fs.body - 0.5}px`,
+                      color: p.contentMuted,
+                      marginTop: "1px",
+                    }}
+                  >
+                    {edu.institution}
+                    {edu.grade ? ` · ${edu.grade}` : ""}
                   </p>
                 </div>
-                <span style={{ fontSize: `${Math.max(7, fs.body - 1.5)}px`, color: p.contentMuted, whiteSpace: "nowrap", marginLeft: "10px" }}>
+                <span
+                  style={{
+                    fontSize: `${Math.max(7, fs.body - 1.5)}px`,
+                    color: p.contentMuted,
+                    whiteSpace: "nowrap",
+                    marginLeft: "10px",
+                  }}
+                >
                   {formatDate(edu.startDate, L)} – {formatDate(edu.endDate, L)}
                 </span>
               </div>
               {edu.thesis && (
-                <p style={{ fontSize: `${Math.max(7, fs.body - 1)}px`, color: p.contentMuted, fontStyle: "italic", marginTop: "3px" }}>
+                <p
+                  style={{
+                    fontSize: `${Math.max(7, fs.body - 1)}px`,
+                    color: p.contentMuted,
+                    fontStyle: "italic",
+                    marginTop: "3px",
+                  }}
+                >
                   {L.thesis}: {edu.thesis}
                 </p>
               )}
@@ -306,32 +552,122 @@ function DesignerContent({ data, p, L, fs }) {
       )}
 
       {/* Progetti */}
-      {projects.filter(Boolean).length > 0 && (
-        <div>
-          <SectionTitle p={p} fs={fs}>{L.projects}</SectionTitle>
-          {projects.filter(Boolean).map((proj, i) => (
-            <div key={i} style={{ display: "flex", gap: "7px", marginBottom: "5px", alignItems: "flex-start" }}>
-              <span style={{ color: p.accent, flexShrink: 0, fontWeight: 700 }}>{p.bulletChar}</span>
-              <span style={{ fontSize: `${fs.body}px`, color: p.contentText, lineHeight: 1.6 }}>{proj}</span>
-            </div>
-          ))}
-        </div>
-      )}
+      {(() => {
+        const norm = (item) => {
+          if (typeof item === "string")
+            return { title: item, description: "", url: "" };
+          if (item.text !== undefined)
+            return { title: item.text, description: "", url: item.url || "" };
+          return item;
+        };
+        const items = projects
+          .map(norm)
+          .filter((item) => item.title || item.description);
+        if (items.length === 0) return null;
+        return (
+          <div>
+            <SectionTitle p={p} fs={fs}>
+              {L.projects}
+            </SectionTitle>
+            {items.map((proj, i) => (
+              <div key={i} style={{ marginBottom: "7px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "7px",
+                    alignItems: "baseline",
+                  }}
+                >
+                  <span
+                    style={{ color: p.accent, flexShrink: 0, fontWeight: 700 }}
+                  >
+                    {p.bulletChar}
+                  </span>
+                  <span>
+                    {proj.title && (
+                      <span
+                        style={{
+                          fontSize: `${fs.body}px`,
+                          color: p.contentText,
+                          fontWeight: 700,
+                          lineHeight: 1.6,
+                        }}
+                      >
+                        {proj.title}
+                      </span>
+                    )}
+                    {proj.url && (
+                      <a
+                        href={
+                          proj.url.startsWith("http")
+                            ? proj.url
+                            : `https://${proj.url}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: "inline",
+                          fontSize: `${fs.small ?? fs.body - 1}px`,
+                          color: p.accent,
+                          textDecoration: "none",
+                          marginLeft: "6px",
+                        }}
+                      >
+                        {proj.url}
+                      </a>
+                    )}
+                  </span>
+                </div>
+                {proj.description && (
+                  <div
+                    className="rtf-preview"
+                    style={{
+                      "--rtf-accent": p.accent,
+                      fontSize: `${fs.body}px`,
+                      color: p.contentText,
+                      paddingLeft: "14px",
+                    }}
+                    dangerouslySetInnerHTML={{ __html: proj.description }}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        );
+      })()}
     </div>
   );
 }
 
 // ─── Componente principale ────────────────────────────────────────────────────
-export function CreativeDesigner({ data, palette = "noir-gold", customColors = {}, customFontSizes = {}, locale }) {
+export const CreativeDesigner = memo(function CreativeDesigner({
+  data,
+  palette = "noir-gold",
+  customColors = {},
+  customFontSizes = {},
+  locale,
+}) {
   const baseP = PALETTES[palette] || PALETTES["noir-gold"];
-  const p  = { ...baseP, ...customColors };
+  const p = { ...baseP, ...customColors };
   const fs = { ...FS_DEFAULT, ...customFontSizes };
-  const L  = locale || getLocale("IT");
+  const L = locale || getCVLocale("IT");
 
   return (
-    <div style={{ width: "100%", backgroundColor: p.bg, fontFamily: "system-ui, sans-serif" }}>
+    <div
+      style={{
+        width: "100%",
+        backgroundColor: p.bg,
+        fontFamily: "system-ui, sans-serif",
+      }}
+    >
       {/* Header */}
-      <div style={{ backgroundColor: p.bg, padding: "32px 32px 24px", borderBottom: `3px solid ${p.accent}` }}>
+      <div
+        style={{
+          backgroundColor: p.bg,
+          padding: "32px 32px 24px",
+          borderBottom: `3px solid ${p.accent}`,
+        }}
+      >
         <h1
           style={{
             fontFamily: p.headerFont,
@@ -345,8 +681,17 @@ export function CreativeDesigner({ data, palette = "noir-gold", customColors = {
         >
           {data.personal.name || "Il tuo nome"}
         </h1>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "8px" }}>
-          <div style={{ width: "32px", height: "2px", backgroundColor: p.accent }} />
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            marginTop: "8px",
+          }}
+        >
+          <div
+            style={{ width: "32px", height: "2px", backgroundColor: p.accent }}
+          />
           <p
             style={{
               fontFamily: "system-ui, sans-serif",
@@ -368,6 +713,25 @@ export function CreativeDesigner({ data, palette = "noir-gold", customColors = {
         <DesignerSidebar data={data} p={p} L={L} fs={fs} />
         <DesignerContent data={data} p={p} L={L} fs={fs} />
       </div>
+
+      {/* Note — sezione full-width in fondo */}
+      {data.note && (
+        <div style={{ padding: "0 32px 28px" }}>
+          <SectionTitle p={p} fs={fs}>
+            {L.notes}
+          </SectionTitle>
+          <div
+            className="rtf-preview"
+            style={{
+              "--rtf-accent": p.accent,
+              fontSize: `${fs.body}px`,
+              color: p.textPrimary,
+              lineHeight: "1.7",
+            }}
+            dangerouslySetInnerHTML={{ __html: data.note }}
+          />
+        </div>
+      )}
     </div>
   );
-}
+});

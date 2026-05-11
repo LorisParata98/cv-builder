@@ -1,37 +1,64 @@
 import { useRef, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { DotsSixVertical, Lightning, Wrench } from "@phosphor-icons/react";
 import { useCVStore } from "../../store/useCVStore";
 import { SectionCard } from "../ui/SectionCard";
 import { generateAtsKeywords } from "../../data/frameworkVersions";
 import { ATS_KEYWORDS } from "../../data/atsKeywords";
-import { useEditorLabels } from "../../locales/editorLabels";
+import { useTranslation } from "react-i18next";
 
 // ─── InfoTooltip ─────────────────────────────────────────────────────────────
+// Portal-based: bypasses overflow-hidden/overflow-y-auto on all ancestor containers
 function InfoTooltip({ text, variant = "gray" }) {
   const colors = variant === "green"
     ? "border-green-600 text-green-700"
     : "border-gray-400 text-gray-400";
+  const [visible, setVisible] = useState(false);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+  const triggerRef = useRef(null);
+
+  const show = () => {
+    if (triggerRef.current) {
+      const r = triggerRef.current.getBoundingClientRect();
+      setPos({ top: r.top - 10, left: r.left + r.width / 2 });
+    }
+    setVisible(true);
+  };
+
   return (
-    <div
-      className="relative group/tip flex-shrink-0"
-      onClick={(e) => e.stopPropagation()}
-    >
+    <div className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
       <span
+        ref={triggerRef}
+        onMouseEnter={show}
+        onMouseLeave={() => setVisible(false)}
         className={`inline-flex items-center justify-center w-3.5 h-3.5 rounded-full border ${colors} text-[9px] font-bold cursor-default select-none leading-none`}
       >
         ?
       </span>
-      <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 leading-relaxed opacity-0 group-hover/tip:opacity-100 pointer-events-none z-50 transition-opacity shadow-xl">
-        {text}
-        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
-      </div>
+      {visible && createPortal(
+        <div
+          style={{
+            position: "fixed",
+            top: pos.top,
+            left: pos.left,
+            transform: "translate(-50%, -100%)",
+            zIndex: 9999,
+            pointerEvents: "none",
+          }}
+          className="w-56 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 leading-relaxed shadow-xl"
+        >
+          {text}
+          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+        </div>,
+        document.body
+      )}
     </div>
   );
 }
 
 function AtsHintsPanel({ template }) {
   const [open, setOpen] = useState(false);
-  const { skills: L } = useEditorLabels();
+  const { t } = useTranslation();
   const keywords = ATS_KEYWORDS[template] || ATS_KEYWORDS.tech;
   const profileLabel = { tech: "Tech", manager: "Manager", designer: "Designer" }[template] || "Tech";
 
@@ -43,14 +70,14 @@ function AtsHintsPanel({ template }) {
       >
         <span className="text-xs font-semibold text-green-800 flex items-center gap-2">
           <Lightning size={13} weight="fill" className="text-green-700" />
-          {L.atsHintTitle} {profileLabel}
-          <InfoTooltip text={L.atsTooltip} variant="green" />
+          {t("editor.skills.atsHintTitle")} {profileLabel}
+          <InfoTooltip text={t("editor.skills.atsTooltip")} variant="green" />
         </span>
         <span className="text-green-600 text-xs">{open ? "▲" : "▼"}</span>
       </button>
       {open && (
         <div className="px-3 py-3 bg-white">
-          <p className="text-xs text-gray-500 mb-2">{L.atsHintBody}</p>
+          <p className="text-xs text-gray-500 mb-2">{t("editor.skills.atsHintBody")}</p>
           <div className="flex flex-wrap gap-1">
             {keywords.map((kw, i) => (
               <span key={i} className="text-xs bg-green-50 border border-green-300 text-green-800 px-2 py-0.5 rounded-full">
@@ -65,8 +92,8 @@ function AtsHintsPanel({ template }) {
 }
 
 // ─── TagEditor: chip (view) ↔ form (edit) ─────────────────────────────────────
-function TagEditor({ tag, isEditing, onStartEdit, onStopEdit, onUpdate, onRemove }) {
-  const { skills: L } = useEditorLabels();
+function TagEditor({ tag, isEditing, onStartEdit, onStopEdit, onUpdate, onRemove, chipDragProps }) {
+  const { t } = useTranslation();
   const [showAts, setShowAts] = useState(false);
   const nameRef = useRef(null);
 
@@ -95,8 +122,9 @@ function TagEditor({ tag, isEditing, onStartEdit, onStopEdit, onUpdate, onRemove
     return (
       <div
         onClick={onStartEdit}
+        {...(chipDragProps || {})}
         className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-gray-200 bg-white hover:bg-blue-50 hover:border-blue-300 cursor-pointer group transition-colors"
-        title={L.editSkill || "Modifica"}
+        title={t("editor.skills.editSkill")}
       >
         <span className="text-xs font-medium text-gray-700 leading-tight">
           {tag.label || "…"}
@@ -107,7 +135,7 @@ function TagEditor({ tag, isEditing, onStartEdit, onStopEdit, onUpdate, onRemove
         {(tag.atsKeywords || []).length > 0 && (
           <span
             className="w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0"
-            title={L.hasAts || "Ha keyword ATS"}
+            title={t("editor.skills.hasAts")}
           />
         )}
         <button
@@ -131,7 +159,7 @@ function TagEditor({ tag, isEditing, onStartEdit, onStopEdit, onUpdate, onRemove
           value={tag.label}
           onChange={(e) => onUpdate({ label: e.target.value })}
           onKeyDown={(e) => { if (e.key === "Enter" || e.key === "Escape") handleDone(); }}
-          placeholder={L.skillPh}
+          placeholder={t("editor.skills.skillPh")}
           className="flex-1 min-w-0 border border-gray-300 rounded px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
         />
         <button
@@ -144,7 +172,7 @@ function TagEditor({ tag, isEditing, onStartEdit, onStopEdit, onUpdate, onRemove
         <button
           onClick={onRemove}
           className="text-xs w-7 h-7 flex items-center justify-center text-gray-400 hover:text-red-500 flex-shrink-0"
-          title={L.removeSkill}
+          title={t("editor.skills.removeSkill")}
         >
           ✕
         </button>
@@ -157,7 +185,7 @@ function TagEditor({ tag, isEditing, onStartEdit, onStopEdit, onUpdate, onRemove
           value={tag.versionsRange || ""}
           onChange={(e) => onUpdate({ versionsRange: e.target.value || null })}
           onKeyDown={(e) => { if (e.key === "Escape") handleDone(); }}
-          placeholder={L.versionPh}
+          placeholder={t("editor.skills.versionPh")}
           className="flex-1 min-w-0 border border-gray-300 rounded px-2 py-1.5 text-xs text-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
         />
         <button
@@ -177,14 +205,14 @@ function TagEditor({ tag, isEditing, onStartEdit, onStopEdit, onUpdate, onRemove
         <div className="mt-2 pt-2 border-t border-blue-100">
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs text-gray-500 font-medium flex items-center gap-1">
-              {L.atsKeywords}
-              <InfoTooltip text={L.atsTooltip} />
+              {t("editor.skills.atsKeywords")}
+              <InfoTooltip text={t("editor.skills.atsTooltip")} />
             </span>
             <button
               onClick={handleAutoGenerate}
               className="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 border border-blue-200 rounded hover:bg-blue-100"
             >
-              {L.autoGenerate}
+              {t("editor.skills.autoGenerate")}
             </button>
           </div>
           <div className="flex flex-wrap gap-1 mb-1">
@@ -202,7 +230,7 @@ function TagEditor({ tag, isEditing, onStartEdit, onStopEdit, onUpdate, onRemove
           </div>
           <input
             type="text"
-            placeholder={L.addKeywordPh}
+            placeholder={t("editor.skills.addKeywordPh")}
             className="w-full border border-gray-300 rounded px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
             onKeyDown={(e) => {
               if (e.key === "Enter" && e.target.value.trim()) {
@@ -211,7 +239,7 @@ function TagEditor({ tag, isEditing, onStartEdit, onStopEdit, onUpdate, onRemove
               }
             }}
           />
-          <p className="text-xs text-gray-400 mt-1">{L.atsInvisible}</p>
+          <p className="text-xs text-gray-400 mt-1">{t("editor.skills.atsInvisible")}</p>
         </div>
       )}
     </div>
@@ -219,10 +247,14 @@ function TagEditor({ tag, isEditing, onStartEdit, onStopEdit, onUpdate, onRemove
 }
 
 // ─── CategoryEditor ───────────────────────────────────────────────────────────
-function CategoryEditor({ category, index, isDragOver, dragHandleProps, onUpdateCategory, onRemoveCategory, onAddTag, onRemoveTag, onUpdateTag }) {
-  const { skills: L, common: LC } = useEditorLabels();
+function CategoryEditor({ category, index, isDragOver, dragHandleProps, onUpdateCategory, onRemoveCategory, onAddTag, onRemoveTag, onUpdateTag, onReorderTags, onMoveTag }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(true);
   const [editingIndex, setEditingIndex] = useState(null);
+  const tagDragIndex = useRef(null);
+  const [tagDragOver, setTagDragOver] = useState(null);
+  const [tagDragSrc, setTagDragSrc] = useState(null);
+  const [foreignDragOver, setForeignDragOver] = useState(false);
 
   const handleAddTag = () => {
     const newIndex = category.tags.length;
@@ -246,7 +278,7 @@ function CategoryEditor({ category, index, isDragOver, dragHandleProps, onUpdate
       <div className="flex items-center gap-2 bg-gray-50 px-3 py-2.5 border-b border-gray-200">
         <span
           {...dragHandleProps}
-          title={LC.dragToReorder}
+          title={t("editor.common.dragToReorder")}
           className="text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing flex-shrink-0 select-none flex items-center"
         >
           <DotsSixVertical size={18} weight="bold" />
@@ -255,7 +287,7 @@ function CategoryEditor({ category, index, isDragOver, dragHandleProps, onUpdate
           type="text"
           value={category.category}
           onChange={(e) => onUpdateCategory(index, { category: e.target.value })}
-          placeholder={L.categoryPh}
+          placeholder={t("editor.skills.categoryPh")}
           className="flex-1 min-w-0 bg-transparent border-none text-sm font-semibold text-gray-800 focus:outline-none"
         />
         {!open && tagCount > 0 && (
@@ -275,10 +307,24 @@ function CategoryEditor({ category, index, isDragOver, dragHandleProps, onUpdate
       {open && (
         <div className="p-3">
           {/* Chips row */}
-          <div className="flex flex-wrap gap-1.5 mb-2">
+          <div
+            className={`flex flex-wrap gap-1.5 mb-2 rounded transition-colors ${foreignDragOver ? "bg-blue-50 outline outline-2 outline-blue-300" : ""}`}
+            onDragOver={(e) => {
+              if (!e.dataTransfer.types.includes("cv-tag")) return;
+              e.preventDefault();
+              setForeignDragOver(true);
+            }}
+            onDrop={(e) => {
+              const raw = e.dataTransfer.getData("cv-tag");
+              if (!raw) return;
+              const { catIndex: fromCat, tagIndex: fromTag } = JSON.parse(raw);
+              if (fromCat !== index) onMoveTag(fromCat, fromTag, index, -1);
+              setForeignDragOver(false); setTagDragOver(null);
+            }}
+            onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setForeignDragOver(false); }}
+          >
             {category.tags.map((tag, ti) =>
               editingIndex === ti ? (
-                // Edit mode: occupa riga intera
                 <TagEditor
                   key={ti}
                   tag={tag}
@@ -289,7 +335,6 @@ function CategoryEditor({ category, index, isDragOver, dragHandleProps, onUpdate
                   onRemove={() => handleRemoveTag(ti)}
                 />
               ) : (
-                // Chip mode
                 <TagEditor
                   key={ti}
                   tag={tag}
@@ -298,6 +343,14 @@ function CategoryEditor({ category, index, isDragOver, dragHandleProps, onUpdate
                   onStopEdit={handleStopEdit}
                   onUpdate={(u) => onUpdateTag(index, ti, u)}
                   onRemove={() => handleRemoveTag(ti)}
+                  chipDragProps={{
+                    draggable: true,
+                    onDragStart: (e) => { e.stopPropagation(); e.dataTransfer.setData("cv-tag", JSON.stringify({ catIndex: index, tagIndex: ti })); tagDragIndex.current = ti; setTagDragSrc(ti); },
+                    onDragOver:  (e) => { e.preventDefault(); e.stopPropagation(); setForeignDragOver(false); setTagDragOver(ti); },
+                    onDrop:      (e) => { e.stopPropagation(); const raw = e.dataTransfer.getData("cv-tag"); if (!raw) return; const { catIndex: fromCat, tagIndex: fromTag } = JSON.parse(raw); if (fromCat === index) { onReorderTags(index, fromTag, ti); } else { onMoveTag(fromCat, fromTag, index, ti); } setTagDragOver(null); setTagDragSrc(null); setForeignDragOver(false); tagDragIndex.current = null; },
+                    onDragEnd:   (e) => { e.stopPropagation(); setTagDragOver(null); setTagDragSrc(null); setForeignDragOver(false); tagDragIndex.current = null; },
+                    style: tagDragOver === ti && tagDragSrc !== ti ? { outline: "2px solid #3b82f6", outlineOffset: 1 } : undefined,
+                  }}
                 />
               )
             )}
@@ -307,7 +360,7 @@ function CategoryEditor({ category, index, isDragOver, dragHandleProps, onUpdate
             onClick={handleAddTag}
             className="w-full text-xs py-2 border border-dashed border-blue-300 text-blue-500 rounded hover:bg-blue-50 transition-colors"
           >
-            {L.addSkill}
+            {t("editor.skills.addSkill")}
           </button>
         </div>
       )}
@@ -326,11 +379,14 @@ export function SkillsForm() {
   const addSkillTag        = useCVStore((s) => s.addSkillTag);
   const removeSkillTag     = useCVStore((s) => s.removeSkillTag);
   const updateSkillTag     = useCVStore((s) => s.updateSkillTag);
-  const { skills: L } = useEditorLabels();
+  const reorderSkillTags   = useCVStore((s) => s.reorderSkillTags);
+  const moveSkillTag       = useCVStore((s) => s.moveSkillTag);
+  const { t } = useTranslation();
 
   const dragIndex  = useRef(null);
   const canDragRef = useRef(false);
   const [dragOver, setDragOver] = useState(null);
+  const [dragSrc, setDragSrc]   = useState(null);
 
   const reorder = (from, to) => {
     if (from === to || from === null) return;
@@ -341,21 +397,21 @@ export function SkillsForm() {
   };
 
   return (
-    <SectionCard title={L.title} icon={<Wrench size={15} weight="duotone" />}>
+    <SectionCard title={t("editor.skills.title")} icon={<Wrench size={15} weight="duotone" />}>
       <AtsHintsPanel template={template} />
       {skills.map((cat, i) => (
         <div
           key={i}
           draggable
-          onDragStart={(e) => { if (!canDragRef.current) { e.preventDefault(); return; } dragIndex.current = i; }}
+          onDragStart={(e) => { if (!canDragRef.current) { e.preventDefault(); return; } dragIndex.current = i; setDragSrc(i); }}
           onDragOver={(e) => { e.preventDefault(); setDragOver(i); }}
-          onDrop={() => { reorder(dragIndex.current, i); setDragOver(null); dragIndex.current = null; }}
-          onDragEnd={() => { canDragRef.current = false; setDragOver(null); dragIndex.current = null; }}
+          onDrop={() => { reorder(dragIndex.current, i); setDragOver(null); setDragSrc(null); dragIndex.current = null; }}
+          onDragEnd={() => { canDragRef.current = false; setDragOver(null); setDragSrc(null); dragIndex.current = null; }}
         >
           <CategoryEditor
             category={cat}
             index={i}
-            isDragOver={dragOver === i && dragIndex.current !== i}
+            isDragOver={dragOver === i && dragSrc !== i}
             dragHandleProps={{
               onMouseDown: () => { canDragRef.current = true; },
               onMouseUp:   () => { canDragRef.current = false; },
@@ -365,6 +421,8 @@ export function SkillsForm() {
             onAddTag={addSkillTag}
             onRemoveTag={removeSkillTag}
             onUpdateTag={updateSkillTag}
+            onReorderTags={reorderSkillTags}
+            onMoveTag={moveSkillTag}
           />
         </div>
       ))}
@@ -372,7 +430,7 @@ export function SkillsForm() {
         onClick={() => addSkillCategory()}
         className="w-full text-sm py-2 border-2 border-dashed border-gray-300 text-gray-500 rounded-lg hover:border-blue-400 hover:text-blue-500 transition-colors"
       >
-        {L.addCategory}
+        {t("editor.skills.addCategory")}
       </button>
     </SectionCard>
   );

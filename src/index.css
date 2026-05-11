@@ -38,7 +38,15 @@ body {
 .rtf-editor-wrapper .ProseMirror ul,
 .rtf-editor-wrapper .ProseMirror ol {
   padding-left: 20px;
-  margin: 2px 0;
+  margin: 4px 0;
+}
+
+.rtf-editor-wrapper .ProseMirror ul {
+  list-style-type: disc;
+}
+
+.rtf-editor-wrapper .ProseMirror ol {
+  list-style-type: decimal;
 }
 
 .rtf-editor-wrapper .ProseMirror li {

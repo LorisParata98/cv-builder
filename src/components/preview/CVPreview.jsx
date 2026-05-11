@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getLocale } from "../../locales/index.js";
+import { getCVLocale } from "../../utils/cvLocales.js";
 import { useCVStore } from "../../store/useCVStore";
 import { TechDeveloper } from "./templates/TechDeveloper";
 import { ManagerialExec } from "./templates/ManagerialExec";
@@ -139,7 +139,7 @@ export function CVPreview() {
   const customColors = (customPalettes && customPalettes[template]) || {};
   const customFontSizes =
     (customFontSizesAll && customFontSizesAll[template]) || {};
-  const locale = getLocale(targetLanguage);
+  const locale = getCVLocale(targetLanguage);
 
   // Zoom state locale — non serve persistenza nello store
   const [zoomIndex, setZoomIndex] = useState(

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useShallow } from "zustand/react/shallow";
 import { useCVStore } from "../../store/useCVStore";
 
 // ─── Palette per template ────────────────────────────────────────────────────
@@ -341,10 +342,15 @@ function CoverLetterDocument({ data, colors }) {
 
 // ─── Export ───────────────────────────────────────────────────────────────────
 export function CoverLetterPreview() {
-  const template = useCVStore((s) => s.template);
+  const template        = useCVStore((s) => s.template);
   const designerPalette = useCVStore((s) => s.designerPalette);
-  const customPalettes = useCVStore((s) => s.customPalettes);
-  const data = useCVStore((s) => s);
+  const customPalettes  = useCVStore((s) => s.customPalettes);
+  const data = useCVStore(
+    useShallow((s) => ({
+      personal:    s.personal,
+      coverLetter: s.coverLetter,
+    }))
+  );
 
   const customColors = (customPalettes && customPalettes[template]) || {};
   const colors = getTemplateColors(template, designerPalette, customColors);

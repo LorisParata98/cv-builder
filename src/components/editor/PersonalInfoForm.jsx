@@ -1,13 +1,14 @@
 import { useRef, useCallback } from "react";
 import { User, ArrowsOutCardinal } from "@phosphor-icons/react";
+import { useTranslation } from "react-i18next";
 import { useCVStore } from "../../store/useCVStore";
 import { SectionCard } from "../ui/SectionCard";
 import { RichTextEditor } from "../ui/RichTextEditor";
-import { useEditorLabels } from "../../locales/editorLabels";
 
 const CIRCLE_PX = 96;
 
-function PhotoPositioner({ photo, position, onChange, L }) {
+function PhotoPositioner({ photo, position, onChange }) {
+  const { t } = useTranslation();
   const dragging   = useRef(false);
   const lastClient = useRef({ x: 0, y: 0 });
   const posRef     = useRef(position);
@@ -49,7 +50,7 @@ function PhotoPositioner({ photo, position, onChange, L }) {
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
       <div
         onMouseDown={handleMouseDown}
-        title={L.photoTitle}
+        title={t("editor.personal.photoTitle")}
         style={{
           width:        CIRCLE_PX,
           height:       CIRCLE_PX,
@@ -88,7 +89,7 @@ function PhotoPositioner({ photo, position, onChange, L }) {
         </div>
       </div>
       <span style={{ fontSize: 10, color: "#9ca3af", lineHeight: 1.3, textAlign: "center" }}>
-        {L.photoDragHint}
+        {t("editor.personal.photoDragHint")}
       </span>
     </div>
   );
@@ -114,20 +115,32 @@ function Field({ label, value, onChange, type = "text", placeholder = "" }) {
 export function PersonalInfoForm() {
   const personal    = useCVStore((s) => s.personal);
   const setPersonal = useCVStore((s) => s.setPersonal);
-  const { personal: L, common: LC } = useEditorLabels();
+  const { t } = useTranslation();
 
   const handlePhotoUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) return;
     if (file.size > 2 * 1024 * 1024) {
-      alert(L.photoTooBig);
+      alert(t("editor.personal.photoTooBig"));
       return;
     }
-    const reader = new FileReader();
-    reader.onload = (ev) =>
-      setPersonal({ photo: ev.target.result, photoPosition: { x: 50, y: 50 } });
-    reader.readAsDataURL(file);
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      const MAX = 400;
+      const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement("canvas");
+      canvas.width  = w;
+      canvas.height = h;
+      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+      const compressed = canvas.toDataURL("image/jpeg", 0.82);
+      setPersonal({ photo: compressed, photoPosition: { x: 50, y: 50 } });
+    };
+    img.src = objectUrl;
   };
 
   const handlePositionChange = useCallback((newPos) => {
@@ -135,14 +148,13 @@ export function PersonalInfoForm() {
   }, [setPersonal]);
 
   return (
-    <SectionCard title={L.title} icon={<User size={15} weight="duotone" />}>
+    <SectionCard title={t("editor.personal.title")} icon={<User size={15} weight="duotone" />}>
       <div className="flex items-center gap-4 mb-6">
         {personal.photo ? (
           <PhotoPositioner
             photo={personal.photo}
             position={personal.photoPosition || { x: 50, y: 50 }}
             onChange={handlePositionChange}
-            L={L}
           />
         ) : (
           <div className="w-16 h-16 rounded-full bg-gray-200 overflow-hidden flex-shrink-0 border-2 border-gray-300 flex items-center justify-center text-gray-400">
@@ -152,7 +164,7 @@ export function PersonalInfoForm() {
 
         <div className="flex flex-col gap-1">
           <label className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-xs font-medium text-gray-700 rounded cursor-pointer border border-gray-300 text-center">
-            {personal.photo ? L.changePhoto : L.uploadPhoto}
+            {personal.photo ? t("editor.personal.changePhoto") : t("editor.personal.uploadPhoto")}
             <input
               type="file"
               accept="image/*"
@@ -165,28 +177,28 @@ export function PersonalInfoForm() {
               onClick={() => setPersonal({ photo: null, photoPosition: { x: 50, y: 50 } })}
               className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-xs font-medium text-red-600 rounded border border-red-200"
             >
-              {L.removePhoto}
+              {t("editor.personal.removePhoto")}
             </button>
           )}
         </div>
       </div>
 
-      <Field label={L.fullName}  value={personal.name}     onChange={(v) => setPersonal({ name: v })}     placeholder={L.fullNamePh} />
-      <Field label={L.jobTitle}  value={personal.title}    onChange={(v) => setPersonal({ title: v })}    placeholder={L.jobTitlePh} />
-      <Field label={L.email}     value={personal.email}    onChange={(v) => setPersonal({ email: v })}    type="email" placeholder={L.emailPh} />
-      <Field label={L.phone}     value={personal.phone}    onChange={(v) => setPersonal({ phone: v })}    placeholder={L.phonePh} />
-      <Field label={L.location}  value={personal.location} onChange={(v) => setPersonal({ location: v })} placeholder={L.locationPh} />
-      <Field label={L.website}   value={personal.website}  onChange={(v) => setPersonal({ website: v })}  placeholder={L.websitePh} />
-      <Field label={L.linkedin}  value={personal.linkedin} onChange={(v) => setPersonal({ linkedin: v })} placeholder={L.linkedinPh} />
+      <Field label={t("editor.personal.fullName")}  value={personal.name}     onChange={(v) => setPersonal({ name: v })}     placeholder={t("editor.personal.fullNamePh")} />
+      <Field label={t("editor.personal.jobTitle")}  value={personal.title}    onChange={(v) => setPersonal({ title: v })}    placeholder={t("editor.personal.jobTitlePh")} />
+      <Field label={t("editor.personal.email")}     value={personal.email}    onChange={(v) => setPersonal({ email: v })}    type="email" placeholder={t("editor.personal.emailPh")} />
+      <Field label={t("editor.personal.phone")}     value={personal.phone}    onChange={(v) => setPersonal({ phone: v })}    placeholder={t("editor.personal.phonePh")} />
+      <Field label={t("editor.personal.location")}  value={personal.location} onChange={(v) => setPersonal({ location: v })} placeholder={t("editor.personal.locationPh")} />
+      <Field label={t("editor.personal.website")}   value={personal.website}  onChange={(v) => setPersonal({ website: v })}  placeholder={t("editor.personal.websitePh")} />
+      <Field label={t("editor.personal.linkedin")}  value={personal.linkedin} onChange={(v) => setPersonal({ linkedin: v })} placeholder={t("editor.personal.linkedinPh")} />
 
       <div className="mb-4">
         <label className="block text-xs font-medium text-gray-600 mb-1.5">
-          {L.summary}
+          {t("editor.personal.summary")}
         </label>
         <RichTextEditor
           value={personal.summary}
           onChange={(html) => setPersonal({ summary: html })}
-          placeholder={L.summaryPh}
+          placeholder={t("editor.personal.summaryPh")}
           minHeight={90}
         />
       </div>

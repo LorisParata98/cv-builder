@@ -4,11 +4,11 @@ export function SectionCard({ title, icon, children, defaultOpen = true }) {
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="border border-gray-200 rounded-lg overflow-hidden mb-3">
+    <div className="border border-gray-200 rounded-lg mb-3">
       {/* Header collassabile */}
       <button
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
+        className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors text-left rounded-t-lg"
       >
         <span className="flex items-center gap-2 text-sm font-semibold text-gray-800">
           {icon && <span className="text-base">{icon}</span>}
@@ -19,7 +19,7 @@ export function SectionCard({ title, icon, children, defaultOpen = true }) {
 
       {/* Contenuto */}
       {open && (
-        <div className="px-4 py-5 bg-white">
+        <div className="px-4 py-5 bg-white rounded-b-lg">
           {children}
         </div>
       )}

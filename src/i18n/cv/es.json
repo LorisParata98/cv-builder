@@ -1,0 +1,25 @@
+{
+  "profile":          "Perfil",
+  "skills":           "Competencias técnicas",
+  "skillsShort":      "Competencias",
+  "experience":       "Experiencia profesional",
+  "experienceShort":  "Experiencia",
+  "education":        "Formación",
+  "certifications":   "Certificaciones",
+  "languages":        "Idiomas",
+  "projects":         "Proyectos",
+  "notes":            "Notas",
+  "contacts":         "Contacto",
+  "present":          "Presente",
+  "thesis":           "Tesis",
+  "months": ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"],
+  "levels": {
+    "native": "Lengua materna",
+    "c2": "C2 – Maestría",
+    "c1": "C1 – Dominio",
+    "b2": "B2 – Intermedio alto",
+    "b1": "B1 – Intermedio",
+    "a2": "A2 – Elemental",
+    "a1": "A1 – Principiante"
+  }
+}

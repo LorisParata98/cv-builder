@@ -1,10 +1,10 @@
 import { useRef, useState } from "react";
 import { DotsSixVertical, Briefcase } from "@phosphor-icons/react";
+import { useTranslation } from "react-i18next";
 import { useCVStore } from "../../store/useCVStore";
 import { SectionCard } from "../ui/SectionCard";
 import { DateField, DateInput } from "../ui/DateInput";
 import { RichTextEditor } from "../ui/RichTextEditor";
-import { useEditorLabels } from "../../locales/editorLabels";
 
 function Field({ label, value, onChange, placeholder = "", type = "text" }) {
   return (
@@ -23,33 +23,22 @@ function Field({ label, value, onChange, placeholder = "", type = "text" }) {
   );
 }
 
-
-function ExperienceCard({
-  exp,
-  onUpdate,
-  onRemove,
-  dragHandleProps,
-  isDragOver,
-}) {
-  const { experience: L, common: LC } = useEditorLabels();
+function ExperienceCard({ exp, onUpdate, onRemove, dragHandleProps, isDragOver }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(true);
 
   return (
-    <div
-      className={`border rounded-lg mb-3.5 overflow-hidden transition-colors ${isDragOver ? "border-blue-400 bg-blue-50" : "border-gray-200"}`}
-    >
+    <div className={`border rounded-lg mb-3.5 overflow-hidden transition-colors ${isDragOver ? "border-blue-400 bg-blue-50" : "border-gray-200"}`}>
       <div className="flex items-center gap-2 bg-gray-50 px-3 py-2.5 border-b border-gray-200">
         <span
           {...dragHandleProps}
-          title={LC.dragToReorder}
+          title={t("editor.common.dragToReorder")}
           className="text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing flex-shrink-0 select-none flex items-center"
         >
           <DotsSixVertical size={18} weight="bold" />
         </span>
-        <span
-          className={`text-xs font-semibold truncate flex-1 ${exp.role ? "text-gray-600" : "text-gray-300"}`}
-        >
-          {exp.role || L.newExp}
+        <span className={`text-xs font-semibold truncate flex-1 ${exp.role ? "text-gray-600" : "text-gray-300"}`}>
+          {exp.role || t("editor.experience.newExp")}
           {exp.company ? ` @ ${exp.company}` : ""}
         </span>
         <button
@@ -59,47 +48,25 @@ function ExperienceCard({
         >
           {open ? "▲" : "▼"}
         </button>
-        <button
-          onClick={onRemove}
-          className="text-xs text-red-400 hover:text-red-600 flex-shrink-0"
-        >
-          {L.remove}
+        <button onClick={onRemove} className="text-xs text-red-400 hover:text-red-600 flex-shrink-0">
+          {t("editor.experience.remove")}
         </button>
       </div>
 
       {open && (
         <div className="px-3 pt-3">
-          <Field
-            label={L.role}
-            value={exp.role}
-            onChange={(v) => onUpdate({ role: v })}
-            placeholder={L.rolePh}
-          />
-          <Field
-            label={L.company}
-            value={exp.company}
-            onChange={(v) => onUpdate({ company: v })}
-            placeholder={L.companyPh}
-          />
-          <Field
-            label={L.location}
-            value={exp.location}
-            onChange={(v) => onUpdate({ location: v })}
-            placeholder={L.locationPh}
-          />
+          <Field label={t("editor.experience.role")}     value={exp.role}     onChange={(v) => onUpdate({ role: v })}     placeholder={t("editor.experience.rolePh")} />
+          <Field label={t("editor.experience.company")}  value={exp.company}  onChange={(v) => onUpdate({ company: v })}  placeholder={t("editor.experience.companyPh")} />
+          <Field label={t("editor.experience.location")} value={exp.location} onChange={(v) => onUpdate({ location: v })} placeholder={t("editor.experience.locationPh")} />
 
           <div className="flex gap-3">
             <div className="flex-1">
-              <DateField
-                label={L.startDate}
-                value={exp.startDate}
-                onChange={(v) => onUpdate({ startDate: v })}
-              />
+              <DateField label={t("editor.experience.startDate")} value={exp.startDate} onChange={(v) => onUpdate({ startDate: v })} />
             </div>
             <div className="flex-1">
               <div className="mb-3.5">
                 <label className="block text-xs font-medium text-gray-500 mb-1.5">
-                  {L.endDate}
+                  {t("editor.experience.endDate")}
                 </label>
                 <DateInput
                   value={exp.endDate === "present" ? "" : exp.endDate}
@@ -107,7 +74,6 @@ function ExperienceCard({
                   disabled={exp.endDate === "present"}
                   className="w-full border border-gray-300 rounded px-2.5 py-2 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-400"
                 />
-                {/* Toggle "In corso" */}
                 <div className="flex items-center gap-1.5 mt-1.5">
                   <button
                     role="switch"
@@ -123,12 +89,8 @@ function ExperienceCard({
                       }`}
                     />
                   </button>
-                  <span
-                    className={`text-xs transition-colors ${
-                      exp.endDate === "present" ? "text-green-600 font-medium" : "text-gray-400"
-                    }`}
-                  >
-                    {L.current}
+                  <span className={`text-xs transition-colors ${exp.endDate === "present" ? "text-green-600 font-medium" : "text-gray-400"}`}>
+                    {t("editor.experience.current")}
                   </span>
                 </div>
               </div>
@@ -137,12 +99,12 @@ function ExperienceCard({
 
           <div className="mb-3.5">
             <label className="block text-xs font-medium text-gray-500 mb-1.5">
-              {L.description}
+              {t("editor.experience.description")}
             </label>
             <RichTextEditor
               value={exp.description}
               onChange={(html) => onUpdate({ description: html })}
-              placeholder={L.descriptionPh}
+              placeholder={t("editor.experience.descriptionPh")}
               minHeight={100}
             />
           </div>
@@ -153,14 +115,14 @@ function ExperienceCard({
 }
 
 export function ExperienceForm() {
-  const experience = useCVStore((s) => s.experience);
-  const setExperience = useCVStore((s) => s.setExperience);
-  const addExperience = useCVStore((s) => s.addExperience);
+  const experience       = useCVStore((s) => s.experience);
+  const setExperience    = useCVStore((s) => s.setExperience);
+  const addExperience    = useCVStore((s) => s.addExperience);
   const removeExperience = useCVStore((s) => s.removeExperience);
   const updateExperience = useCVStore((s) => s.updateExperience);
-  const { experience: L } = useEditorLabels();
+  const { t } = useTranslation();
 
-  const dragIndex = useRef(null);
+  const dragIndex  = useRef(null);
   const canDragRef = useRef(false);
   const [dragOver, setDragOver] = useState(null);
 
@@ -173,35 +135,15 @@ export function ExperienceForm() {
   };
 
   return (
-    <SectionCard
-      title={L.title}
-      icon={<Briefcase size={15} weight="duotone" />}
-    >
+    <SectionCard title={t("editor.experience.title")} icon={<Briefcase size={15} weight="duotone" />}>
       {experience.map((exp, index) => (
         <div
           key={exp.id}
           draggable
-          onDragStart={(e) => {
-            if (!canDragRef.current) {
-              e.preventDefault();
-              return;
-            }
-            dragIndex.current = index;
-          }}
-          onDragOver={(e) => {
-            e.preventDefault();
-            setDragOver(index);
-          }}
-          onDrop={() => {
-            reorder(dragIndex.current, index);
-            setDragOver(null);
-            dragIndex.current = null;
-          }}
-          onDragEnd={() => {
-            canDragRef.current = false;
-            setDragOver(null);
-            dragIndex.current = null;
-          }}
+          onDragStart={(e) => { if (!canDragRef.current) { e.preventDefault(); return; } dragIndex.current = index; }}
+          onDragOver={(e) => { e.preventDefault(); setDragOver(index); }}
+          onDrop={() => { reorder(dragIndex.current, index); setDragOver(null); dragIndex.current = null; }}
+          onDragEnd={() => { canDragRef.current = false; setDragOver(null); dragIndex.current = null; }}
         >
           <ExperienceCard
             exp={exp}
@@ -209,12 +151,8 @@ export function ExperienceForm() {
             onRemove={() => removeExperience(exp.id)}
             isDragOver={dragOver === index && dragIndex.current !== index}
             dragHandleProps={{
-              onMouseDown: () => {
-                canDragRef.current = true;
-              },
-              onMouseUp: () => {
-                canDragRef.current = false;
-              },
+              onMouseDown: () => { canDragRef.current = true; },
+              onMouseUp:   () => { canDragRef.current = false; },
             }}
           />
         </div>
@@ -223,7 +161,7 @@ export function ExperienceForm() {
         onClick={addExperience}
         className="w-full text-sm py-2.5 border-2 border-dashed border-gray-300 text-gray-500 rounded-lg hover:border-blue-400 hover:text-blue-500 transition-colors"
       >
-        {L.addExperience}
+        {t("editor.experience.addExperience")}
       </button>
     </SectionCard>
   );

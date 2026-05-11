@@ -1,0 +1,25 @@
+{
+  "profile":          "Profile",
+  "skills":           "Technical Skills",
+  "skillsShort":      "Skills",
+  "experience":       "Professional Experience",
+  "experienceShort":  "Experience",
+  "education":        "Education",
+  "certifications":   "Certifications",
+  "languages":        "Languages",
+  "projects":         "Projects",
+  "notes":            "Notes",
+  "contacts":         "Contacts",
+  "present":          "Present",
+  "thesis":           "Thesis",
+  "months": ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+  "levels": {
+    "native": "Native",
+    "c2": "C2 – Proficient",
+    "c1": "C1 – Advanced",
+    "b2": "B2 – Upper Intermediate",
+    "b1": "B1 – Intermediate",
+    "a2": "A2 – Elementary",
+    "a1": "A1 – Beginner"
+  }
+}

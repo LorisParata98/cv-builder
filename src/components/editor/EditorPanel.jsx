@@ -6,6 +6,7 @@ import { CertificationsForm } from "./CertificationsForm";
 import { LanguagesForm } from "./LanguagesForm";
 import { ProjectsForm } from "./ProjectsForm";
 import { CoverLetterForm } from "./CoverLetterForm";
+import { NoteForm } from "./NoteForm";
 
 const FORMS = {
   personal: PersonalInfoForm,
@@ -15,6 +16,7 @@ const FORMS = {
   certifications: CertificationsForm,
   languages: LanguagesForm,
   projects: ProjectsForm,
+  note: NoteForm,
   coverLetter: CoverLetterForm,
 };
 

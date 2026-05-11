@@ -4,48 +4,62 @@ import {
   Paragraph,
   TextRun,
   HeadingLevel,
-  AlignmentType,
   BorderStyle,
-  ShadingType,
-  TableRow,
-  TableCell,
-  Table,
-  WidthType,
-  ImageRun,
   convertInchesToTwip,
 } from "docx";
 import { saveAs } from "file-saver";
+import { formatDate } from "../utils/translationUtils";
+// ─── Colori per template ──────────────────────────────────────────────────────
+const DESIGNER_PALETTE_ACCENTS = {
+  "noir-gold": "C8B89A",
+  "indigo-electric": "5B4FE8",
+  "forest-stone": "2D6A4F",
+};
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-function formatDate(d) {
-  if (!d) return "";
-  if (d === "present") return "Presente";
-  const [y, m] = d.split("-");
-  if (!m) return y;
-  const months = [
-    "Gen",
-    "Feb",
-    "Mar",
-    "Apr",
-    "Mag",
-    "Giu",
-    "Lug",
-    "Ago",
-    "Set",
-    "Ott",
-    "Nov",
-    "Dic",
-  ];
-  return `${months[parseInt(m, 10) - 1]} ${y}`;
+const DESIGNER_PALETTE_HEADERS = {
+  "noir-gold": "0D0D0D",
+  "indigo-electric": "1A1060",
+  "forest-stone": "1B4332",
+};
+
+function resolveDocxColors(data) {
+  const cp = data.customPalettes || {};
+  if (data.template === "manager") {
+    return {
+      headerColor: (cp.manager?.bg || "1e3a5f").replace("#", ""),
+      accentColor: (cp.manager?.accent || "c8a951").replace("#", ""),
+    };
+  }
+  if (data.template === "designer") {
+    const pal = data.designerPalette || "noir-gold";
+    const defAcc = DESIGNER_PALETTE_ACCENTS[pal] || "C8B89A";
+    const defHdr = DESIGNER_PALETTE_HEADERS[pal] || "0D0D0D";
+    return {
+      headerColor: (cp.designer?.bg || defHdr).replace("#", ""),
+      accentColor: (cp.designer?.accent || defAcc).replace("#", ""),
+    };
+  }
+  // tech (default)
+  return {
+    headerColor: (cp.tech?.bg || "0f2644").replace("#", ""),
+    accentColor: (cp.tech?.accent || "4ec9b0").replace("#", ""),
+  };
 }
 
-function sectionHeading(text) {
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function sectionHeading(text, accentColor = "4ec9b0") {
   return new Paragraph({
     text: text.toUpperCase(),
     heading: HeadingLevel.HEADING_2,
     spacing: { before: 200, after: 80 },
     border: {
-      bottom: { style: BorderStyle.SINGLE, size: 4, color: "4ec9b0", space: 4 },
+      bottom: {
+        style: BorderStyle.SINGLE,
+        size: 4,
+        color: accentColor,
+        space: 4,
+      },
     },
     run: {
       font: "Courier New",
@@ -172,6 +186,8 @@ function base64ToUint8Array(base64) {
 
 // ─── Generatore documento ─────────────────────────────────────────────────────
 export async function exportDOCX(data) {
+  const { headerColor, accentColor } = resolveDocxColors(data);
+
   const {
     personal,
     skills,
@@ -180,6 +196,7 @@ export async function exportDOCX(data) {
     certifications,
     languages,
     projects,
+    note,
   } = data;
   const name = personal.name || "CV";
 
@@ -194,7 +211,7 @@ export async function exportDOCX(data) {
           bold: true,
           size: 48,
           font: "Calibri",
-          color: "0f2644",
+          color: headerColor,
         }),
       ],
       spacing: { after: 60 },
@@ -205,7 +222,7 @@ export async function exportDOCX(data) {
           text: personal.title || "",
           size: 24,
           font: "Calibri",
-          color: "4ec9b0",
+          color: accentColor,
           italics: true,
         }),
       ],
@@ -242,7 +259,7 @@ export async function exportDOCX(data) {
   // ── Profilo ──
   if (personal.summary) {
     sections.push(
-      sectionHeading("Profilo"),
+      sectionHeading("Profilo", accentColor),
       ...htmlToDocxBlocks(personal.summary),
       ...spacer(),
     );
@@ -250,7 +267,7 @@ export async function exportDOCX(data) {
 
   // ── Competenze ──
   if (skills.length > 0) {
-    sections.push(sectionHeading("Competenze Tecniche"));
+    sections.push(sectionHeading("Competenze Tecniche", accentColor));
     for (const cat of skills) {
       const tagLabels = cat.tags
         .map((t) => t.label + (t.versionsRange ? ` (${t.versionsRange})` : ""))
@@ -275,7 +292,7 @@ export async function exportDOCX(data) {
 
   // ── Esperienza ──
   if (experience.length > 0) {
-    sections.push(sectionHeading("Esperienza Professionale"));
+    sections.push(sectionHeading("Esperienza Professionale", accentColor));
     for (const exp of experience) {
       const dateStr = `${formatDate(exp.startDate)} – ${formatDate(exp.endDate)}`;
       sections.push(
@@ -310,7 +327,7 @@ export async function exportDOCX(data) {
               text: dateStr,
               font: "Courier New",
               size: 16,
-              color: "4ec9b0",
+              color: accentColor,
             }),
           ],
           spacing: { after: 60 },
@@ -323,7 +340,7 @@ export async function exportDOCX(data) {
 
   // ── Formazione ──
   if (education.length > 0) {
-    sections.push(sectionHeading("Formazione"));
+    sections.push(sectionHeading("Formazione", accentColor));
     for (const edu of education) {
       sections.push(
         new Paragraph({
@@ -357,7 +374,7 @@ export async function exportDOCX(data) {
               text: `    ${formatDate(edu.startDate)} – ${formatDate(edu.endDate)}`,
               font: "Courier New",
               size: 16,
-              color: "4ec9b0",
+              color: accentColor,
             }),
           ].filter(Boolean),
           spacing: { after: 40 },
@@ -387,7 +404,7 @@ export async function exportDOCX(data) {
   const certs = certifications.filter(Boolean);
   if (certs.length > 0) {
     sections.push(
-      sectionHeading("Certificazioni"),
+      sectionHeading("Certificazioni", accentColor),
       ...certs.map((c) => bullet(c)),
       ...spacer(),
     );
@@ -395,7 +412,7 @@ export async function exportDOCX(data) {
 
   // ── Lingue ──
   if (languages.length > 0) {
-    sections.push(sectionHeading("Lingue"));
+    sections.push(sectionHeading("Lingue", accentColor));
     sections.push(
       new Paragraph({
         children: languages.flatMap((l, i) =>
@@ -425,9 +442,27 @@ export async function exportDOCX(data) {
   }
 
   // ── Progetti ──
-  const projs = projects.filter(Boolean);
+  const projs = projects
+    .map((p) => {
+      if (typeof p === "string") return { title: p, description: "", url: "" };
+      if (p.text !== undefined)
+        return { title: p.text, description: "", url: p.url || "" };
+      return p;
+    })
+    .filter((p) => p.title || p.description);
   if (projs.length > 0) {
-    sections.push(sectionHeading("Progetti"), ...projs.map((p) => bullet(p)));
+    sections.push(sectionHeading("Progetti", accentColor));
+    for (const p of projs) {
+      const titleLine = p.url ? `${p.title} (${p.url})` : p.title;
+      if (titleLine) sections.push(bullet(titleLine));
+      if (p.description) sections.push(...htmlToDocxBlocks(p.description));
+    }
+  }
+
+  // ── Note ──
+  if (note) {
+    sections.push(sectionHeading("Note", accentColor));
+    sections.push(...htmlToDocxBlocks(note));
   }
 
   // ── Crea documento ──

@@ -1,48 +1,75 @@
 import { create } from "zustand";
 import { defaultCV } from "../data/defaultCV";
+import i18n from "../translation/i18n";
 
 const STORAGE_KEY = "cv-builder:state";
-const DEEPL_KEY = "cv-builder:deepl-key";
+const DEEPL_KEY   = "cv-builder:deepl-key";
+const PHOTO_KEY   = "cv-builder:photo";
+
+function debounce(fn, ms) {
+  let timer;
+  return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms); };
+}
 
 const loadFromStorage = () => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    const photo = localStorage.getItem(PHOTO_KEY) || null;
+    return { ...parsed, personal: { ...parsed.personal, photo } };
   } catch {
     return null;
   }
 };
 
-const saveToStorage = (state) => {
+const saveToStorage = debounce((state) => {
   try {
-    const { deepLApiKey, ...rest } = state;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(rest));
-    if (deepLApiKey) {
-      localStorage.setItem(DEEPL_KEY, deepLApiKey);
-    }
+    const { deepLApiKey, personal, ...rest } = state;
+    const { photo, ...personalRest } = personal || {};
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...rest, personal: personalRest }));
+    if (photo) localStorage.setItem(PHOTO_KEY, photo);
+    else localStorage.removeItem(PHOTO_KEY);
+    if (deepLApiKey) localStorage.setItem(DEEPL_KEY, deepLApiKey);
   } catch {
     // Silenzioso
   }
-};
+}, 400);
 
 // ─── Migrazione dati legacy ───────────────────────────────────────────────────
 // Converte experience[].bullets (string[]) → experience[].description (HTML)
 // per compatibilità con i dati salvati prima dell'introduzione del RTF editor.
 function migrateState(state) {
-  if (!state?.experience) return state;
-  const migrated = state.experience.map((exp) => {
-    if (Array.isArray(exp.bullets) && exp.description === undefined) {
-      const items = exp.bullets
-        .filter(Boolean)
-        .map((b) => `<li><p>${b}</p></li>`)
-        .join("");
-      const { bullets, ...rest } = exp;
-      return { ...rest, description: items ? `<ul>${items}</ul>` : "" };
-    }
-    return exp;
-  });
-  return { ...state, experience: migrated };
+  if (!state) return state;
+  let result = state;
+
+  if (result.experience) {
+    const migrated = result.experience.map((exp) => {
+      if (Array.isArray(exp.bullets) && exp.description === undefined) {
+        const items = exp.bullets
+          .filter(Boolean)
+          .map((b) => `<li><p>${b}</p></li>`)
+          .join("");
+        const { bullets, ...rest } = exp;
+        return { ...rest, description: items ? `<ul>${items}</ul>` : "" };
+      }
+      return exp;
+    });
+    result = { ...result, experience: migrated };
+  }
+
+  if (result.projects) {
+    result = {
+      ...result,
+      projects: result.projects.map((p) => {
+        if (typeof p === "string") return { title: p, description: "", url: "" };
+        if (p.text !== undefined) return { title: p.text, description: "", url: p.url || "" };
+        return p;
+      }),
+    };
+  }
+
+  return result;
 }
 
 const savedState = migrateState(loadFromStorage());
@@ -201,6 +228,28 @@ export const useCVStore = create((set, get) => ({
     saveToStorage({ ...get(), skills });
   },
 
+  reorderSkillTags: (categoryIndex, fromIndex, toIndex) => {
+    if (fromIndex === toIndex) return;
+    const skills = get().skills.map((cat, i) => {
+      if (i !== categoryIndex) return cat;
+      const tags = [...cat.tags];
+      const [moved] = tags.splice(fromIndex, 1);
+      tags.splice(toIndex, 0, moved);
+      return { ...cat, tags };
+    });
+    set({ skills });
+    saveToStorage({ ...get(), skills });
+  },
+
+  moveSkillTag: (fromCat, fromTag, toCat, toTag) => {
+    const skills = get().skills.map((cat) => ({ ...cat, tags: [...cat.tags] }));
+    const [tag] = skills[fromCat].tags.splice(fromTag, 1);
+    const insertAt = toTag === -1 ? skills[toCat].tags.length : toTag;
+    skills[toCat].tags.splice(insertAt, 0, tag);
+    set({ skills });
+    saveToStorage({ ...get(), skills });
+  },
+
   // ─── Experience ─────────────────────────────────────────────────────────────
   setExperience: (experience) => {
     set({ experience });
@@ -331,7 +380,7 @@ export const useCVStore = create((set, get) => ({
   },
 
   addProject: () => {
-    const projects = [...get().projects, ""];
+    const projects = [...get().projects, { title: "", description: "", url: "" }];
     set({ projects });
     saveToStorage({ ...get(), projects });
   },
@@ -342,10 +391,18 @@ export const useCVStore = create((set, get) => ({
     saveToStorage({ ...get(), projects });
   },
 
-  updateProject: (index, value) => {
-    const projects = get().projects.map((p, i) => (i === index ? value : p));
+  updateProject: (index, updates) => {
+    const projects = get().projects.map((p, i) =>
+      i === index ? { ...p, ...updates } : p,
+    );
     set({ projects });
     saveToStorage({ ...get(), projects });
+  },
+
+  // ─── Note ───────────────────────────────────────────────────────────────────
+  setNote: (note) => {
+    set({ note });
+    saveToStorage({ ...get(), note });
   },
 
   // ─── Cover Letter ────────────────────────────────────────────────────────────
@@ -379,6 +436,7 @@ export const useCVStore = create((set, get) => ({
   setUiLanguage: (uiLanguage) => {
     set({ uiLanguage });
     saveToStorage({ ...get(), uiLanguage });
+    i18n.changeLanguage(uiLanguage.toLowerCase());
   },
 
   setDeepLApiKey: (deepLApiKey) => {

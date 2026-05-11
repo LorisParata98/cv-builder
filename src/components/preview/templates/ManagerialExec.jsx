@@ -1,12 +1,14 @@
 // ManagerialExec.jsx — Profilo manager / executive
 // Layout due colonne, Playfair Display, palette navy + bianco
 
-import { getLocale } from "../../../locales/index.js";
+import { memo } from "react";
+import { getCVLocale, translateLevel } from "../../../utils/cvLocales.js";
 import {
   makeHref,
   shortenWebsite,
   shortenLinkedIn,
 } from "../../../utils/urlUtils.js";
+import { formatDate } from "../../../utils/translationUtils";
 
 const COLORS_DEFAULT = {
   bg: "#1e3a5f",
@@ -23,14 +25,6 @@ const COLORS_DEFAULT = {
 };
 
 const FS_DEFAULT = { name: 30, role: 11, sectionHeader: 10, body: 10 };
-
-function formatDate(d, L) {
-  if (!d) return "";
-  if (d === "present") return L.present;
-  const [y, m] = d.split("-");
-  if (!m) return y;
-  return `${L.months[parseInt(m, 10) - 1]} ${y}`;
-}
 
 function SectionTitle({ children, C, fs }) {
   return (
@@ -269,7 +263,7 @@ function LeftColumn({ data, C, L, fs }) {
                     color: C.muted,
                   }}
                 >
-                  {l.level}
+                  {translateLevel(l.level, L.lang)}
                 </p>
               )}
             </div>
@@ -478,43 +472,95 @@ function RightColumn({ data, C, L, fs }) {
         </div>
       )}
 
-      {projects.filter(Boolean).length > 0 && (
-        <div>
-          <SectionTitle C={C} fs={fs}>
-            {L.projects}
-          </SectionTitle>
-          {projects.filter(Boolean).map((p, i) => (
-            <div
-              key={i}
-              style={{
-                display: "flex",
-                gap: "6px",
-                marginBottom: "4px",
-                alignItems: "flex-start",
-              }}
-            >
-              <span style={{ color: C.accent, flexShrink: 0, fontWeight: 700 }}>
-                —
-              </span>
-              <span
-                style={{
-                  fontSize: `${fs.body}px`,
-                  color: C.body,
-                  lineHeight: 1.6,
-                }}
-              >
-                {p}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
+      {(() => {
+        const norm = (p) => {
+          if (typeof p === "string")
+            return { title: p, description: "", url: "" };
+          if (p.text !== undefined)
+            return { title: p.text, description: "", url: p.url || "" };
+          return p;
+        };
+        const items = projects
+          .map(norm)
+          .filter((p) => p.title || p.description);
+        if (items.length === 0) return null;
+        return (
+          <div>
+            <SectionTitle C={C} fs={fs}>
+              {L.projects}
+            </SectionTitle>
+            {items.map((proj, i) => (
+              <div key={i} style={{ marginBottom: "6px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "6px",
+                    alignItems: "baseline",
+                  }}
+                >
+                  <span
+                    style={{ color: C.accent, flexShrink: 0, fontWeight: 700 }}
+                  >
+                    —
+                  </span>
+                  <span>
+                    {proj.title && (
+                      <span
+                        style={{
+                          fontSize: `${fs.body}px`,
+                          color: C.body,
+                          fontWeight: 700,
+                          lineHeight: 1.6,
+                        }}
+                      >
+                        {proj.title}
+                      </span>
+                    )}
+                    {proj.url && (
+                      <a
+                        href={
+                          proj.url.startsWith("http")
+                            ? proj.url
+                            : `https://${proj.url}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: "inline",
+                          fontSize: `${fs.small ?? fs.body - 1}px`,
+                          color: C.accent,
+                          textDecoration: "none",
+                          marginLeft: "6px",
+                        }}
+                      >
+                        {proj.url}
+                      </a>
+                    )}
+                  </span>
+                </div>
+                {proj.description && (
+                  <div
+                    className="rtf-preview"
+                    style={{
+                      "--rtf-accent": C.accent,
+                      fontSize: `${fs.body}px`,
+                      color: C.body,
+                      paddingLeft: "14px",
+                    }}
+                    dangerouslySetInnerHTML={{ __html: proj.description }}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        );
+      })()}
     </div>
   );
 }
 
 // ─── Componente principale ────────────────────────────────────────────────────
-export function ManagerialExec({
+export const ManagerialExec = memo(function ManagerialExec({
   data,
   customColors = {},
   customFontSizes = {},
@@ -522,7 +568,7 @@ export function ManagerialExec({
 }) {
   const C = { ...COLORS_DEFAULT, ...customColors };
   const fs = { ...FS_DEFAULT, ...customFontSizes };
-  const L = locale || getLocale("IT");
+  const L = locale || getCVLocale("IT");
 
   return (
     <div
@@ -577,6 +623,25 @@ export function ManagerialExec({
         <LeftColumn data={data} C={C} L={L} fs={fs} />
         <RightColumn data={data} C={C} L={L} fs={fs} />
       </div>
+
+      {/* Note — sezione full-width in fondo */}
+      {data.note && (
+        <div style={{ padding: "0 32px 28px" }}>
+          <SectionTitle C={C} fs={fs}>
+            {L.notes}
+          </SectionTitle>
+          <div
+            className="rtf-preview"
+            style={{
+              "--rtf-accent": C.accent,
+              fontSize: `${fs.body}px`,
+              color: C.body,
+              lineHeight: "1.7",
+            }}
+            dangerouslySetInnerHTML={{ __html: data.note }}
+          />
+        </div>
+      )}
     </div>
   );
-}
+});

@@ -2,7 +2,6 @@
   "welcome": "Welcome",
   "save": "Save",
 
-  {
   "levels": {
     "native": "Native",
     "c2": "Proficient",
@@ -11,6 +10,185 @@
     "b1": "Intermediate",
     "a2": "Elementary",
     "a1": "Beginner"
+  },
+
+  "editor": {
+    "common": {
+      "remove": "Remove",
+      "dragToReorder": "Drag to reorder"
+    },
+    "personal": {
+      "title": "Personal Info",
+      "photoTitle": "Drag to reposition the photo",
+      "photoDragHint": "Drag to\nreposition",
+      "changePhoto": "Change photo",
+      "uploadPhoto": "Upload photo",
+      "removePhoto": "Remove",
+      "photoTooBig": "Photo too large (max 2MB)",
+      "fullName": "Full name",
+      "jobTitle": "Job title",
+      "email": "Email",
+      "phone": "Phone",
+      "location": "City / Country",
+      "place": "Residence",
+      "website": "Website / GitHub",
+      "linkedin": "LinkedIn",
+      "summary": "Professional summary",
+      "fullNamePh": "e.g. John Smith",
+      "jobTitlePh": "e.g. Senior Frontend Developer",
+      "emailPh": "john@example.com",
+      "phonePh": "+1 555 000 0000",
+      "locationPh": "New York, USA",
+      "websitePh": "github.com/yourprofile",
+      "linkedinPh": "linkedin.com/in/yourprofile",
+      "summaryPh": "Brief description of your professional profile..."
+    },
+    "skills": {
+      "title": "Skills",
+      "atsHintTitle": "Recommended ATS keywords — profile",
+      "atsHintBody": "Make sure these keywords appear in your skills or experience bullet points.",
+      "atsTooltip": "ATS (Applicant Tracking System) are tools used by recruiters to automatically screen CVs. Including the right keywords increases the chance your CV passes the automated filter.",
+      "skillPh": "e.g. Angular",
+      "versionPh": "optional versions (e.g. v8–v20)",
+      "removeSkill": "Remove skill",
+      "atsKeywords": "ATS Keywords",
+      "autoGenerate": "⚡ Auto-generate",
+      "addKeywordPh": "Add keyword and press Enter...",
+      "atsInvisible": "Hidden in PDF · used by ATS parsers",
+      "categoryPh": "Category name",
+      "addSkill": "+ Add skill",
+      "addCategory": "+ Add category",
+      "editSkill": "Edit skill",
+      "hasAts": "Has ATS keywords"
+    },
+    "experience": {
+      "title": "Experience",
+      "newExp": "New experience",
+      "remove": "Remove",
+      "role": "Role",
+      "company": "Company",
+      "location": "City / Country",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "current": "Current",
+      "description": "Description",
+      "rolePh": "e.g. Senior Frontend Developer",
+      "companyPh": "e.g. Acme Corp",
+      "locationPh": "e.g. New York, USA",
+      "datePh": "mm/yyyy",
+      "descriptionPh": "Describe your role, achievements, technologies used...",
+      "addExperience": "+ Add experience"
+    },
+    "education": {
+      "title": "Education",
+      "newEdu": "New education entry",
+      "remove": "Remove",
+      "institution": "Institution",
+      "degree": "Degree",
+      "field": "Field / Major",
+      "grade": "Grade / GPA",
+      "startDate": "Start",
+      "endDate": "End",
+      "thesis": "Thesis (optional)",
+      "institutionPh": "e.g. MIT",
+      "degreePh": "e.g. Master's Degree",
+      "fieldPh": "e.g. Computer Science",
+      "gradePh": "e.g. 3.9/4.0",
+      "datePh": "mm/yyyy",
+      "thesisPh": "Thesis title or topic...",
+      "addEducation": "+ Add education"
+    },
+    "certifications": {
+      "title": "Certifications",
+      "certPh": "e.g. AWS Certified Developer – Associate (2023)",
+      "addCertification": "+ Add certification"
+    },
+    "languages": {
+      "title": "Languages",
+      "languagePh": "e.g. English",
+      "level": "Level",
+      "selectLevel": "Select level",
+      "addLanguage": "+ Add language"
+    },
+    "note": {
+      "title": "Notes",
+      "notePh": "Add additional notes to your CV (extra info, availability, etc.)..."
+    },
+    "projects": {
+      "title": "Projects",
+      "hint": "Include name, brief description and link if available",
+      "newProject": "New project",
+      "titlePh": "Project name...",
+      "descriptionLabel": "Description",
+      "descriptionPh": "Brief project description, technologies used...",
+      "urlLabel": "Link",
+      "urlPh": "e.g. github.com/user/project",
+      "addProject": "+ Add project"
+    }
+  },
+
+  "nav": {
+    "subtitle": "Build your professional CV",
+    "cvGroup": "CV",
+    "docsGroup": "Documents",
+    "sections": {
+      "personal": "Personal Info",
+      "skills": "Skills",
+      "experience": "Experience",
+      "education": "Education",
+      "certifications": "Certifications",
+      "languages": "Languages",
+      "projects": "Projects",
+      "note": "Notes",
+      "coverLetter": "Cover Letter"
+    }
+  },
+
+  "sidebar": {
+    "palette": {
+      "title": "Customize Palette",
+      "modified": "Palette modified",
+      "reset": "↺ Reset to default",
+      "hint": "Modify the active template's colors.",
+      "keyLabels": {
+        "header": "Header",
+        "accent": "Accent",
+        "sidebar": "Sidebar",
+        "background": "Background"
+      }
+    },
+    "fontSizes": {
+      "title": "Font Sizes",
+      "modified": "Fonts modified",
+      "reset": "↺ Reset to default",
+      "hint": "Modify sizes for the active template. Body scales proportionally.",
+      "defSuffix": "def",
+      "keyLabels": {
+        "name": "Name",
+        "role": "Role / Title",
+        "sectionHeader": "Section Headers",
+        "body": "Body text"
+      }
+    },
+    "deepl": {
+      "title": "DeepL Translation",
+      "apiKey": "API Key",
+      "targetLang": "Target language",
+      "hint": "Section titles update immediately in the preview.",
+      "translate": "Translate CV content",
+      "translating": "Translating...",
+      "show": "Show",
+      "hide": "Hide",
+      "errorEmpty": "Enter your DeepL API key.",
+      "errorGeneric": "DeepL error."
+    },
+    "modal": {
+      "title": "Warning: translation will overwrite texts",
+      "body": "Translation will overwrite current texts. We recommend downloading a JSON backup before proceeding.",
+      "downloadAndProceed": "Download backup and proceed",
+      "proceedWithout": "Proceed without downloading",
+      "translating": "Translation in progress...",
+      "cancel": "Cancel"
+    }
   }
-}
 }

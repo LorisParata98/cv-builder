@@ -103,6 +103,7 @@ This project is open source and completely free to use.
 If you found it helpful and want to buy me a coffee, you can do so here:
 
 **Ko-fi:** https://ko-fi.com/lorisparata
-**PayPal:** https://paypal.me/lorisparata
+
+<!-- **PayPal:** https://paypal.me/lorisparata -->
 
 Any contribution is appreciated and helps keep the project alive. Thank you!

@@ -3,12 +3,14 @@
 // Font: JetBrains Mono (titoli), system-ui (corpo)
 // Layout: colonna singola, ATS-safe
 
-import { getLocale } from "../../../locales/index.js";
+import { memo } from "react";
+import { getCVLocale, translateLevel } from "../../../utils/cvLocales.js";
 import {
   makeHref,
   shortenWebsite,
   shortenLinkedIn,
 } from "../../../utils/urlUtils.js";
+import { formatDate } from "../../../utils/translationUtils.jsx";
 
 const COLORS_DEFAULT = {
   bg: "#0f2644",
@@ -31,14 +33,6 @@ const COLORS_DEFAULT = {
 const FS_DEFAULT = { name: 26, role: 12, sectionHeader: 10, body: 11 };
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
-
-function formatDate(dateStr, L) {
-  if (!dateStr) return "";
-  if (dateStr === "present") return L.present;
-  const [year, month] = dateStr.split("-");
-  if (!month) return year;
-  return `${L.months[parseInt(month, 10) - 1]} ${year}`;
-}
 
 function SectionHeader({ icon, title, C, fs }) {
   return (
@@ -482,7 +476,7 @@ function LanguagesSection({ languages, C, L, fs }) {
           >
             <strong>{lang.language}</strong>
             {lang.level && (
-              <span style={{ color: C.bodyMuted }}> – {lang.level}</span>
+              <span style={{ color: C.bodyMuted }}> – {translateLevel(lang.level, L.lang)}</span>
             )}
           </span>
         ))}
@@ -492,36 +486,80 @@ function LanguagesSection({ languages, C, L, fs }) {
 }
 
 function ProjectsSection({ projects, C, L, fs }) {
-  const items = (projects || []).filter(Boolean);
+  const norm = (p) => {
+    if (typeof p === "string") return { title: p, description: "", url: "" };
+    if (p.text !== undefined)
+      return { title: p.text, description: "", url: p.url || "" };
+    return p;
+  };
+  const items = (projects || [])
+    .map(norm)
+    .filter((p) => p.title || p.description);
   if (items.length === 0) return null;
   return (
     <div style={{ marginBottom: "22px" }}>
       <SectionHeader icon=">" title={L.projects} C={C} fs={fs} />
       {items.map((proj, i) => (
-        <div
-          key={i}
-          style={{ display: "flex", gap: "8px", marginBottom: "5px" }}
-        >
-          <span
-            style={{
-              color: C.accent,
-              flexShrink: 0,
-              fontWeight: 700,
-              fontSize: `${fs.body}px`,
-            }}
-          >
-            ▶
-          </span>
-          <span
-            style={{
-              fontSize: `${fs.body}px`,
-              color: C.bodyText,
-              lineHeight: 1.6,
-              fontFamily: "system-ui, sans-serif",
-            }}
-          >
-            {proj}
-          </span>
+        <div key={i} style={{ marginBottom: "8px" }}>
+          <div style={{ display: "flex", gap: "8px", alignItems: "baseline" }}>
+            <span
+              style={{
+                color: C.accent,
+                flexShrink: 0,
+                fontWeight: 700,
+                fontSize: `${fs.body}px`,
+              }}
+            >
+              ▶
+            </span>
+            <span style={{ fontFamily: "system-ui, sans-serif" }}>
+              {proj.title && (
+                <span
+                  style={{
+                    fontSize: `${fs.body}px`,
+                    color: C.bodyText,
+                    fontWeight: 700,
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {proj.title}
+                </span>
+              )}
+              {proj.url && (
+                <a
+                  href={
+                    proj.url.startsWith("http")
+                      ? proj.url
+                      : `https://${proj.url}`
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "inline",
+                    fontSize: `${fs.small ?? fs.body - 1}px`,
+                    color: C.accent,
+                    textDecoration: "none",
+                    marginLeft: "6px",
+                  }}
+                >
+                  {proj.url}
+                </a>
+              )}
+            </span>
+          </div>
+          {proj.description && (
+            <div
+              className="rtf-preview"
+              style={{
+                "--rtf-accent": C.accent,
+                fontSize: `${fs.body}px`,
+                color: C.bodyText,
+                fontFamily: "system-ui, sans-serif",
+                paddingLeft: "16px",
+              }}
+              dangerouslySetInnerHTML={{ __html: proj.description }}
+            />
+          )}
         </div>
       ))}
     </div>
@@ -529,7 +567,26 @@ function ProjectsSection({ projects, C, L, fs }) {
 }
 
 // ─── Componente principale ────────────────────────────────────────────────────
-export function TechDeveloper({
+function NoteSection({ note, C, L, fs }) {
+  if (!note) return null;
+  return (
+    <div style={{ marginBottom: "22px" }}>
+      <SectionHeader icon="--" title={L.notes} C={C} fs={fs} />
+      <div
+        className="rtf-preview"
+        style={{
+          "--rtf-accent": C.accent,
+          fontSize: `${fs.body}px`,
+          lineHeight: "1.7",
+          color: C.bodyText,
+        }}
+        dangerouslySetInnerHTML={{ __html: note }}
+      />
+    </div>
+  );
+}
+
+export const TechDeveloper = memo(function TechDeveloper({
   data,
   customColors = {},
   customFontSizes = {},
@@ -537,7 +594,8 @@ export function TechDeveloper({
 }) {
   const C = { ...COLORS_DEFAULT, ...customColors };
   const fs = { ...FS_DEFAULT, ...customFontSizes };
-  const L = locale || getLocale("IT");
+  const L = locale || getCVLocale("IT");
+
   const {
     personal,
     skills,
@@ -546,6 +604,7 @@ export function TechDeveloper({
     certifications,
     languages,
     projects,
+    note,
   } = data;
 
   return (
@@ -570,7 +629,8 @@ export function TechDeveloper({
         />
         <LanguagesSection languages={languages} C={C} L={L} fs={fs} />
         <ProjectsSection projects={projects} C={C} L={L} fs={fs} />
+        <NoteSection note={note} C={C} L={L} fs={fs} />
       </div>
     </div>
   );
-}
+});

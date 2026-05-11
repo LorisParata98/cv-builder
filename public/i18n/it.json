@@ -10,5 +10,185 @@
     "b1": "B1 – Intermedio",
     "a2": "A2 – Elementare",
     "a1": "A1 – Base"
+  },
+
+  "editor": {
+    "common": {
+      "remove": "Rimuovi",
+      "dragToReorder": "Trascina per riordinare"
+    },
+    "personal": {
+      "title": "Dati Personali",
+      "photoTitle": "Trascina per riposizionare la foto",
+      "photoDragHint": "Trascina per riposizionare",
+      "changePhoto": "Cambia foto",
+      "uploadPhoto": "Carica foto",
+      "removePhoto": "Rimuovi",
+      "photoTooBig": "Foto troppo grande (max 2MB)",
+      "fullName": "Nome completo",
+      "jobTitle": "Titolo professionale",
+      "email": "Email",
+      "phone": "Telefono",
+      "location": "Città / Nazione",
+      "place": "Residenza",
+      "website": "Sito web / GitHub",
+      "linkedin": "LinkedIn",
+      "summary": "Sommario professionale",
+      "fullNamePh": "Es. Mario Rossi",
+      "jobTitlePh": "Es. Senior Frontend Developer",
+      "emailPh": "mario@esempio.it",
+      "phonePh": "+39 333 000 0000",
+      "locationPh": "Milano, Italia",
+      "websitePh": "github.com/tuoprofilo",
+      "linkedinPh": "linkedin.com/in/tuoprofilo",
+      "summaryPh": "Breve descrizione del tuo profilo..."
+    },
+    "skills": {
+      "title": "Competenze",
+      "atsHintTitle": "Keyword ATS consigliate — profilo",
+      "atsHintBody": "Assicurati che queste keyword compaiano nelle tue skill o nei bullet delle esperienze.",
+      "atsTooltip": "Gli ATS (Applicant Tracking System) sono software usati dai recruiter per filtrare automaticamente i CV. Includere le keyword giuste aumenta la probabilità che il tuo CV superi il filtro automatico.",
+      "skillPh": "Es. Angular",
+      "versionPh": "versioni opzionali (es. v8–v20)",
+      "removeSkill": "Rimuovi skill",
+      "atsKeywords": "Keyword ATS",
+      "autoGenerate": "⚡ Auto-genera",
+      "addKeywordPh": "Aggiungi keyword e premi Invio...",
+      "atsInvisible": "Invisibili nel PDF · usate dai parser ATS",
+      "categoryPh": "Nome categoria",
+      "addSkill": "+ Aggiungi skill",
+      "addCategory": "+ Aggiungi categoria",
+      "editSkill": "Modifica skill",
+      "hasAts": "Ha keyword ATS"
+    },
+    "experience": {
+      "title": "Esperienza",
+      "newExp": "Nuova esperienza",
+      "remove": "Rimuovi",
+      "role": "Ruolo",
+      "company": "Azienda",
+      "location": "Città / Nazione",
+      "startDate": "Data inizio",
+      "endDate": "Data fine",
+      "current": "Attuale",
+      "description": "Descrizione",
+      "rolePh": "Es. Senior Frontend Developer",
+      "companyPh": "Es. Acme Corp",
+      "locationPh": "Es. Milano, Italia",
+      "datePh": "mm/yyyy",
+      "descriptionPh": "Descrivi il tuo ruolo, i risultati raggiunti, le tecnologie usate...",
+      "addExperience": "+ Aggiungi esperienza"
+    },
+    "education": {
+      "title": "Formazione",
+      "newEdu": "Nuovo titolo di studio",
+      "remove": "Rimuovi",
+      "institution": "Istituto",
+      "degree": "Titolo",
+      "field": "Indirizzo / Materia",
+      "grade": "Voto",
+      "startDate": "Inizio",
+      "endDate": "Fine",
+      "thesis": "Tesi (opzionale)",
+      "institutionPh": "Es. Politecnico di Milano",
+      "degreePh": "Es. Laurea Magistrale",
+      "fieldPh": "Es. Ingegneria Informatica",
+      "gradePh": "Es. 110/110",
+      "datePh": "mm/yyyy",
+      "thesisPh": "Titolo o argomento della tesi...",
+      "addEducation": "+ Aggiungi titolo di studio"
+    },
+    "certifications": {
+      "title": "Certificazioni",
+      "certPh": "Es. AWS Certified Developer – Associate (2023)",
+      "addCertification": "+ Aggiungi certificazione"
+    },
+    "languages": {
+      "title": "Lingue",
+      "languagePh": "Es. Italiano",
+      "level": "Livello",
+      "selectLevel": "Seleziona livello",
+      "addLanguage": "+ Aggiungi lingua"
+    },
+    "note": {
+      "title": "Note",
+      "notePh": "Aggiungi delle note aggiuntive al tuo CV (informazioni extra, disponibilità, ecc.)..."
+    },
+    "projects": {
+      "title": "Progetti",
+      "hint": "Includi nome, breve descrizione e link se disponibile",
+      "newProject": "Nuovo progetto",
+      "titlePh": "Nome progetto...",
+      "descriptionLabel": "Descrizione",
+      "descriptionPh": "Breve descrizione del progetto, tecnologie usate...",
+      "urlLabel": "Link",
+      "urlPh": "es. github.com/utente/progetto",
+      "addProject": "+ Aggiungi progetto"
+    }
+  },
+
+  "nav": {
+    "subtitle": "Costruisci il tuo CV professionale",
+    "cvGroup": "CV",
+    "docsGroup": "Documenti",
+    "sections": {
+      "personal": "Dati Personali",
+      "skills": "Competenze",
+      "experience": "Esperienza",
+      "education": "Formazione",
+      "certifications": "Certificazioni",
+      "languages": "Lingue",
+      "projects": "Progetti",
+      "note": "Note",
+      "coverLetter": "Cover Letter"
+    }
+  },
+
+  "sidebar": {
+    "palette": {
+      "title": "Personalizza Palette",
+      "modified": "Palette modificata",
+      "reset": "↺ Ripristina default",
+      "hint": "Modifica i colori del template attivo.",
+      "keyLabels": {
+        "header": "Header",
+        "accent": "Accento",
+        "sidebar": "Sidebar",
+        "background": "Sfondo"
+      }
+    },
+    "fontSizes": {
+      "title": "Dimensioni Font",
+      "modified": "Font modificati",
+      "reset": "↺ Ripristina default",
+      "hint": "Modifica le dimensioni per il template attivo. Il corpo scala proporzionalmente.",
+      "defSuffix": "def",
+      "keyLabels": {
+        "name": "Nome",
+        "role": "Ruolo / Titolo",
+        "sectionHeader": "Intestazioni sezioni",
+        "body": "Corpo testo"
+      }
+    },
+    "deepl": {
+      "title": "Traduzione DeepL",
+      "apiKey": "API Key",
+      "targetLang": "Lingua di destinazione",
+      "hint": "I titoli delle sezioni si aggiornano subito nella preview.",
+      "translate": "Traduci contenuto CV",
+      "translating": "Traduzione...",
+      "show": "Mostra",
+      "hide": "Nascondi",
+      "errorEmpty": "Inserisci la tua API key DeepL.",
+      "errorGeneric": "Errore DeepL."
+    },
+    "modal": {
+      "title": "Attenzione: la traduzione sovrascriverà i testi",
+      "body": "La traduzione sovrascriverà i testi attuali. Ti consigliamo di scaricare un backup in formato JSON prima di procedere.",
+      "downloadAndProceed": "Scarica backup e procedi",
+      "proceedWithout": "Procedi senza scaricare",
+      "translating": "Traduzione in corso...",
+      "cancel": "Annulla"
+    }
   }
 }

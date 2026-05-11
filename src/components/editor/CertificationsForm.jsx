@@ -1,16 +1,16 @@
 import { useRef, useState } from "react";
 import { DotsSixVertical, Certificate } from "@phosphor-icons/react";
+import { useTranslation } from "react-i18next";
 import { useCVStore } from "../../store/useCVStore";
 import { SectionCard } from "../ui/SectionCard";
-import { useEditorLabels } from "../../locales/editorLabels";
 
 export function CertificationsForm() {
-  const certifications    = useCVStore((s) => s.certifications);
-  const setCertifications = useCVStore((s) => s.setCertifications);
-  const addCertification  = useCVStore((s) => s.addCertification);
+  const certifications      = useCVStore((s) => s.certifications);
+  const setCertifications   = useCVStore((s) => s.setCertifications);
+  const addCertification    = useCVStore((s) => s.addCertification);
   const removeCertification = useCVStore((s) => s.removeCertification);
   const updateCertification = useCVStore((s) => s.updateCertification);
-  const { certifications: L, common: LC } = useEditorLabels();
+  const { t } = useTranslation();
 
   const dragIndex  = useRef(null);
   const canDragRef = useRef(false);
@@ -25,7 +25,7 @@ export function CertificationsForm() {
   };
 
   return (
-    <SectionCard title={L.title} icon={<Certificate size={15} weight="duotone" />}>
+    <SectionCard title={t("editor.certifications.title")} icon={<Certificate size={15} weight="duotone" />}>
       <div className="space-y-2.5">
         {certifications.map((cert, i) => (
           <div
@@ -41,7 +41,7 @@ export function CertificationsForm() {
             }`}
           >
             <span
-              title={LC.dragToReorder}
+              title={t("editor.common.dragToReorder")}
               onMouseDown={() => { canDragRef.current = true; }}
               onMouseUp={() => { canDragRef.current = false; }}
               className="text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing flex-shrink-0 select-none flex items-center"
@@ -52,7 +52,7 @@ export function CertificationsForm() {
               type="text"
               value={cert}
               onChange={(e) => updateCertification(i, e.target.value)}
-              placeholder={L.certPh}
+              placeholder={t("editor.certifications.certPh")}
               className="flex-1 border border-gray-300 rounded px-2.5 py-2 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
             {certifications.length > 1 && (
@@ -65,7 +65,7 @@ export function CertificationsForm() {
         onClick={addCertification}
         className="mt-3.5 w-full text-sm py-2.5 border-2 border-dashed border-gray-300 text-gray-500 rounded-lg hover:border-blue-400 hover:text-blue-500 transition-colors"
       >
-        {L.addCertification}
+        {t("editor.certifications.addCertification")}
       </button>
     </SectionCard>
   );

@@ -1,4 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
+
+function debounce(fn, ms) {
+  let timer;
+  return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms); };
+}
 import {
   User,
   Wrench,
@@ -7,6 +13,7 @@ import {
   Certificate,
   Globe,
   Rocket,
+  NotePencil,
   Palette,
   Translate,
   Warning,
@@ -16,7 +23,7 @@ import {
   TextAa,
 } from "@phosphor-icons/react";
 import { useCVStore } from "../../store/useCVStore";
-import { UI_LANGUAGES } from "../../locales/index.js";
+import { LanguagePicker, CV_LANGUAGES } from "./LanguagePicker";
 
 const CV_SECTIONS = [
   { id: "personal",       Icon: User },
@@ -26,143 +33,12 @@ const CV_SECTIONS = [
   { id: "certifications", Icon: Certificate },
   { id: "languages",      Icon: Globe },
   { id: "projects",       Icon: Rocket },
+  { id: "note",          Icon: NotePencil },
 ];
 
 const EXTRA_SECTIONS = [
   { id: "coverLetter", Icon: EnvelopeSimple },
 ];
-
-// ─── Traduzioni nav ───────────────────────────────────────────────────────────
-const NAV_LABELS = {
-  IT: {
-    cvGroup:  "CV",
-    docsGroup: "Documenti",
-    subtitle: "Costruisci il tuo CV professionale",
-    sections: {
-      personal:       "Dati Personali",
-      skills:         "Competenze",
-      experience:     "Esperienza",
-      education:      "Formazione",
-      certifications: "Certificazioni",
-      languages:      "Lingue",
-      projects:       "Progetti",
-      coverLetter:    "Cover Letter",
-    },
-  },
-  EN: {
-    cvGroup:  "CV",
-    docsGroup: "Documents",
-    subtitle: "Build your professional CV",
-    sections: {
-      personal:       "Personal Info",
-      skills:         "Skills",
-      experience:     "Experience",
-      education:      "Education",
-      certifications: "Certifications",
-      languages:      "Languages",
-      projects:       "Projects",
-      coverLetter:    "Cover Letter",
-    },
-  },
-};
-
-// ─── Traduzioni pannelli sidebar ──────────────────────────────────────────────
-const SIDEBAR_LABELS = {
-  IT: {
-    palette: {
-      title:    "Personalizza Palette",
-      modified: "Palette modificata",
-      reset:    "↺ Ripristina default",
-      hint:     "Modifica i colori del template attivo.",
-      keyLabels: {
-        header:     "Header",
-        accent:     "Accento",
-        sidebar:    "Sidebar",
-        background: "Sfondo",
-      },
-    },
-    fontSizes: {
-      title:     "Dimensioni Font",
-      modified:  "Font modificati",
-      reset:     "↺ Ripristina default",
-      hint:      "Modifica le dimensioni per il template attivo. Il corpo scala proporzionalmente.",
-      defSuffix: "def",
-      keyLabels: {
-        name:          "Nome",
-        role:          "Ruolo / Titolo",
-        sectionHeader: "Intestazioni sezioni",
-        body:          "Corpo testo",
-      },
-    },
-    deepl: {
-      title:       "Traduzione DeepL",
-      apiKey:      "API Key",
-      targetLang:  "Lingua di destinazione",
-      hint:        "I titoli delle sezioni si aggiornano subito nella preview.",
-      translate:   "Traduci contenuto CV",
-      translating: "Traduzione...",
-      show:        "Mostra",
-      hide:        "Nascondi",
-      errorEmpty:  "Inserisci la tua API key DeepL.",
-      errorGeneric:"Errore DeepL.",
-    },
-    modal: {
-      title:              "Attenzione: la traduzione sovrascriverà i testi",
-      body:               "La traduzione sovrascriverà i testi attuali. Ti consigliamo di scaricare un backup in formato JSON prima di procedere.",
-      downloadAndProceed: "Scarica backup e procedi",
-      proceedWithout:     "Procedi senza scaricare",
-      translating:        "Traduzione in corso...",
-      cancel:             "Annulla",
-    },
-  },
-  EN: {
-    palette: {
-      title:    "Customize Palette",
-      modified: "Palette modified",
-      reset:    "↺ Reset to default",
-      hint:     "Modify the active template's colors.",
-      keyLabels: {
-        header:     "Header",
-        accent:     "Accent",
-        sidebar:    "Sidebar",
-        background: "Background",
-      },
-    },
-    fontSizes: {
-      title:     "Font Sizes",
-      modified:  "Fonts modified",
-      reset:     "↺ Reset to default",
-      hint:      "Modify sizes for the active template. Body scales proportionally.",
-      defSuffix: "def",
-      keyLabels: {
-        name:          "Name",
-        role:          "Role / Title",
-        sectionHeader: "Section Headers",
-        body:          "Body text",
-      },
-    },
-    deepl: {
-      title:       "DeepL Translation",
-      apiKey:      "API Key",
-      targetLang:  "Target language",
-      hint:        "Section titles update immediately in the preview.",
-      translate:   "Translate CV content",
-      translating: "Translating...",
-      show:        "Show",
-      hide:        "Hide",
-      errorEmpty:  "Enter your DeepL API key.",
-      errorGeneric:"DeepL error.",
-    },
-    modal: {
-      title:              "Warning: translation will overwrite texts",
-      body:               "Translation will overwrite current texts. We recommend downloading a JSON backup before proceeding.",
-      downloadAndProceed: "Download backup and proceed",
-      proceedWithout:     "Proceed without downloading",
-      translating:        "Translation in progress...",
-      cancel:             "Cancel",
-    },
-  },
-};
 
 const PALETTE_KEYS = {
   tech: [
@@ -184,21 +60,28 @@ const HEX_VALID = /^#[0-9a-fA-F]{6}$/;
 
 // ─── PaletteCustomizerPanel ───────────────────────────────────────────────────
 function PaletteCustomizerPanel() {
-  const template           = useCVStore((s) => s.template);
-  const customPalettes     = useCVStore((s) => s.customPalettes);
+  const template              = useCVStore((s) => s.template);
+  const customPalettes        = useCVStore((s) => s.customPalettes);
   const setCustomPaletteColor = useCVStore((s) => s.setCustomPaletteColor);
-  const resetCustomPalette = useCVStore((s) => s.resetCustomPalette);
-  const uiLanguage         = useCVStore((s) => s.uiLanguage);
+  const resetCustomPalette    = useCVStore((s) => s.resetCustomPalette);
+  const { t } = useTranslation();
 
-  const [open, setOpen]           = useState(false);
-  const [textInputs, setTextInputs] = useState({});
+  const [open, setOpen]               = useState(false);
+  const [textInputs, setTextInputs]   = useState({});
+  const [localColors, setLocalColors] = useState({});
 
-  const L    = (SIDEBAR_LABELS[uiLanguage] || SIDEBAR_LABELS.IT).palette;
-  const keys = PALETTE_KEYS[template] || [];
+  const debouncedSetColorRef = useRef(null);
+  if (!debouncedSetColorRef.current) {
+    debouncedSetColorRef.current = debounce((tpl, k, v) => setCustomPaletteColor(tpl, k, v), 80);
+  }
+  const debouncedSetColor = debouncedSetColorRef.current;
+
+  const keys    = PALETTE_KEYS[template] || [];
   const current = customPalettes[template] || {};
 
   useEffect(() => {
     setTextInputs({});
+    setLocalColors({});
   }, [template]);
 
   const getStoreValue = (key, def) => {
@@ -218,11 +101,11 @@ function PaletteCustomizerPanel() {
       >
         <span className="flex items-center gap-2">
           <Palette size={14} weight="duotone" />
-          <span>{L.title}</span>
+          <span>{t("sidebar.palette.title")}</span>
           {hasCustom && (
             <span
               className="w-1.5 h-1.5 rounded-full bg-purple-400 inline-block"
-              title={L.modified}
+              title={t("sidebar.palette.modified")}
             />
           )}
         </span>
@@ -232,7 +115,7 @@ function PaletteCustomizerPanel() {
       {open && (
         <div className="px-4 pb-4 space-y-3">
           {keys.map(({ key, labelKey, def }) => {
-            const label      = L.keyLabels[labelKey] || labelKey;
+            const label      = t("sidebar.palette.keyLabels." + labelKey, { defaultValue: labelKey });
             const storeValue = getStoreValue(key, def);
             const textValue  = getTextValue(key, def);
             const isDirty    = HEX_VALID.test(current[key]) && current[key] !== def;
@@ -242,11 +125,16 @@ function PaletteCustomizerPanel() {
                 <div className="flex gap-2 items-center">
                   <input
                     type="color"
-                    value={storeValue}
+                    value={localColors[key] ?? storeValue}
                     onChange={(e) => {
                       const v = e.target.value;
-                      setCustomPaletteColor(template, key, v);
+                      setLocalColors((prev) => ({ ...prev, [key]: v }));
                       setTextInputs((prev) => ({ ...prev, [key]: v }));
+                      debouncedSetColor(template, key, v);
+                    }}
+                    onBlur={() => {
+                      const v = localColors[key];
+                      if (v) setCustomPaletteColor(template, key, v);
                     }}
                     className="w-8 h-8 rounded cursor-pointer border-0 p-0 bg-transparent flex-shrink-0"
                     style={{ appearance: "none", WebkitAppearance: "none" }}
@@ -275,8 +163,9 @@ function PaletteCustomizerPanel() {
                       onClick={() => {
                         setCustomPaletteColor(template, key, def);
                         setTextInputs((prev) => ({ ...prev, [key]: def }));
+                        setLocalColors((prev) => { const n = { ...prev }; delete n[key]; return n; });
                       }}
-                      title={L.reset}
+                      title={t("sidebar.palette.reset")}
                       className="text-gray-600 hover:text-gray-300 text-xs px-1 flex-shrink-0"
                     >
                       ↺
@@ -290,13 +179,14 @@ function PaletteCustomizerPanel() {
             onClick={() => {
               resetCustomPalette(template);
               setTextInputs({});
+              setLocalColors({});
             }}
             disabled={!hasCustom}
             className="w-full py-1.5 rounded text-xs font-medium border border-gray-600 text-gray-400 hover:text-white hover:border-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
-            {L.reset}
+            {t("sidebar.palette.reset")}
           </button>
-          <p className="text-xs text-gray-600 leading-tight">{L.hint}</p>
+          <p className="text-xs text-gray-600 leading-tight">{t("sidebar.palette.hint")}</p>
         </div>
       )}
     </div>
@@ -326,15 +216,23 @@ const FONT_SIZE_KEYS = {
 };
 
 function FontSizeCustomizerPanel() {
-  const template        = useCVStore((s) => s.template);
-  const customFontSizes = useCVStore((s) => s.customFontSizes);
+  const template            = useCVStore((s) => s.template);
+  const customFontSizes     = useCVStore((s) => s.customFontSizes);
   const setCustomFontSize   = useCVStore((s) => s.setCustomFontSize);
   const resetCustomFontSizes = useCVStore((s) => s.resetCustomFontSizes);
-  const uiLanguage      = useCVStore((s) => s.uiLanguage);
+  const { t } = useTranslation();
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen]           = useState(false);
+  const [localSizes, setLocalSizes] = useState({});
 
-  const L       = (SIDEBAR_LABELS[uiLanguage] || SIDEBAR_LABELS.IT).fontSizes;
+  const debouncedSetSizeRef = useRef(null);
+  if (!debouncedSetSizeRef.current) {
+    debouncedSetSizeRef.current = debounce((tpl, k, v) => setCustomFontSize(tpl, k, v), 80);
+  }
+  const debouncedSetSize = debouncedSetSizeRef.current;
+
+  useEffect(() => { setLocalSizes({}); }, [template]);
+
   const keys    = FONT_SIZE_KEYS[template] || [];
   const current = customFontSizes[template] || {};
 
@@ -351,11 +249,11 @@ function FontSizeCustomizerPanel() {
       >
         <span className="flex items-center gap-2">
           <TextAa size={14} weight="duotone" />
-          <span>{L.title}</span>
+          <span>{t("sidebar.fontSizes.title")}</span>
           {hasCustom && (
             <span
               className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"
-              title={L.modified}
+              title={t("sidebar.fontSizes.modified")}
             />
           )}
         </span>
@@ -365,9 +263,10 @@ function FontSizeCustomizerPanel() {
       {open && (
         <div className="px-4 pb-4 space-y-3">
           {keys.map(({ key, labelKey, def, min, max }) => {
-            const label  = L.keyLabels[labelKey] || labelKey;
-            const val    = getValue(key, def);
-            const isDirty = current[key] !== undefined && current[key] !== def;
+            const label    = t("sidebar.fontSizes.keyLabels." + labelKey, { defaultValue: labelKey });
+            const val      = getValue(key, def);
+            const localVal = localSizes[key] ?? val;
+            const isDirty  = current[key] !== undefined && current[key] !== def;
             return (
               <div key={key}>
                 <div className="flex justify-between items-center mb-1">
@@ -381,12 +280,15 @@ function FontSizeCustomizerPanel() {
                         textAlign: "right",
                       }}
                     >
-                      {val}px
+                      {localVal}px
                     </span>
                     {isDirty && (
                       <button
-                        onClick={() => setCustomFontSize(template, key, def)}
-                        title={L.reset}
+                        onClick={() => {
+                          setCustomFontSize(template, key, def);
+                          setLocalSizes((prev) => { const n = { ...prev }; delete n[key]; return n; });
+                        }}
+                        title={t("sidebar.fontSizes.reset")}
                         className="text-gray-600 hover:text-gray-300 text-xs px-0.5 flex-shrink-0"
                       >
                         ↺
@@ -399,10 +301,12 @@ function FontSizeCustomizerPanel() {
                   min={min}
                   max={max}
                   step={1}
-                  value={val}
-                  onChange={(e) =>
-                    setCustomFontSize(template, key, Number(e.target.value))
-                  }
+                  value={localVal}
+                  onChange={(e) => {
+                    const v = Number(e.target.value);
+                    setLocalSizes((prev) => ({ ...prev, [key]: v }));
+                    debouncedSetSize(template, key, v);
+                  }}
                   className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
                   style={{
                     accentColor: isDirty ? "#34d399" : "#4b5563",
@@ -411,7 +315,7 @@ function FontSizeCustomizerPanel() {
                 />
                 <div className="flex justify-between text-gray-700 text-xs mt-0.5">
                   <span>{min}</span>
-                  <span className="text-gray-600">{def} {L.defSuffix}</span>
+                  <span className="text-gray-600">{def} {t("sidebar.fontSizes.defSuffix")}</span>
                   <span>{max}</span>
                 </div>
               </div>
@@ -423,9 +327,9 @@ function FontSizeCustomizerPanel() {
             disabled={!hasCustom}
             className="w-full py-1.5 rounded text-xs font-medium border border-gray-600 text-gray-400 hover:text-white hover:border-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors mt-1"
           >
-            {L.reset}
+            {t("sidebar.fontSizes.reset")}
           </button>
-          <p className="text-xs text-gray-600 leading-tight">{L.hint}</p>
+          <p className="text-xs text-gray-600 leading-tight">{t("sidebar.fontSizes.hint")}</p>
         </div>
       )}
     </div>
@@ -433,7 +337,8 @@ function FontSizeCustomizerPanel() {
 }
 
 // ─── Modale conferma traduzione ───────────────────────────────────────────────
-function TranslateConfirmModal({ L, onDownloadAndProceed, onProceed, onCancel, translating }) {
+function TranslateConfirmModal({ onDownloadAndProceed, onProceed, onCancel, translating }) {
+  const { t } = useTranslation();
   return (
     <div
       style={{
@@ -461,10 +366,10 @@ function TranslateConfirmModal({ L, onDownloadAndProceed, onProceed, onCancel, t
       >
         <Warning size={32} weight="duotone" color="#f59e0b" style={{ marginBottom: 10 }} />
         <h2 style={{ color: "#f1f5f9", fontSize: "14px", fontWeight: 700, marginBottom: "10px", lineHeight: 1.4 }}>
-          {L.title}
+          {t("sidebar.modal.title")}
         </h2>
         <p style={{ color: "#94a3b8", fontSize: "12px", lineHeight: 1.65, marginBottom: "22px" }}>
-          {L.body}
+          {t("sidebar.modal.body")}
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           <button
@@ -478,7 +383,7 @@ function TranslateConfirmModal({ L, onDownloadAndProceed, onProceed, onCancel, t
               opacity: translating ? 0.6 : 1, textAlign: "center",
             }}
           >
-            {L.downloadAndProceed}
+            {t("sidebar.modal.downloadAndProceed")}
           </button>
           <button
             onClick={onProceed}
@@ -491,7 +396,7 @@ function TranslateConfirmModal({ L, onDownloadAndProceed, onProceed, onCancel, t
               fontSize: "12px", opacity: translating ? 0.6 : 1, textAlign: "center",
             }}
           >
-            {translating ? L.translating : L.proceedWithout}
+            {translating ? t("sidebar.modal.translating") : t("sidebar.modal.proceedWithout")}
           </button>
           <button
             onClick={onCancel}
@@ -504,7 +409,7 @@ function TranslateConfirmModal({ L, onDownloadAndProceed, onProceed, onCancel, t
               fontSize: "12px", opacity: translating ? 0.5 : 1,
             }}
           >
-            {L.cancel}
+            {t("sidebar.modal.cancel")}
           </button>
         </div>
       </div>
@@ -514,24 +419,22 @@ function TranslateConfirmModal({ L, onDownloadAndProceed, onProceed, onCancel, t
 
 // ─── DeepL panel ──────────────────────────────────────────────────────────────
 function DeepLPanel({ onTranslate }) {
-  const deepLApiKey    = useCVStore((s) => s.deepLApiKey);
-  const setDeepLApiKey = useCVStore((s) => s.setDeepLApiKey);
+  const deepLApiKey       = useCVStore((s) => s.deepLApiKey);
+  const setDeepLApiKey    = useCVStore((s) => s.setDeepLApiKey);
   const targetLanguage    = useCVStore((s) => s.targetLanguage);
   const setTargetLanguage = useCVStore((s) => s.setTargetLanguage);
-  const uiLanguage        = useCVStore((s) => s.uiLanguage);
+  const personal          = useCVStore((s) => s.personal);
+  const { t } = useTranslation();
 
-  const [open, setOpen]         = useState(false);
-  const [showKey, setShowKey]   = useState(false);
+  const [open, setOpen]           = useState(false);
+  const [showKey, setShowKey]     = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [translating, setTranslating] = useState(false);
-  const [error, setError]       = useState("");
-
-  const L = (SIDEBAR_LABELS[uiLanguage] || SIDEBAR_LABELS.IT).deepl;
-  const LM = (SIDEBAR_LABELS[uiLanguage] || SIDEBAR_LABELS.IT).modal;
+  const [error, setError]         = useState("");
 
   const downloadBackup = () => {
     const state = useCVStore.getState();
-    const { personal, skills, experience, education, certifications, languages, projects, template, designerPalette } = state;
+    const { skills, experience, education, certifications, languages, projects, template, designerPalette } = state;
     const data = { personal, skills, experience, education, certifications, languages, projects, template, designerPalette };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const url  = URL.createObjectURL(blob);
@@ -546,7 +449,7 @@ function DeepLPanel({ onTranslate }) {
 
   const doTranslate = async () => {
     if (!deepLApiKey.trim()) {
-      setError(L.errorEmpty);
+      setError(t("sidebar.deepl.errorEmpty"));
       setShowModal(false);
       return;
     }
@@ -556,7 +459,7 @@ function DeepLPanel({ onTranslate }) {
       await onTranslate(targetLanguage, deepLApiKey);
       setShowModal(false);
     } catch (e) {
-      setError(e.message || L.errorGeneric);
+      setError(e.message || t("sidebar.deepl.errorGeneric"));
       setShowModal(false);
     } finally {
       setTranslating(false);
@@ -564,7 +467,7 @@ function DeepLPanel({ onTranslate }) {
   };
 
   const handleClickTranslate = () => {
-    if (!deepLApiKey.trim()) { setError(L.errorEmpty); return; }
+    if (!deepLApiKey.trim()) { setError(t("sidebar.deepl.errorEmpty")); return; }
     setError("");
     setShowModal(true);
   };
@@ -578,7 +481,7 @@ function DeepLPanel({ onTranslate }) {
         >
           <span className="flex items-center gap-2">
             <Translate size={14} weight="duotone" />
-            <span>{L.title}</span>
+            <span>{t("sidebar.deepl.title")}</span>
           </span>
           <span className="text-gray-600 text-xs">{open ? "▲" : "▼"}</span>
         </button>
@@ -586,7 +489,7 @@ function DeepLPanel({ onTranslate }) {
         {open && (
           <div className="px-4 pb-4 space-y-2">
             <div>
-              <label className="block text-xs text-gray-500 mb-1">{L.apiKey}</label>
+              <label className="block text-xs text-gray-500 mb-1">{t("sidebar.deepl.apiKey")}</label>
               <div className="flex gap-1">
                 <input
                   type={showKey ? "text" : "password"}
@@ -597,7 +500,7 @@ function DeepLPanel({ onTranslate }) {
                 />
                 <button
                   onClick={() => setShowKey((v) => !v)}
-                  title={showKey ? L.hide : L.show}
+                  title={showKey ? t("sidebar.deepl.hide") : t("sidebar.deepl.show")}
                   className="px-1.5 bg-gray-700 border border-gray-600 rounded text-gray-400 hover:text-white text-xs"
                 >
                   {showKey ? <EyeSlashIcon /> : <EyeIcon />}
@@ -605,17 +508,13 @@ function DeepLPanel({ onTranslate }) {
               </div>
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">{L.targetLang}</label>
-              <select
+              <label className="block text-xs text-gray-500 mb-1">{t("sidebar.deepl.targetLang")}</label>
+              <LanguagePicker
                 value={targetLanguage}
-                onChange={(e) => setTargetLanguage(e.target.value)}
-                className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1 text-xs text-gray-100 focus:outline-none focus:border-blue-500"
-              >
-                {UI_LANGUAGES.map((l) => (
-                  <option key={l.code} value={l.code}>{l.label}</option>
-                ))}
-              </select>
-              <p className="text-xs text-gray-600 mt-1 leading-tight">{L.hint}</p>
+                onChange={setTargetLanguage}
+                languages={CV_LANGUAGES}
+              />
+              <p className="text-xs text-gray-600 mt-1 leading-tight">{t("sidebar.deepl.hint")}</p>
             </div>
             {error && <p className="text-xs text-red-400">{error}</p>}
             <button
@@ -623,7 +522,7 @@ function DeepLPanel({ onTranslate }) {
               disabled={translating}
               className="w-full py-1.5 rounded text-xs font-semibold bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:text-gray-500 text-white transition-colors"
             >
-              {translating ? L.translating : L.translate}
+              {translating ? t("sidebar.deepl.translating") : t("sidebar.deepl.translate")}
             </button>
           </div>
         )}
@@ -631,7 +530,6 @@ function DeepLPanel({ onTranslate }) {
 
       {showModal && (
         <TranslateConfirmModal
-          L={LM}
           translating={translating}
           onDownloadAndProceed={async () => { downloadBackup(); await doTranslate(); }}
           onProceed={doTranslate}
@@ -646,14 +544,14 @@ function DeepLPanel({ onTranslate }) {
 export function Sidebar({ activeSection, onSectionChange, onTranslate }) {
   const uiLanguage    = useCVStore((s) => s.uiLanguage);
   const setUiLanguage = useCVStore((s) => s.setUiLanguage);
-  const nav = NAV_LABELS[uiLanguage] || NAV_LABELS.IT;
+  const { t } = useTranslation();
 
   return (
     <div className="flex flex-col h-full bg-gray-900 text-white overflow-hidden">
       {/* Logo / Brand — fisso */}
       <div className="px-4 py-4 border-b border-gray-700 flex-shrink-0">
         <h1 className="text-sm font-bold text-white tracking-wide">CV Builder</h1>
-        <p className="text-xs text-gray-500 mt-0.5">{nav.subtitle}</p>
+        <p className="text-xs text-gray-500 mt-0.5">{t("nav.subtitle")}</p>
       </div>
 
       {/* Language SelectButton — fisso */}
@@ -678,7 +576,7 @@ export function Sidebar({ activeSection, onSectionChange, onTranslate }) {
       {/* Navigazione sezioni CV — scrollabile, occupa lo spazio disponibile */}
       <nav className="flex-1 min-h-0 overflow-y-auto py-2" style={{ scrollbarGutter: "stable" }}>
         <p className="px-4 py-1 text-xs font-semibold text-gray-600 uppercase tracking-widest">
-          {nav.cvGroup}
+          {t("nav.cvGroup")}
         </p>
         {CV_SECTIONS.map(({ id, Icon }) => (
           <button
@@ -691,14 +589,14 @@ export function Sidebar({ activeSection, onSectionChange, onTranslate }) {
             }`}
           >
             <Icon size={16} weight="duotone" />
-            <span className="truncate">{nav.sections[id]}</span>
+            <span className="truncate">{t("nav.sections." + id)}</span>
           </button>
         ))}
 
         <div className="mx-4 my-2 border-t border-gray-700" />
 
         <p className="px-4 py-1 text-xs font-semibold text-gray-600 uppercase tracking-widest">
-          {nav.docsGroup}
+          {t("nav.docsGroup")}
         </p>
         {EXTRA_SECTIONS.map(({ id, Icon }) => (
           <button
@@ -711,7 +609,7 @@ export function Sidebar({ activeSection, onSectionChange, onTranslate }) {
             }`}
           >
             <Icon size={16} weight="duotone" />
-            <span className="truncate">{nav.sections[id]}</span>
+            <span className="truncate">{t("nav.sections." + id)}</span>
           </button>
         ))}
       </nav>
