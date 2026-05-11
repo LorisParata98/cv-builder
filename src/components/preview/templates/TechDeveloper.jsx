@@ -4,7 +4,11 @@
 // Layout: colonna singola, ATS-safe
 
 import { getLocale } from "../../../locales/index.js";
-import { makeHref, shortenWebsite, shortenLinkedIn } from "../../../utils/urlUtils.js";
+import {
+  makeHref,
+  shortenWebsite,
+  shortenLinkedIn,
+} from "../../../utils/urlUtils.js";
 
 const COLORS_DEFAULT = {
   bg: "#0f2644",
@@ -14,6 +18,7 @@ const COLORS_DEFAULT = {
   text: "#e8eaf0",
   textMuted: "#8fa8c8",
   tagBg: "#1a3a60",
+  tagText: "#ffffff",
   tagBorder: "#4ec9b0",
   white: "#ffffff",
   bodyBg: "#f8f9fa",
@@ -137,11 +142,31 @@ function HeaderSection({ personal, C, fs }) {
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 18px" }}>
           {[
-            personal.email    && { raw: `mailto:${personal.email}`, display: personal.email,                    prefix: "✉" },
-            personal.phone    && { raw: null,                         display: personal.phone,                    prefix: "☎" },
-            personal.location && { raw: null,                         display: personal.location,                 prefix: "📍" },
-            personal.website  && { raw: makeHref(personal.website),   display: shortenWebsite(personal.website),  prefix: "gh" },
-            personal.linkedin && { raw: makeHref(personal.linkedin),  display: shortenLinkedIn(personal.linkedin), prefix: "in" },
+            personal.email && {
+              raw: `mailto:${personal.email}`,
+              display: personal.email,
+              prefix: "✉",
+            },
+            personal.phone && {
+              raw: null,
+              display: personal.phone,
+              prefix: "☎",
+            },
+            personal.location && {
+              raw: null,
+              display: personal.location,
+              prefix: "📍",
+            },
+            personal.website && {
+              raw: makeHref(personal.website),
+              display: shortenWebsite(personal.website),
+              prefix: "gh",
+            },
+            personal.linkedin && {
+              raw: makeHref(personal.linkedin),
+              display: shortenLinkedIn(personal.linkedin),
+              prefix: "in",
+            },
           ]
             .filter(Boolean)
             .map((item, i) => (
@@ -155,12 +180,23 @@ function HeaderSection({ personal, C, fs }) {
               >
                 <span style={{ color: C.accent }}>{item.prefix} </span>
                 {item.raw ? (
-                  <a href={item.raw} target="_blank" rel="noopener noreferrer"
-                     style={{ color: "inherit", textDecoration: "none" }}
-                     onMouseEnter={e => e.currentTarget.style.textDecoration = "underline"}
-                     onMouseLeave={e => e.currentTarget.style.textDecoration = "none"}
-                  >{item.display}</a>
-                ) : item.display}
+                  <a
+                    href={item.raw}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: "inherit", textDecoration: "none" }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.textDecoration = "underline")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.textDecoration = "none")
+                    }
+                  >
+                    {item.display}
+                  </a>
+                ) : (
+                  item.display
+                )}
               </span>
             ))}
         </div>
@@ -233,7 +269,12 @@ function SkillsSection({ skills, C, L, fs }) {
                 >
                   {tag.label}
                   {tag.versionsRange && (
-                    <span style={{ color: C.textMuted, fontSize: `${Math.max(8, fs.body - 2)}px` }}>
+                    <span
+                      style={{
+                        color: C.textMuted,
+                        fontSize: `${Math.max(8, fs.body - 2)}px`,
+                      }}
+                    >
                       {tag.versionsRange}
                     </span>
                   )}
@@ -394,9 +435,28 @@ function CertificationsSection({ certifications, C, L, fs }) {
     <div style={{ marginBottom: "22px" }}>
       <SectionHeader icon="[*]" title={L.certifications} C={C} fs={fs} />
       {items.map((cert, i) => (
-        <div key={i} style={{ display: "flex", gap: "8px", marginBottom: "4px" }}>
-          <span style={{ color: C.accent, flexShrink: 0, fontWeight: 700, fontSize: `${fs.body}px` }}>★</span>
-          <span style={{ fontSize: `${fs.body}px`, color: C.bodyText, lineHeight: 1.6, fontFamily: "system-ui, sans-serif" }}>
+        <div
+          key={i}
+          style={{ display: "flex", gap: "8px", marginBottom: "4px" }}
+        >
+          <span
+            style={{
+              color: C.accent,
+              flexShrink: 0,
+              fontWeight: 700,
+              fontSize: `${fs.body}px`,
+            }}
+          >
+            ★
+          </span>
+          <span
+            style={{
+              fontSize: `${fs.body}px`,
+              color: C.bodyText,
+              lineHeight: 1.6,
+              fontFamily: "system-ui, sans-serif",
+            }}
+          >
             {cert}
           </span>
         </div>
@@ -412,9 +472,18 @@ function LanguagesSection({ languages, C, L, fs }) {
       <SectionHeader icon="Aa" title={L.languages} C={C} fs={fs} />
       <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
         {languages.map((lang, i) => (
-          <span key={i} style={{ fontSize: `${fs.body}px`, color: C.bodyText, fontFamily: "system-ui, sans-serif" }}>
+          <span
+            key={i}
+            style={{
+              fontSize: `${fs.body}px`,
+              color: C.bodyText,
+              fontFamily: "system-ui, sans-serif",
+            }}
+          >
             <strong>{lang.language}</strong>
-            {lang.level && <span style={{ color: C.bodyMuted }}> – {lang.level}</span>}
+            {lang.level && (
+              <span style={{ color: C.bodyMuted }}> – {lang.level}</span>
+            )}
           </span>
         ))}
       </div>
@@ -429,9 +498,28 @@ function ProjectsSection({ projects, C, L, fs }) {
     <div style={{ marginBottom: "22px" }}>
       <SectionHeader icon=">" title={L.projects} C={C} fs={fs} />
       {items.map((proj, i) => (
-        <div key={i} style={{ display: "flex", gap: "8px", marginBottom: "5px" }}>
-          <span style={{ color: C.accent, flexShrink: 0, fontWeight: 700, fontSize: `${fs.body}px` }}>▶</span>
-          <span style={{ fontSize: `${fs.body}px`, color: C.bodyText, lineHeight: 1.6, fontFamily: "system-ui, sans-serif" }}>
+        <div
+          key={i}
+          style={{ display: "flex", gap: "8px", marginBottom: "5px" }}
+        >
+          <span
+            style={{
+              color: C.accent,
+              flexShrink: 0,
+              fontWeight: 700,
+              fontSize: `${fs.body}px`,
+            }}
+          >
+            ▶
+          </span>
+          <span
+            style={{
+              fontSize: `${fs.body}px`,
+              color: C.bodyText,
+              lineHeight: 1.6,
+              fontFamily: "system-ui, sans-serif",
+            }}
+          >
             {proj}
           </span>
         </div>
@@ -441,21 +529,45 @@ function ProjectsSection({ projects, C, L, fs }) {
 }
 
 // ─── Componente principale ────────────────────────────────────────────────────
-export function TechDeveloper({ data, customColors = {}, customFontSizes = {}, locale }) {
-  const C  = { ...COLORS_DEFAULT, ...customColors };
+export function TechDeveloper({
+  data,
+  customColors = {},
+  customFontSizes = {},
+  locale,
+}) {
+  const C = { ...COLORS_DEFAULT, ...customColors };
   const fs = { ...FS_DEFAULT, ...customFontSizes };
-  const L  = locale || getLocale("IT");
-  const { personal, skills, experience, education, certifications, languages, projects } = data;
+  const L = locale || getLocale("IT");
+  const {
+    personal,
+    skills,
+    experience,
+    education,
+    certifications,
+    languages,
+    projects,
+  } = data;
 
   return (
-    <div style={{ width: "100%", backgroundColor: C.bodyBg, fontFamily: "system-ui, sans-serif" }}>
+    <div
+      style={{
+        width: "100%",
+        backgroundColor: C.bodyBg,
+        fontFamily: "system-ui, sans-serif",
+      }}
+    >
       <HeaderSection personal={personal} C={C} fs={fs} />
       <div style={{ padding: "28px 40px 32px" }}>
         <SummarySection summary={personal.summary} C={C} L={L} fs={fs} />
         <SkillsSection skills={skills} C={C} L={L} fs={fs} />
         <ExperienceSection experience={experience} C={C} L={L} fs={fs} />
         <EducationSection education={education} C={C} L={L} fs={fs} />
-        <CertificationsSection certifications={certifications} C={C} L={L} fs={fs} />
+        <CertificationsSection
+          certifications={certifications}
+          C={C}
+          L={L}
+          fs={fs}
+        />
         <LanguagesSection languages={languages} C={C} L={L} fs={fs} />
         <ProjectsSection projects={projects} C={C} L={L} fs={fs} />
       </div>

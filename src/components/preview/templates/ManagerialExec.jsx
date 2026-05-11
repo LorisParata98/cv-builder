@@ -2,7 +2,11 @@
 // Layout due colonne, Playfair Display, palette navy + bianco
 
 import { getLocale } from "../../../locales/index.js";
-import { makeHref, shortenWebsite, shortenLinkedIn } from "../../../utils/urlUtils.js";
+import {
+  makeHref,
+  shortenWebsite,
+  shortenLinkedIn,
+} from "../../../utils/urlUtils.js";
 
 const COLORS_DEFAULT = {
   bg: "#1e3a5f",
@@ -90,11 +94,19 @@ function LeftColumn({ data, C, L, fs }) {
       }}
     >
       {personal.photo && (
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: "4px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: "4px",
+          }}
+        >
           <div
             style={{
-              width: "96px", height: "96px",
-              borderRadius: "50%", overflow: "hidden",
+              width: "96px",
+              height: "96px",
+              borderRadius: "50%",
+              overflow: "hidden",
               border: `3px solid ${C.accent}`,
               boxShadow: "0 2px 12px rgba(30,58,95,0.2)",
             }}
@@ -103,7 +115,8 @@ function LeftColumn({ data, C, L, fs }) {
               src={personal.photo}
               alt={personal.name}
               style={{
-                width: "100%", height: "100%",
+                width: "100%",
+                height: "100%",
                 objectFit: "cover",
                 objectPosition: `${personal.photoPosition?.x ?? 50}% ${personal.photoPosition?.y ?? 50}%`,
               }}
@@ -114,29 +127,75 @@ function LeftColumn({ data, C, L, fs }) {
 
       {/* Contatti */}
       <div>
-        <SectionTitleLight C={C} fs={fs}>{L.contacts}</SectionTitleLight>
+        <SectionTitleLight C={C} fs={fs}>
+          {L.contacts}
+        </SectionTitleLight>
         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
           {[
-            { icon: "✉", raw: `mailto:${personal.email}`,  display: personal.email },
-            { icon: "☎", raw: null,                          display: personal.phone },
-            { icon: "📍", raw: null,                         display: personal.location },
-            { icon: "🔗", raw: makeHref(personal.website),   display: shortenWebsite(personal.website) },
-            { icon: "in", raw: makeHref(personal.linkedin),  display: shortenLinkedIn(personal.linkedin) },
+            {
+              icon: "✉",
+              raw: `mailto:${personal.email}`,
+              display: personal.email,
+            },
+            { icon: "☎", raw: null, display: personal.phone },
+            { icon: "📍", raw: null, display: personal.location },
+            {
+              icon: "🔗",
+              raw: makeHref(personal.website),
+              display: shortenWebsite(personal.website),
+            },
+            {
+              icon: "in",
+              raw: makeHref(personal.linkedin),
+              display: shortenLinkedIn(personal.linkedin),
+            },
           ]
             .filter((x) => x.display)
             .map((item, i) => (
-              <div key={i} style={{ display: "flex", gap: "6px", alignItems: "flex-start" }}>
-                <span style={{ fontSize: `${Math.max(7, fs.body - 1)}px`, color: C.accent, flexShrink: 0, minWidth: "14px" }}>
+              <div
+                key={i}
+                style={{
+                  display: "flex",
+                  gap: "6px",
+                  alignItems: "flex-start",
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: `${Math.max(7, fs.body - 1)}px`,
+                    color: C.accent,
+                    flexShrink: 0,
+                    minWidth: "14px",
+                  }}
+                >
                   {item.icon}
                 </span>
-                <span style={{ fontSize: `${Math.max(7, fs.body - 1)}px`, color: C.body, wordBreak: "break-word", lineHeight: 1.4 }}>
+                <span
+                  style={{
+                    fontSize: `${Math.max(7, fs.body - 1)}px`,
+                    color: C.body,
+                    wordBreak: "break-word",
+                    lineHeight: 1.4,
+                  }}
+                >
                   {item.raw ? (
-                    <a href={item.raw} target="_blank" rel="noopener noreferrer"
-                       style={{ color: "inherit", textDecoration: "none" }}
-                       onMouseEnter={e => e.currentTarget.style.textDecoration = "underline"}
-                       onMouseLeave={e => e.currentTarget.style.textDecoration = "none"}
-                    >{item.display}</a>
-                  ) : item.display}
+                    <a
+                      href={item.raw}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: "inherit", textDecoration: "none" }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.textDecoration = "underline")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.textDecoration = "none")
+                      }
+                    >
+                      {item.display}
+                    </a>
+                  ) : (
+                    item.display
+                  )}
                 </span>
               </div>
             ))}
@@ -146,15 +205,36 @@ function LeftColumn({ data, C, L, fs }) {
       {/* Competenze */}
       {skills.length > 0 && (
         <div>
-          <SectionTitleLight C={C} fs={fs}>{L.skillsShort}</SectionTitleLight>
+          <SectionTitleLight C={C} fs={fs}>
+            {L.skillsShort}
+          </SectionTitleLight>
           {skills.map((cat, i) => (
             <div key={i} style={{ marginBottom: "8px" }}>
-              <p style={{ fontSize: `${Math.max(7, fs.body - 2)}px`, fontWeight: 700, color: C.muted, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "4px" }}>
+              <p
+                style={{
+                  fontSize: `${Math.max(7, fs.body - 2)}px`,
+                  fontWeight: 700,
+                  color: C.muted,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
+                  marginBottom: "4px",
+                }}
+              >
                 {cat.category}
               </p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "3px" }}>
                 {cat.tags.map((tag, ti) => (
-                  <span key={ti} style={{ backgroundColor: C.tagBg, color: C.accent, fontSize: `${Math.max(7, fs.body - 1.5)}px`, padding: "2px 6px", borderRadius: "3px", fontWeight: 500 }}>
+                  <span
+                    key={ti}
+                    style={{
+                      backgroundColor: C.tagBg,
+                      color: C.accent,
+                      fontSize: `${Math.max(7, fs.body - 1.5)}px`,
+                      padding: "2px 6px",
+                      borderRadius: "3px",
+                      fontWeight: 500,
+                    }}
+                  >
                     {tag.label}
                   </span>
                 ))}
@@ -167,11 +247,31 @@ function LeftColumn({ data, C, L, fs }) {
       {/* Lingue */}
       {languages.length > 0 && (
         <div>
-          <SectionTitleLight C={C} fs={fs}>{L.languages}</SectionTitleLight>
+          <SectionTitleLight C={C} fs={fs}>
+            {L.languages}
+          </SectionTitleLight>
           {languages.map((l, i) => (
             <div key={i} style={{ marginBottom: "5px" }}>
-              <p style={{ fontSize: `${Math.max(7, fs.body - 1)}px`, fontWeight: 700, color: C.body, marginBottom: "1px" }}>{l.language}</p>
-              {l.level && <p style={{ fontSize: `${Math.max(7, fs.body - 2)}px`, color: C.muted }}>{l.level}</p>}
+              <p
+                style={{
+                  fontSize: `${Math.max(7, fs.body - 1)}px`,
+                  fontWeight: 700,
+                  color: C.body,
+                  marginBottom: "1px",
+                }}
+              >
+                {l.language}
+              </p>
+              {l.level && (
+                <p
+                  style={{
+                    fontSize: `${Math.max(7, fs.body - 2)}px`,
+                    color: C.muted,
+                  }}
+                >
+                  {l.level}
+                </p>
+              )}
             </div>
           ))}
         </div>
@@ -180,11 +280,37 @@ function LeftColumn({ data, C, L, fs }) {
       {/* Certificazioni */}
       {certifications.filter(Boolean).length > 0 && (
         <div>
-          <SectionTitleLight C={C} fs={fs}>{L.certifications}</SectionTitleLight>
+          <SectionTitleLight C={C} fs={fs}>
+            {L.certifications}
+          </SectionTitleLight>
           {certifications.filter(Boolean).map((cert, i) => (
-            <div key={i} style={{ display: "flex", gap: "5px", marginBottom: "4px", alignItems: "flex-start" }}>
-              <span style={{ color: C.accent, fontSize: `${Math.max(7, fs.body - 2)}px`, flexShrink: 0 }}>★</span>
-              <span style={{ fontSize: `${Math.max(7, fs.body - 1.5)}px`, color: C.body, lineHeight: 1.4 }}>{cert}</span>
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                gap: "5px",
+                marginBottom: "4px",
+                alignItems: "flex-start",
+              }}
+            >
+              <span
+                style={{
+                  color: C.accent,
+                  fontSize: `${Math.max(7, fs.body - 2)}px`,
+                  flexShrink: 0,
+                }}
+              >
+                ★
+              </span>
+              <span
+                style={{
+                  fontSize: `${Math.max(7, fs.body - 1.5)}px`,
+                  color: C.body,
+                  lineHeight: 1.4,
+                }}
+              >
+                {cert}
+              </span>
             </div>
           ))}
         </div>
@@ -201,10 +327,18 @@ function RightColumn({ data, C, L, fs }) {
     <div style={{ flex: 1, padding: "28px 28px 32px", overflowY: "visible" }}>
       {personal.summary && (
         <div style={{ marginBottom: "20px" }}>
-          <SectionTitle C={C} fs={fs}>{L.profile}</SectionTitle>
+          <SectionTitle C={C} fs={fs}>
+            {L.profile}
+          </SectionTitle>
           <div
             className="rtf-preview"
-            style={{ "--rtf-accent": C.accent, fontSize: `${fs.body}px`, lineHeight: 1.7, color: C.body, fontFamily: "system-ui, sans-serif" }}
+            style={{
+              "--rtf-accent": C.accent,
+              fontSize: `${fs.body}px`,
+              lineHeight: 1.7,
+              color: C.body,
+              fontFamily: "system-ui, sans-serif",
+            }}
             dangerouslySetInnerHTML={{ __html: personal.summary }}
           />
         </div>
@@ -212,26 +346,65 @@ function RightColumn({ data, C, L, fs }) {
 
       {experience.length > 0 && (
         <div style={{ marginBottom: "20px" }}>
-          <SectionTitle C={C} fs={fs}>{L.experienceShort}</SectionTitle>
+          <SectionTitle C={C} fs={fs}>
+            {L.experienceShort}
+          </SectionTitle>
           {experience.map((exp) => (
             <div key={exp.id} style={{ marginBottom: "14px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "2px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  marginBottom: "2px",
+                }}
+              >
                 <div>
-                  <p style={{ fontSize: `${fs.body + 1}px`, fontWeight: 700, color: C.body, fontFamily: "'Playfair Display', serif" }}>
+                  <p
+                    style={{
+                      fontSize: `${fs.body + 1}px`,
+                      fontWeight: 700,
+                      color: C.body,
+                      fontFamily: "'Playfair Display', serif",
+                    }}
+                  >
                     {exp.role}
                   </p>
-                  <p style={{ fontSize: `${fs.body}px`, color: C.accent, fontWeight: 600, marginTop: "1px" }}>
-                    {exp.company}{exp.location ? ` · ${exp.location}` : ""}
+                  <p
+                    style={{
+                      fontSize: `${fs.body}px`,
+                      color: C.accent,
+                      fontWeight: 600,
+                      marginTop: "1px",
+                    }}
+                  >
+                    {exp.company}
+                    {exp.location ? ` · ${exp.location}` : ""}
                   </p>
                 </div>
-                <span style={{ fontSize: `${Math.max(7, fs.body - 1)}px`, color: C.muted, whiteSpace: "nowrap", marginLeft: "10px", marginTop: "1px" }}>
+                <span
+                  style={{
+                    fontSize: `${Math.max(7, fs.body - 1)}px`,
+                    color: C.muted,
+                    whiteSpace: "nowrap",
+                    marginLeft: "10px",
+                    marginTop: "1px",
+                  }}
+                >
                   {formatDate(exp.startDate, L)} – {formatDate(exp.endDate, L)}
                 </span>
               </div>
               {exp.description && (
                 <div
                   className="rtf-preview"
-                  style={{ "--rtf-accent": C.accent, fontSize: `${fs.body}px`, lineHeight: 1.6, color: C.body, fontFamily: "system-ui, sans-serif", marginTop: "5px" }}
+                  style={{
+                    "--rtf-accent": C.accent,
+                    fontSize: `${fs.body}px`,
+                    lineHeight: 1.6,
+                    color: C.body,
+                    fontFamily: "system-ui, sans-serif",
+                    marginTop: "5px",
+                  }}
                   dangerouslySetInnerHTML={{ __html: exp.description }}
                 />
               )}
@@ -242,24 +415,61 @@ function RightColumn({ data, C, L, fs }) {
 
       {education.length > 0 && (
         <div style={{ marginBottom: "20px" }}>
-          <SectionTitle C={C} fs={fs}>{L.education}</SectionTitle>
+          <SectionTitle C={C} fs={fs}>
+            {L.education}
+          </SectionTitle>
           {education.map((edu) => (
             <div key={edu.id} style={{ marginBottom: "10px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                }}
+              >
                 <div>
-                  <p style={{ fontSize: `${fs.body + 1}px`, fontWeight: 700, color: C.body, fontFamily: "'Playfair Display', serif" }}>
-                    {edu.degree}{edu.field ? ` in ${edu.field}` : ""}
+                  <p
+                    style={{
+                      fontSize: `${fs.body + 1}px`,
+                      fontWeight: 700,
+                      color: C.body,
+                      fontFamily: "'Playfair Display', serif",
+                    }}
+                  >
+                    {edu.degree}
+                    {edu.field ? ` in ${edu.field}` : ""}
                   </p>
-                  <p style={{ fontSize: `${fs.body}px`, color: C.muted, marginTop: "1px" }}>
-                    {edu.institution}{edu.grade ? ` · ${edu.grade}` : ""}
+                  <p
+                    style={{
+                      fontSize: `${fs.body}px`,
+                      color: C.muted,
+                      marginTop: "1px",
+                    }}
+                  >
+                    {edu.institution}
+                    {edu.grade ? ` · ${edu.grade}` : ""}
                   </p>
                 </div>
-                <span style={{ fontSize: `${Math.max(7, fs.body - 1)}px`, color: C.muted, whiteSpace: "nowrap", marginLeft: "10px" }}>
+                <span
+                  style={{
+                    fontSize: `${Math.max(7, fs.body - 1)}px`,
+                    color: C.muted,
+                    whiteSpace: "nowrap",
+                    marginLeft: "10px",
+                  }}
+                >
                   {formatDate(edu.startDate, L)} – {formatDate(edu.endDate, L)}
                 </span>
               </div>
               {edu.thesis && (
-                <p style={{ fontSize: `${Math.max(7, fs.body - 1)}px`, color: C.muted, fontStyle: "italic", marginTop: "3px" }}>
+                <p
+                  style={{
+                    fontSize: `${Math.max(7, fs.body - 1)}px`,
+                    color: C.muted,
+                    fontStyle: "italic",
+                    marginTop: "3px",
+                  }}
+                >
                   {L.thesis}: {edu.thesis}
                 </p>
               )}
@@ -270,11 +480,31 @@ function RightColumn({ data, C, L, fs }) {
 
       {projects.filter(Boolean).length > 0 && (
         <div>
-          <SectionTitle C={C} fs={fs}>{L.projects}</SectionTitle>
+          <SectionTitle C={C} fs={fs}>
+            {L.projects}
+          </SectionTitle>
           {projects.filter(Boolean).map((p, i) => (
-            <div key={i} style={{ display: "flex", gap: "6px", marginBottom: "4px", alignItems: "flex-start" }}>
-              <span style={{ color: C.accent, flexShrink: 0, fontWeight: 700 }}>—</span>
-              <span style={{ fontSize: `${fs.body}px`, color: C.body, lineHeight: 1.6 }}>{p}</span>
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                gap: "6px",
+                marginBottom: "4px",
+                alignItems: "flex-start",
+              }}
+            >
+              <span style={{ color: C.accent, flexShrink: 0, fontWeight: 700 }}>
+                —
+              </span>
+              <span
+                style={{
+                  fontSize: `${fs.body}px`,
+                  color: C.body,
+                  lineHeight: 1.6,
+                }}
+              >
+                {p}
+              </span>
             </div>
           ))}
         </div>
@@ -284,20 +514,59 @@ function RightColumn({ data, C, L, fs }) {
 }
 
 // ─── Componente principale ────────────────────────────────────────────────────
-export function ManagerialExec({ data, customColors = {}, customFontSizes = {}, locale }) {
-  const C  = { ...COLORS_DEFAULT, ...customColors };
+export function ManagerialExec({
+  data,
+  customColors = {},
+  customFontSizes = {},
+  locale,
+}) {
+  const C = { ...COLORS_DEFAULT, ...customColors };
   const fs = { ...FS_DEFAULT, ...customFontSizes };
-  const L  = locale || getLocale("IT");
+  const L = locale || getLocale("IT");
 
   return (
-    <div style={{ width: "100%", backgroundColor: C.white, fontFamily: "system-ui, sans-serif" }}>
+    <div
+      style={{
+        width: "100%",
+        backgroundColor: C.white,
+        fontFamily: "system-ui, sans-serif",
+      }}
+    >
       {/* Header */}
-      <div style={{ backgroundColor: C.bg, padding: "28px 32px 24px", display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+      <div
+        style={{
+          backgroundColor: C.bg,
+          padding: "28px 32px 24px",
+          display: "flex",
+          alignItems: "flex-end",
+          justifyContent: "space-between",
+        }}
+      >
         <div>
-          <h1 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: `${fs.name}px`, fontWeight: 700, color: C.white, margin: 0, letterSpacing: "-0.5px", lineHeight: 1.15 }}>
+          <h1
+            style={{
+              fontFamily: "'Playfair Display', Georgia, serif",
+              fontSize: `${fs.name}px`,
+              fontWeight: 700,
+              color: C.white,
+              margin: 0,
+              letterSpacing: "-0.5px",
+              lineHeight: 1.15,
+            }}
+          >
             {data.personal.name || "Il tuo nome"}
           </h1>
-          <p style={{ fontFamily: "system-ui, sans-serif", fontSize: `${fs.role}px`, color: C.accentLight, margin: "6px 0 0", textTransform: "uppercase", letterSpacing: "2px", fontWeight: 500 }}>
+          <p
+            style={{
+              fontFamily: "system-ui, sans-serif",
+              fontSize: `${fs.role}px`,
+              color: C.accentLight,
+              margin: "6px 0 0",
+              textTransform: "uppercase",
+              letterSpacing: "2px",
+              fontWeight: 500,
+            }}
+          >
             {data.personal.title || "Il tuo ruolo"}
           </p>
         </div>
