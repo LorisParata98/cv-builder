@@ -1,16 +1,16 @@
 import {
   Document,
-  Page,
-  Text,
-  View,
   Image,
   Link,
+  Page,
   pdf,
+  Text,
+  View,
 } from "@react-pdf/renderer";
-import { makeHref, shortenWebsite, shortenLinkedIn } from "../utils/urlUtils.js";
 import { saveAs } from "file-saver";
-import { getCVLocale, translateLevel } from "../utils/cvLocales.js";
 import { useTranslation } from "react-i18next";
+import { getCVLocale, translateLevel } from "../utils/cvLocales.js";
+import { makeHref, shortenLinkedIn, shortenWebsite } from "../utils/urlUtils.js";
 
 // ─── Palette (matching CreativeDesigner HTML) ─────────────────────────────────
 const PALETTES = {
@@ -436,21 +436,21 @@ function CVDocumentDesigner({ data }) {
               <View style={{ marginBottom: 16 }}>
                 <ContentSectionHeader label={L.projects} p={p} fs={fs} />
                 {projItems.map((proj, i) => (
-                  <View key={i} style={{ marginBottom: 7, flexDirection: "row", alignItems: "flex-start" }} wrap={false}>
+                  <View key={i} style={{ marginBottom: 12, flexDirection: "row", alignItems: "flex-start" }} wrap={false}>
                     <Text style={{ color: p.accent, fontFamily: "Helvetica-Bold", fontSize: fs.body, marginRight: 6, flexShrink: 0 }}>-</Text>
                     <View style={{ flex: 1 }}>
                       {proj.title && (
                         <Text style={{ ...contentText, fontFamily: "Helvetica-Bold" }}>{proj.title}</Text>
                       )}
-                      {proj.url && (
-                        <Text style={{ fontSize: Math.max(6, fs.body - 2), color: p.accent }}>
-                          {proj.url}
-                        </Text>
-                      )}
                       {proj.description && (
-                        <View style={{ marginTop: 2 }}>
+                        <View style={{ marginTop: 1 }}>
                           {htmlToPdfBlocks(proj.description, contentText, p.accent, fs.body)}
                         </View>
+                      )}
+                      {proj.url && (
+                        <Text style={{ fontSize: Math.max(6, fs.body - 2), color: p.accent, marginTop: -2 }}>
+                          {proj.url}
+                        </Text>
                       )}
                     </View>
                   </View>

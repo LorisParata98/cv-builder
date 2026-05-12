@@ -1,23 +1,23 @@
 import {
   Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
   Image,
   Link,
+  Page,
   pdf,
+  StyleSheet,
+  Text,
+  View,
 } from "@react-pdf/renderer";
-import {
-  makeHref,
-  shortenWebsite,
-  shortenLinkedIn,
-} from "../utils/urlUtils.js";
 import { saveAs } from "file-saver";
 import { useTranslation } from "react-i18next";
-import { exportManagerPDF } from "./exportPDF_manager.jsx";
-import { exportDesignerPDF } from "./exportPDF_designer.jsx";
 import { getCVLocale, translateLevel } from "../utils/cvLocales.js";
+import {
+  makeHref,
+  shortenLinkedIn,
+  shortenWebsite,
+} from "../utils/urlUtils.js";
+import { exportDesignerPDF } from "./exportPDF_designer.jsx";
+import { exportManagerPDF } from "./exportPDF_manager.jsx";
 
 // ─── Colori default (TechDeveloper) ──────────────────────────────────────────
 const C_DEFAULT = {
@@ -252,6 +252,9 @@ function makeStyles(C, fs) {
     },
     listText: { flex: 1, fontSize: Math.max(8, b - 2), lineHeight: 1.6, color: C.body },
     listUrl: { flex: 1, fontSize: Math.max(7, b - 3.5), color: C.teal, marginTop: 1 },
+    projTitle: { fontFamily: "Courier-Bold", fontSize: Math.max(8, b - 2), lineHeight: 1.6, color: C.body },
+    projUrl: { fontSize: Math.max(7, b - 3.5), color: C.teal, marginTop: -2 },
+    projDesc: { fontSize: Math.max(8, b - 2), lineHeight: 1.65, color: C.body },
     langRow: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
     langItem: { fontSize: Math.max(8, b - 2), color: C.body },
     langLevel: { fontSize: Math.max(8, b - 2), color: C.bodyMuted },
@@ -378,6 +381,16 @@ function htmlToPdfBlocks(html, textStyle, s) {
   return blocks.length > 0 ? blocks : null;
 }
 
+function makeSectionHeader(icon, label, s) {
+  return (
+    <View style={s.sectionRow}>
+      <Text style={s.sectionIcon}>{icon}</Text>
+      <Text style={s.sectionLabel}>{label}</Text>
+      <View style={s.sectionLine} />
+    </View>
+  );
+}
+
 // ─── Documento PDF (TechDeveloper) ───────────────────────────────────────────
 function CVDocument({ data }) {
   const C  = resolveC(data.customPalettes?.tech);
@@ -397,16 +410,6 @@ function CVDocument({ data }) {
   } = data;
 
   const { t } = useTranslation();
-
-  function SectionHeader({ icon, label }) {
-    return (
-      <View style={s.sectionRow}>
-        <Text style={s.sectionIcon}>{icon}</Text>
-        <Text style={s.sectionLabel}>{label}</Text>
-        <View style={s.sectionLine} />
-      </View>
-    );
-  }
 
   const allAtsKeywords = skills
     .flatMap((cat) => cat.tags.flatMap((tag) => tag.atsKeywords || []))
@@ -486,10 +489,7 @@ function CVDocument({ data }) {
           {/* Profilo */}
           {personal.summary ? (
             <View style={s.section} wrap={false}>
-              <SectionHeader
-                icon={ICONS.profile}
-                label={L.profile}
-              />
+              {makeSectionHeader(ICONS.profile, L.profile, s)}
               {htmlToPdfBlocks(personal.summary, s.summary, s)}
             </View>
           ) : null}
@@ -497,10 +497,7 @@ function CVDocument({ data }) {
           {/* Competenze */}
           {skills.length > 0 && (
             <View style={s.section}>
-              <SectionHeader
-                icon={ICONS.skills}
-                label={L.skills}
-              />
+              {makeSectionHeader(ICONS.skills, L.skills, s)}
               {skills.map((cat, i) => (
                 <View key={i} style={s.skillRow} wrap={false}>
                   <Text style={s.skillCategory}>{cat.category}</Text>
@@ -527,10 +524,7 @@ function CVDocument({ data }) {
           {/* Esperienza */}
           {experience.length > 0 && (
             <View style={s.section}>
-              <SectionHeader
-                icon={ICONS.exp}
-                label={L.experience}
-              />
+              {makeSectionHeader(ICONS.exp, L.experience, s)}
               {experience.map((exp) => (
                 <View key={exp.id} style={s.expBlock} wrap={false}>
                   <View style={s.expHeader}>
@@ -558,10 +552,7 @@ function CVDocument({ data }) {
           {/* Formazione */}
           {education.length > 0 && (
             <View style={s.section}>
-              <SectionHeader
-                icon={ICONS.edu}
-                label={L.education}
-              />
+              {makeSectionHeader(ICONS.edu, L.education, s)}
               {education.map((edu) => (
                 <View key={edu.id} style={s.eduBlock} wrap={false}>
                   <View style={s.eduHeader}>
@@ -590,10 +581,7 @@ function CVDocument({ data }) {
           {/* Certificazioni */}
           {certifications.filter(Boolean).length > 0 && (
             <View style={s.section} wrap={false}>
-              <SectionHeader
-                icon={ICONS.certs}
-                label={L.certifications}
-              />
+              {makeSectionHeader(ICONS.certs, L.certifications, s)}
               {certifications.filter(Boolean).map((c, i) => (
                 <View key={i} style={s.listItem}>
                   <Text style={s.listDot}>{ICONS.bullet}</Text>
@@ -606,10 +594,7 @@ function CVDocument({ data }) {
           {/* Lingue */}
           {languages.length > 0 && (
             <View style={s.section} wrap={false}>
-              <SectionHeader
-                icon={ICONS.langs}
-                label={L.languages}
-              />
+              {makeSectionHeader(ICONS.langs, L.languages, s)}
               <View style={s.langRow}>
                 {languages.map((l, i) => (
                   <Text key={i} style={s.langItem}>
@@ -636,35 +621,35 @@ function CVDocument({ data }) {
             if (items.length === 0) return null;
             return (
               <View style={s.section}>
-                <SectionHeader icon={ICONS.projects} label={L.projects} />
+                {makeSectionHeader(ICONS.projects, L.projects, s)}
                 {items.map((proj, i) => (
-                  <View key={i} style={s.listItem} wrap={false}>
+                  <View key={i} style={[s.listItem, { marginBottom: 10 }]} wrap={false}>
                     <Text style={s.listDot}>{ICONS.bullet}</Text>
                     <View style={{ flex: 1 }}>
                       {proj.title ? (
-                        <Text style={[s.listText, { fontFamily: "Courier-Bold" }]}>{proj.title}</Text>
+                        <Text style={s.projTitle}>{proj.title}</Text>
                       ) : null}
-                      {proj.url ? <Text style={s.listUrl}>{proj.url}</Text> : null}
                       {proj.description ? (
-                        <View style={{ marginTop: 2 }}>
-                          {htmlToPdfBlocks(proj.description, s.bulletText, s)}
+                        <View style={{ marginTop: 1 }}>
+                          {htmlToPdfBlocks(proj.description, s.projDesc, s)}
                         </View>
                       ) : null}
+                      {proj.url ? <Text style={s.projUrl}>{proj.url}</Text> : null}
                     </View>
                   </View>
                 ))}
               </View>
             );
           })()}
-        </View>
 
-        {/* Note */}
-        {note ? (
-          <View style={s.section} wrap={false}>
-            <SectionHeader icon={ICONS.notes} label={L.notes} />
-            {htmlToPdfBlocks(note, s.summary, s)}
-          </View>
-        ) : null}
+          {/* Note */}
+          {note ? (
+            <View style={s.section} wrap={false}>
+              {makeSectionHeader(ICONS.notes, L.notes, s)}
+              {htmlToPdfBlocks(note, s.summary, s)}
+            </View>
+          ) : null}
+        </View>
 
         {/* ATS keywords invisibili */}
         {allAtsKeywords && <Text style={s.atsHidden}>{allAtsKeywords}</Text>}

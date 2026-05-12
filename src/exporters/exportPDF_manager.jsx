@@ -1,16 +1,16 @@
 import {
   Document,
-  Page,
-  Text,
-  View,
   Image,
   Link,
+  Page,
   pdf,
+  Text,
+  View,
 } from "@react-pdf/renderer";
-import { makeHref, shortenWebsite, shortenLinkedIn } from "../utils/urlUtils.js";
 import { saveAs } from "file-saver";
-import { getCVLocale, translateLevel } from "../utils/cvLocales.js";
 import { useTranslation } from "react-i18next";
+import { getCVLocale, translateLevel } from "../utils/cvLocales.js";
+import { makeHref, shortenLinkedIn, shortenWebsite } from "../utils/urlUtils.js";
 
 // ─── Palette default (ManagerialExec) ────────────────────────────────────────
 // accent  = sezione titoli, icone sidebar (default navy, customizzabile)
@@ -432,7 +432,7 @@ function CVDocumentManager({ data }) {
                       </Text>
                     )}
                     {proj.description && (
-                      <View style={{ marginTop: 2 }}>
+                      <View style={{ marginTop: 1 }}>
                         {htmlToPdfBlocks(proj.description, bodyStyle, C.accent, fs.body)}
                       </View>
                     )}
