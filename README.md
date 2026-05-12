@@ -80,6 +80,28 @@ npm run build
 npm run preview   # test the build locally
 ```
 
+### DeepL translation in local development
+
+The translation feature calls `/api/translate`, a Vercel Serverless Function that proxies requests to the DeepL API.
+With `npm run dev` (Vite only) that route doesn't exist, so translation will fail.
+
+To run the API function locally, use the **Vercel CLI**:
+
+```bash
+npm install -g vercel
+
+# First run: link the project to a Vercel account (one-time)
+vercel link
+
+# Start both the Vite frontend and the /api functions on the same port
+vercel dev
+```
+
+App available at `http://localhost:3000`.
+
+You still need a [DeepL API key](https://www.deepl.com/pro-api) (the free tier works — keys end with `:fx`).
+Enter it in the **Language** panel inside the app sidebar.
+
 ### Deploy to Vercel
 
 The project includes a `vercel.json` configured with SPA routing and CSP headers.

@@ -59,14 +59,8 @@ export async function translateCV(cvData, targetLang, apiKey) {
 
   // Experience
   result.experience?.forEach((exp, ei) => {
-    add(exp.role, (v) => {
-      result.experience[ei].role = v;
-    });
-    exp.bullets?.forEach((b, bi) => {
-      add(b, (v) => {
-        result.experience[ei].bullets[bi] = v;
-      });
-    });
+    add(exp.role, (v) => { result.experience[ei].role = v; });
+    add(exp.description, (v) => { result.experience[ei].description = v; });
   });
 
   // Education
@@ -90,18 +84,24 @@ export async function translateCV(cvData, targetLang, apiKey) {
   });
 
   // Projects
-  result.projects?.forEach((p, pi) => {
-    add(p, (v) => {
-      result.projects[pi] = v;
-    });
+  result.projects?.forEach((proj, pi) => {
+    if (typeof proj === "string") {
+      add(proj, (v) => { result.projects[pi] = v; });
+    } else if (proj.text !== undefined) {
+      add(proj.text, (v) => { result.projects[pi].text = v; });
+    } else {
+      add(proj.title,       (v) => { result.projects[pi].title       = v; });
+      add(proj.description, (v) => { result.projects[pi].description = v; });
+    }
   });
 
   // Skill category names (optional — often already in the target language)
   result.skills?.forEach((cat, ci) => {
-    add(cat.category, (v) => {
-      result.skills[ci].category = v;
-    });
+    add(cat.category, (v) => { result.skills[ci].category = v; });
   });
+
+  // Note
+  add(result.note, (v) => { result.note = v; });
 
   if (strings.length === 0) return result;
 
