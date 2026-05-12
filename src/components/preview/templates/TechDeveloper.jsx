@@ -249,7 +249,7 @@ function SkillsSection({ skills, C, L, fs }) {
                   key={ti}
                   style={{
                     display: "inline-flex",
-                    alignItems: "center",
+                    alignItems: "baseline",
                     gap: "4px",
                     backgroundColor: C.tagBg,
                     border: `1px solid ${C.accent}`,
@@ -261,7 +261,7 @@ function SkillsSection({ skills, C, L, fs }) {
                     fontWeight: 500,
                   }}
                 >
-                  {tag.label}
+                  <span>{tag.label}</span>
                   {tag.versionsRange && (
                     <span
                       style={{
