@@ -104,7 +104,10 @@ const initialState = {
     ...((savedState || {}).customFontSizes || {}),
   },
   targetLanguage: (savedState || {}).targetLanguage || "IT",
-  uiLanguage: (savedState || {}).uiLanguage || "IT",
+  uiLanguage: (savedState || {}).uiLanguage || (() => {
+    const lang = (navigator.language || "en").split("-")[0].toUpperCase();
+    return ["IT", "EN", "DE", "ES"].includes(lang) ? lang : "EN";
+  })(),
   coverLetter: {
     ...DEFAULT_COVER_LETTER,
     ...((savedState || {}).coverLetter || {}),

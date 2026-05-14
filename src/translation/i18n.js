@@ -7,13 +7,20 @@ import cvEn from "../i18n/cv/en.json";
 import cvDe from "../i18n/cv/de.json";
 import cvEs from "../i18n/cv/es.json";
 
+const SUPPORTED_LANGS = ["it", "en", "de", "es"];
+
+const detectBrowserLang = () => {
+  const lang = (navigator.language || "en").split("-")[0].toLowerCase();
+  return SUPPORTED_LANGS.includes(lang) ? lang : "en";
+};
+
 const getInitialLang = () => {
   try {
     const raw = localStorage.getItem("cv-builder:state");
     const lang = raw ? JSON.parse(raw)?.uiLanguage : null;
-    return (lang || "IT").toLowerCase();
+    return lang ? lang.toLowerCase() : detectBrowserLang();
   } catch {
-    return "it";
+    return detectBrowserLang();
   }
 };
 
@@ -22,7 +29,7 @@ i18n
   .use(initReactI18next)
   .init({
     lng: getInitialLang(),
-    fallbackLng: "it",
+    fallbackLng: "en",
     preload: ["it", "en"],
     returnObjects: true,
     joinArrays: false,
