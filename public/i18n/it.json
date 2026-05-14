@@ -59,7 +59,9 @@
       "addSkill": "+ Aggiungi skill",
       "addCategory": "+ Aggiungi categoria",
       "editSkill": "Modifica skill",
-      "hasAts": "Ha keyword ATS"
+      "hasAts": "Ha keyword ATS",
+      "removeKeyword": "Rimuovi keyword",
+      "removeCategory": "Rimuovi categoria"
     },
     "experience": {
       "title": "Esperienza",

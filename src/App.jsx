@@ -5,11 +5,8 @@ import { Toolbar } from "./components/ui/Toolbar";
 import { EditorPanel } from "./components/editor/EditorPanel";
 import { CVPreview } from "./components/preview/CVPreview";
 import { CoverLetterPreview } from "./components/preview/CoverLetterPreview";
+import { ErrorBoundary } from "./components/ui/ErrorBoundary";
 import { useCVStore } from "./store/useCVStore";
-import { exportPDF } from "./exporters/exportPDF";
-import { exportDOCX } from "./exporters/exportDOCX";
-import { exportCoverLetterPDF } from "./exporters/exportCoverLetterPDF";
-import { exportCoverLetterDOCX } from "./exporters/exportCoverLetterDOCX";
 import { translateCV } from "./services/translateCV";
 
 function Toast({ message, type, onDismiss }) {
@@ -330,6 +327,7 @@ function useExportHandlers(setExporting, showToast) {
   const handleExportPDF = async () => {
     setExporting("pdf");
     try {
+      const { exportPDF } = await import("./exporters/exportPDF");
       await exportPDF(getStoreData());
       showToast("PDF esportato!", "success");
     } catch (e) {
@@ -343,6 +341,7 @@ function useExportHandlers(setExporting, showToast) {
   const handleExportDOCX = async () => {
     setExporting("docx");
     try {
+      const { exportDOCX } = await import("./exporters/exportDOCX");
       await exportDOCX(getStoreData());
       showToast("DOCX esportato!", "success");
     } catch (e) {
@@ -356,6 +355,7 @@ function useExportHandlers(setExporting, showToast) {
   const handleExportCoverLetterPDF = async () => {
     setExporting("cl-pdf");
     try {
+      const { exportCoverLetterPDF } = await import("./exporters/exportCoverLetterPDF");
       await exportCoverLetterPDF(getStoreData());
       showToast("Cover Letter PDF esportata!", "success");
     } catch (e) {
@@ -369,6 +369,7 @@ function useExportHandlers(setExporting, showToast) {
   const handleExportCoverLetterDOCX = async () => {
     setExporting("cl-docx");
     try {
+      const { exportCoverLetterDOCX } = await import("./exporters/exportCoverLetterDOCX");
       await exportCoverLetterDOCX(getStoreData());
       showToast("Cover Letter DOCX esportata!", "success");
     } catch (e) {
@@ -535,9 +536,13 @@ export default function App() {
             </div>
             <EditorResizeHandle onDrag={handleEditorDrag} />
             {activeSection === "coverLetter" ? (
-              <CoverLetterPreview />
+              <ErrorBoundary key="cl">
+                <CoverLetterPreview />
+              </ErrorBoundary>
             ) : (
-              <CVPreview />
+              <ErrorBoundary key="cv">
+                <CVPreview />
+              </ErrorBoundary>
             )}
           </div>
         </div>

@@ -141,6 +141,7 @@ function TagEditor({ tag, isEditing, onStartEdit, onStopEdit, onUpdate, onRemove
         <button
           onClick={(e) => { e.stopPropagation(); onRemove(); }}
           className="text-gray-300 group-hover:text-gray-400 hover:!text-red-400 ml-0.5 leading-none text-xs flex-shrink-0"
+          aria-label={t("editor.skills.removeSkill")}
         >
           ×
         </button>
@@ -222,6 +223,7 @@ function TagEditor({ tag, isEditing, onStartEdit, onStopEdit, onUpdate, onRemove
                 <button
                   onClick={() => onUpdate({ atsKeywords: (tag.atsKeywords || []).filter((_, i) => i !== ki) })}
                   className="text-gray-400 hover:text-red-500 leading-none"
+                  aria-label={t("editor.skills.removeKeyword")}
                 >
                   ×
                 </button>
@@ -300,7 +302,7 @@ function CategoryEditor({ category, index, isDragOver, dragHandleProps, onUpdate
         >
           {open ? "▲" : "▼"}
         </button>
-        <button onClick={() => onRemoveCategory(index)} className="text-xs text-red-400 hover:text-red-600 flex-shrink-0">✕</button>
+        <button onClick={() => onRemoveCategory(index)} className="text-xs text-red-400 hover:text-red-600 flex-shrink-0" aria-label={t("editor.skills.removeCategory")}>✕</button>
       </div>
 
       {/* Body */}
