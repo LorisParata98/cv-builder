@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Desktop } from "@phosphor-icons/react";
 import { Sidebar } from "./components/ui/Sidebar";
 import { Toolbar } from "./components/ui/Toolbar";
@@ -46,6 +47,7 @@ function Toast({ message, type, onDismiss }) {
 }
 
 function MobileWarning() {
+  const { t } = useTranslation();
   const [dismissed, setDismissed] = useState(false);
   const [narrow, setNarrow] = useState(
     typeof window !== "undefined" && window.innerWidth < 1024,
@@ -102,7 +104,7 @@ function MobileWarning() {
             lineHeight: 1.3,
           }}
         >
-          Schermo troppo piccolo
+          {t("mobileWarning.title")}
         </h2>
         <p
           style={{
@@ -112,8 +114,7 @@ function MobileWarning() {
             marginBottom: "28px",
           }}
         >
-          Per un layout accurato e una generazione PDF ottimale, si raccomanda
-          l'uso da Desktop.
+          {t("mobileWarning.body")}
         </p>
         <button
           onClick={() => setDismissed(true)}
@@ -129,7 +130,7 @@ function MobileWarning() {
             width: "100%",
           }}
         >
-          Continua comunque
+          {t("mobileWarning.dismiss")}
         </button>
       </div>
     </div>

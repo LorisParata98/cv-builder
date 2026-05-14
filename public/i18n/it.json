@@ -146,6 +146,16 @@
     }
   },
 
+  "mobileWarning": {
+    "title": "Schermo troppo piccolo",
+    "body": "Per un layout accurato e una generazione PDF ottimale, si raccomanda l'uso da Desktop.",
+    "dismiss": "Continua comunque"
+  },
+
+  "toolbar": {
+    "exportCoverLetter": "Esporta Cover Letter:"
+  },
+
   "sidebar": {
     "palette": {
       "title": "Personalizza Palette",

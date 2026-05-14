@@ -129,6 +129,12 @@
     }
   },
 
+  "mobileWarning": {
+    "title": "Screen too small",
+    "body": "For accurate layout and optimal PDF generation, desktop use is recommended.",
+    "dismiss": "Continue anyway"
+  },
+
   "nav": {
     "subtitle": "Build your professional CV",
     "cvGroup": "CV",
@@ -144,6 +150,10 @@
       "note": "Notes",
       "coverLetter": "Cover Letter"
     }
+  },
+
+  "toolbar": {
+    "exportCoverLetter": "Export Cover Letter:"
   },
 
   "sidebar": {
