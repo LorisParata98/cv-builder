@@ -116,6 +116,7 @@ export function generateCoverLetterPrompt(cvData, cl, lang = "IT") {
     lines.push('- DO NOT use: "I consider myself ideal", "great passion for", "dynamic", "proactive", "I am the right candidate"');
     lines.push("- Fluid prose only — no header, no bullet points, no section titles");
     lines.push("- Do not include date, sender/recipient address — only the letter body");
+    lines.push("- Do NOT include closing greetings (e.g. 'Kind regards', 'Sincerely') — they are added separately");
   } else {
     lines.push(`Scrivi una cover letter professionale in italiano con tono ${toneLabel}.`);
     lines.push("");
@@ -169,6 +170,7 @@ export function generateCoverLetterPrompt(cvData, cl, lang = "IT") {
     lines.push('- NON usare: "mi ritengo ideale", "grande passione per", "dinamico", "proattivo", "sono un candidato"');
     lines.push("- Solo prosa fluida — niente intestazione, niente elenchi puntati, niente titoli di sezione");
     lines.push("- Non includere data, indirizzo mittente/destinatario — solo il corpo della lettera");
+    lines.push("- NON includere i saluti finali (es. 'Cordiali saluti', 'Distinti saluti') — vengono aggiunti separatamente");
   }
 
   return lines.join("\n");
@@ -283,6 +285,7 @@ export function generateSpontaneousPrompt(cvData, cl, lang = "IT") {
     lines.push("- The letter must feel tailored to this company, not generic");
     lines.push("- Fluid prose only — no bullet points, no section titles");
     lines.push("- Do not include date, address — only the letter body");
+    lines.push("- Do NOT include closing greetings (e.g. 'Kind regards', 'Sincerely') — they are added separately");
   } else {
     lines.push(`Scrivi una lettera di candidatura spontanea in italiano con tono ${toneLabel}.`);
     lines.push("Non c'è un'offerta di lavoro specifica: il candidato si propone proattivamente.");
@@ -332,6 +335,7 @@ export function generateSpontaneousPrompt(cvData, cl, lang = "IT") {
     lines.push("- La lettera deve sembrare scritta su misura per questa azienda, non generica");
     lines.push("- Solo prosa fluida — niente elenchi puntati, niente titoli di sezione");
     lines.push("- Non includere data, indirizzo — solo il corpo della lettera");
+    lines.push("- NON includere i saluti finali (es. 'Cordiali saluti', 'Distinti saluti') — vengono aggiunti separatamente");
   }
 
   return lines.join("\n");
